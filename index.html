@@ -84,16 +84,11 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 
 /* ── 공통 타임블록 ── */
 .tblock{border-radius:14px;overflow:hidden;border:1px solid var(--brd);background:var(--card)}
-.thd{display:flex;align-items:center;gap:7px;padding:11px 14px;background:var(--surf);border-bottom:1px solid var(--brd);cursor:pointer;user-select:none}
-.thd:active{background:var(--brd)}
+.thd{display:flex;align-items:center;gap:7px;padding:11px 14px;background:var(--surf);border-bottom:1px solid var(--brd)}
 .tbadge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px}
 .trange{font-size:11px;color:var(--mu)}
 .tcnt{margin-left:auto;font-size:11px;color:var(--mu)}
-.toggle-icon{font-size:11px;color:var(--mu);transition:transform .25s}
-.toggle-icon.open{transform:rotate(180deg)}
-.tblock-body{overflow:hidden;transition:max-height .3s ease}
-.tblock-body.collapsed{max-height:0}
-.tblock-body.expanded{max-height:none}
+.tblock-body{display:block}
 .cls-hd{padding:5px 14px 2px;display:flex;align-items:center;gap:5px}
 .cls-dot{width:5px;height:5px;border-radius:50%}
 .cls-nm{font-size:10px;font-weight:700}
@@ -254,7 +249,7 @@ const S={"2026-07-01":{"1타임":{"입시반":[],"예비반":[],"중등반":[],"
 
 // ── 상태 ─────────────────────────────────────────────
 let DB='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
-let cur='',att={},drafts={},openT={},curTime=null,saveTimer=null,toastTimer=null,pollTimer=null;
+let cur='',att={},drafts={},curTime=null,saveTimer=null,toastTimer=null,pollTimer=null;
 let adminY=2026,adminM=7,adminTab=0,adminData={};
 
 function toKey(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
@@ -352,15 +347,26 @@ function buildPcCal(tk){
   const el=document.getElementById('pc-cal');if(el)el.innerHTML=h;
 }
 function buildClsTabs(){
-  const sc=S[cur];
-  // 활성 반 목록 (중복 제거)
-  const activeCls=sc?CLS.filter(c=>TIMES.some(ti=>(sc[ti][c]||[]).length>0)):[];
-  function tab(c,extra=''){
-    return `<button class="cls-tab" onclick="jumpToCls('${c}')"
-      style="background:${CC[c]}18;color:${CC[c]};border-color:${CC[c]}44;${extra}">${c}</button>`;
+  const sc=S[cur];if(!sc){
+    const ct=document.getElementById('cls-tabs');if(ct)ct.innerHTML='';
+    const pt=document.getElementById('pc-cls-tabs');if(pt)pt.innerHTML='';
+    buildTimeTabs();return;
   }
-  const ct=document.getElementById('cls-tabs');if(ct)ct.innerHTML=activeCls.map(c=>tab(c)).join('');
-  const pt=document.getElementById('pc-cls-tabs');if(pt)pt.innerHTML=activeCls.map(c=>tab(c,'width:100%;')).join('');
+  // 현재 보여주는 타임
+  const activeTimes=TIMES.filter(t=>CLS.some(c=>(sc[t][c]||[]).length>0));
+  const viewTime=isMob()&&activeTimes.length>1?curTime:null;
+
+  function tab(c,extra=''){
+    // 현재 타임에 해당 반 있는지 확인
+    const hasInView=viewTime?(sc[viewTime][c]||[]).length>0:TIMES.some(t=>(sc[t][c]||[]).length>0);
+    const dim=!hasInView;
+    return `<button class="cls-tab" onclick="${dim?'':("jumpToCls('"+c+"')")}"
+      style="background:${CC[c]}${dim?'0a':'18'};color:${CC[c]};border-color:${CC[c]}${dim?'22':'44'};opacity:${dim?'0.35':'1'};cursor:${dim?'default':'pointer'};${extra}">${c}</button>`;
+  }
+  // 전체 반 목록 표시 (있는 반만)
+  const allCls=CLS.filter(c=>TIMES.some(t=>(sc[t][c]||[]).length>0));
+  const ct=document.getElementById('cls-tabs');if(ct)ct.innerHTML=allCls.map(c=>tab(c)).join('');
+  const pt=document.getElementById('pc-cls-tabs');if(pt)pt.innerHTML=allCls.map(c=>tab(c,'width:100%;')).join('');
   buildTimeTabs();
 }
 function buildTimeTabs(){
@@ -378,21 +384,15 @@ function selectTime(ti){curTime=ti;render()}
 function jumpTo(ti,cls){
   const sc=S[cur];const activeTimes=sc?TIMES.filter(t=>CLS.some(c=>(sc[t][c]||[]).length>0)):[];
   if(isMob()&&activeTimes.length>1){curTime=ti;render();setTimeout(()=>scrollToCls(ti,cls),130);}
-  else{openTime(ti);setTimeout(()=>scrollToCls(ti,cls),130);}
+  else{setTimeout(()=>scrollToCls(ti,cls),130);}
 }
 function jumpToCls(cls){
-  // 해당 반이 있는 첫 번째 타임으로 이동
   const sc=S[cur];if(!sc)return;
-  const ti=TIMES.find(t=>(sc[t][cls]||[]).length>0);
-  if(!ti)return;
-  // 모바일 멀티타임: 해당 타임으로 전환
   const activeTimes=TIMES.filter(t=>CLS.some(c=>(sc[t][c]||[]).length>0));
-  if(isMob()&&activeTimes.length>1){curTime=ti;render();setTimeout(()=>scrollToCls(ti,cls),130);}
-  else{openTime(ti);setTimeout(()=>scrollToCls(ti,cls),130);}
-}
-function openTime(ti){
-  const body=document.getElementById('tbody_'+ti),icon=document.getElementById('icon_'+ti);
-  if(body&&body.classList.contains('collapsed')){body.className='tblock-body expanded';if(icon)icon.className='toggle-icon open';openT[ti]=true;}
+  // 현재 보여주는 타임에서 해당 반 위치로 스크롤
+  const ti=isMob()&&activeTimes.length>1?curTime:TIMES.find(t=>(sc[t][cls]||[]).length>0);
+  if(!ti)return;
+  scrollToCls(ti,cls);
 }
 function scrollToCls(ti,cls){
   const el=document.getElementById('cls_'+ti+'_'+cls);if(!el)return;
@@ -400,13 +400,6 @@ function scrollToCls(ti,cls){
   const off=sticky?sticky.offsetHeight+6:0;
   const top=el.getBoundingClientRect().top+window.scrollY-off;
   window.scrollTo({top,behavior:'smooth'});
-}
-function toggleTime(ti){
-  const body=document.getElementById('tbody_'+ti),icon=document.getElementById('icon_'+ti);
-  if(!body)return;const open=body.classList.contains('expanded');
-  body.className='tblock-body '+(open?'collapsed':'expanded');
-  if(icon)icon.className='toggle-icon '+(open?'':'open');
-  openT[ti]=!open;
 }
 
 // ── 렌더 ─────────────────────────────────────────────
@@ -430,15 +423,13 @@ function render(){
     const pc2=all.filter(({n})=>ent(ti,n).present).length;
     const ac=all.filter(({n})=>ent(ti,n).absent).length;
     const tc=TC[ti];
-    const isOpen=openT[ti]||false;
-    h+=`<div class="tblock">
-      <div class="thd" onclick="toggleTime('${ti}')">
+    h+=`<div class="tblock" id="tblock_${ti}">
+      <div class="thd">
         <span class="tbadge" style="background:${tc}22;color:${tc}">${ti}</span>
         <span class="trange">${TR[ti]}</span>
         <span class="tcnt">출<b style="color:var(--green);margin:0 2px">${pc2}</b>결<b style="color:var(--red);margin:0 2px">${ac}</b>/${all.length}명</span>
-        <span class="toggle-icon${isOpen?' open':''}">▼</span>
       </div>
-      <div class="tblock-body ${isOpen?'expanded':'collapsed'}" id="tbody_${ti}">`;
+      <div class="tblock-body" id="tbody_${ti}">`;
 
     CLS.forEach(c=>{
       const ns=sc[ti][c]||[];if(!ns.length)return;
@@ -485,6 +476,7 @@ function render(){
   });
   if(isPC)h+=`</div>`;
   setContent(h);
+  buildClsTabs();
 }
 function setContent(h){
   const ct=isMob()?'mob-ct':'pc-ct';
