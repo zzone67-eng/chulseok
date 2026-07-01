@@ -97,6 +97,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 .srow{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--brd);transition:background .15s}
 .chk{width:22px;height:22px;border-radius:7px;border:2px solid #404060;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;user-select:none}
 .chk.on{border-color:var(--green);background:var(--green)}
+.chk.red{border-color:var(--red);background:var(--red)}
 .sinfo{flex:1;min-width:0}
 .snm{font-size:14px;font-weight:500}
 .snm.x{color:#444;text-decoration:line-through}
@@ -489,7 +490,7 @@ function render(){
         const rid='ri_'+ti+'_'+name.replace(/[^가-힣a-z0-9]/gi,'');
         h+=`<div>
           <div class="srow" style="${e.absent?'background:#ff5c5c08':e.present?'background:#26de8108':''}">
-            <div class="chk${chk?' on':''}" onclick="tgP('${ti}','${name}')">${chk?'<span style="font-size:12px;color:#0f0f13;font-weight:800">✓</span>':''}</div>
+            <div class="chk${e.absent?'  red':chk?' on':''}" onclick="tgP('${ti}','${name}')">${chk?'<span style="font-size:12px;color:#0f0f13;font-weight:800">✓</span>':e.absent?'<span style="font-size:12px;color:#fff;font-weight:800">✕</span>':''}</div>
             <div class="sinfo"><div class="snm${e.absent?' x':''}">${name}</div><div class="ssc">${SCHOOL[name]||''}</div></div>
             <button class="abtn" onclick="tgA('${ti}','${name}')" style="background:${e.absent?'var(--red)':'#2a2a3a'};color:${e.absent?'#fff':'var(--mu)'}">${e.absent?'출석으로':'결석'}</button>
           </div>`;
