@@ -623,7 +623,7 @@ window.addEventListener('resize',()=>{
   buildNav();render();
 });
 
-DB=localStorage.getItem('db_url')||'';
+DB='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
 if(DB){launch();}else{document.getElementById('db-url').focus();}
 </script>
 </body>
