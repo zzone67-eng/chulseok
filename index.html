@@ -216,25 +216,24 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 <div id="admin">
   <div class="admin-hd">
     <div class="admin-row1">
-      <div style="flex:1;display:flex;align-items:baseline;gap:10px">
-        <div class="admin-title">관리자</div>
-        <div class="admin-sub" id="admin-month-label" style="font-size:20px;color:var(--txt);font-weight:600"></div>
-      </div>
+      <div class="admin-title" style="flex:1">관리자</div>
       <div class="admin-right">
-        <button class="btn-sm" onclick="loadAdminData()" style="width:36px;height:36px;padding:0;border-radius:50%;font-size:16px;justify-content:center">↻</button>
+        <button class="btn-sm" onclick="loadAdminData()" style="width:34px;height:34px;padding:0;border-radius:50%;font-size:16px;justify-content:center">↻</button>
         <button class="btn-sm" onclick="closeAdmin()">← 메인</button>
       </div>
     </div>
     <div class="admin-row2">
       <button class="mnbtn" onclick="changeMonth(-1)">‹</button>
-      <div class="live-dot"></div><span>실시간 공유</span>
-      <button class="mnbtn" onclick="changeMonth(1)" style="margin-left:auto">›</button>
+      <div id="admin-month-label" style="font-size:14px;font-weight:600;color:var(--txt);flex:1;text-align:center"></div>
+      <button class="mnbtn" onclick="changeMonth(1)">›</button>
+      <div class="live-dot" style="margin-left:10px"></div><span style="margin-left:4px">실시간 공유</span>
     </div>
   </div>
   <div class="admin-tabs">
     <div class="tab act" id="tab0" onclick="switchTab(0)">결석현황</div>
     <div class="tab" id="tab1" onclick="switchTab(1)">학생통계</div>
     <div class="tab" id="tab2" onclick="switchTab(2)">일별요약</div>
+    <div class="tab" id="tab3" onclick="switchTab(3)">결석집계</div>
   </div>
   <div class="admin-body" id="admin-ct"></div>
 </div>
@@ -508,7 +507,7 @@ function changeMonth(d){
   adminData={};loadAdminData();
 }
 function switchTab(i){
-  adminTab=i;['tab0','tab1','tab2'].forEach((id,j)=>document.getElementById(id).className='tab'+(j===i?' act':''));
+  adminTab=i;['tab0','tab1','tab2','tab3'].forEach((id,j)=>document.getElementById(id).className='tab'+(j===i?' act':''));
   renderAdmin();
 }
 async function loadAdminData(){
@@ -524,8 +523,116 @@ function renderAdmin(){
   const ym=`${adminY}-${String(adminM).padStart(2,'0')}`,days=new Date(adminY,adminM,0).getDate();
   if(adminTab===0)rAbsences(ym,days);
   else if(adminTab===1)rStats(ym,days);
-  else rDays(ym,days);
+  else if(adminTab===2)rDays(ym,days);
+  else rAbsCount();
 }
+function rAbsCount(){
+  // 날짜 범위 입력 UI + 집계 결과
+  const today=toKey(new Date());
+  const defStart=`${adminY}-${String(adminM).padStart(2,'0')}-01`;
+  const defEnd=`${adminY}-${String(adminM).padStart(2,'0')}-${String(new Date(adminY,adminM,0).getDate()).padStart(2,'0')}`;
+  if(!window._absFrom)window._absFrom=defStart;
+  if(!window._absTo)window._absTo=defEnd;
+
+  let h=`<div style="background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:14px;margin-bottom:12px">
+    <div style="font-size:13px;color:var(--mu);margin-bottom:10px">조회 기간 설정</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <input type="date" id="abs-from" value="${window._absFrom}"
+        style="flex:1;min-width:130px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;color:var(--txt);font-size:13px;padding:7px 10px;font-family:inherit;outline:none">
+      <span style="color:var(--mu);font-size:13px">~</span>
+      <input type="date" id="abs-to" value="${window._absTo}"
+        style="flex:1;min-width:130px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;color:var(--txt);font-size:13px;padding:7px 10px;font-family:inherit;outline:none">
+      <button onclick="applyAbsRange()" class="rbtn" style="height:34px;font-size:13px;padding:0 14px">조회</button>
+    </div>
+  </div>`;
+
+  // 기간 내 날짜 목록
+  const from=new Date(window._absFrom+'T12:00:00');
+  const to=new Date(window._absTo+'T12:00:00');
+  if(isNaN(from)||isNaN(to)||from>to){
+    document.getElementById('admin-ct').innerHTML=h+'<div class="empty">날짜를 확인해주세요</div>';return;
+  }
+
+  // 학생별 결석 집계
+  const counts={};
+  CLS.forEach(c=>SCHOOL&&Object.keys(SCHOOL).forEach(name=>{
+    if(!counts[name])counts[name]={cls:'',abs:0,dates:[]};
+  }));
+
+  // S 데이터에서 반 정보 가져오기
+  Object.entries(S).forEach(([dk,sc])=>{
+    if(!sc)return;
+    const d=new Date(dk+'T12:00:00');
+    if(d<from||d>to)return;
+    TIMES.forEach(ti=>CLS.forEach(cls=>(sc[ti][cls]||[]).forEach(name=>{
+      if(!counts[name])counts[name]={cls,abs:0,dates:[]};
+      counts[name].cls=cls;
+      const e=(adminData[dk]||{})[ti]?.[name];
+      if(e&&e.absent){
+        counts[name].abs++;
+        counts[name].dates.push(`${d.getMonth()+1}/${d.getDate()}(${DW[d.getDay()]})`);
+      }
+    })));
+  });
+
+  // 반별로 정렬해서 표시
+  const hasSomeData=Object.values(counts).some(v=>v.abs>0);
+  if(!hasSomeData){
+    document.getElementById('admin-ct').innerHTML=h+'<div class="empty">😊 해당 기간 결석 없음</div>';return;
+  }
+
+  CLS.forEach(cls=>{
+    const studs=Object.entries(counts).filter(([_,v])=>v.cls===cls&&v.abs>0)
+      .sort(([_,a],[__,b])=>b.abs-a.abs);
+    if(!studs.length)return;
+    h+=`<div class="acard"><div class="acard-hd">
+      <div style="width:8px;height:8px;border-radius:50%;background:${CC[cls]}"></div>
+      <span style="color:${CC[cls]}">${cls}</span>
+    </div>`;
+    studs.forEach(([name,v])=>{
+      const bar=Math.min(100,v.abs*20);
+      const bc=v.abs>=5?'var(--red)':v.abs>=3?'var(--t1)':'var(--acc)';
+      h+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--brd)">
+        <div style="min-width:60px">
+          <div style="font-size:14px;font-weight:500">${name}</div>
+          <div style="font-size:10px;color:var(--mu)">${SCHOOL[name]||''}</div>
+        </div>
+        <div style="flex:1">
+          <div style="height:6px;border-radius:3px;background:var(--brd);overflow:hidden;margin-bottom:3px">
+            <div style="width:${bar}%;height:100%;border-radius:3px;background:${bc};transition:width .4s"></div>
+          </div>
+          <div style="font-size:11px;color:var(--mu)">${v.dates.slice(0,5).join(', ')}${v.dates.length>5?` 외 ${v.dates.length-5}건`:''}</div>
+        </div>
+        <div style="font-size:18px;font-weight:700;color:${bc};min-width:30px;text-align:right">${v.abs}</div>
+      </div>`;
+    });
+    h+=`</div>`;
+  });
+
+  document.getElementById('admin-ct').innerHTML=h;
+}
+
+function applyAbsRange(){
+  const f=document.getElementById('abs-from');
+  const t=document.getElementById('abs-to');
+  if(f)window._absFrom=f.value;
+  if(t)window._absTo=t.value;
+
+  // 해당 기간 데이터 로드
+  const from=new Date((window._absFrom||'')+'T12:00:00');
+  const to=new Date((window._absTo||'')+'T12:00:00');
+  if(isNaN(from)||isNaN(to))return;
+
+  const promises=[];
+  for(let d=new Date(from);d<=to;d.setDate(d.getDate()+1)){
+    const dk=toKey(new Date(d));
+    if(!adminData[dk]){
+      promises.push(fbGet('att/'+dk).then(v=>{adminData[dk]=v||{}}).catch(()=>{adminData[dk]={}}));
+    }
+  }
+  Promise.all(promises).then(()=>rAbsCount());
+}
+
 function rAbsences(ym,days){
   const recs=[];
   for(let i=1;i<=days;i++){
@@ -542,7 +649,7 @@ function rAbsences(ym,days){
   CLS.forEach(cls=>{
     if(!byCls[cls])return;
     h+=`<div class="acard"><div class="acard-hd"><div style="width:8px;height:8px;border-radius:50%;background:${CC[cls]};flex-shrink:0"></div><span style="color:${CC[cls]}">${cls}</span><span style="margin-left:auto;font-size:11px;color:var(--mu)">${byCls[cls].length}건</span></div>`;
-    byCls[cls].forEach(r=>{h+=`<div class="abs-row"><div class="abs-date">${r.d.getMonth()+1}/${r.d.getDate()}(${DW[r.d.getDay()]})<br><span style="color:${TC[r.ti]};font-size:10px">${r.ti}</span></div><div><div class="abs-name">${r.name}</div>${r.reason?`<div class="abs-reason">📌 ${r.reason}</div>`:''}<div style="font-size:10px;color:var(--t1);margin-top:2px">${r.contact?'📞학부모 ':''} ${r.contact2?'📱학생':''}</div></div></div>`;});
+    byCls[cls].forEach(r=>{h+=`<div class="abs-row"><div class="abs-date">${r.d.getMonth()+1}/${r.d.getDate()}(${DW[r.d.getDay()]})<br><span style="color:${TC[r.ti]};font-size:10px">${r.ti}</span></div><div><div class="abs-name">${r.name}</div>${r.reason?`<div class="abs-reason">${r.reason}</div>`:''}<div style="font-size:10px;color:var(--t1);margin-top:2px">${r.contact?'📞학부모 ':''} ${r.contact2?'📱학생':''}</div></div></div>`;});
     h+=`</div>`;
   });
   h+=`<div style="text-align:center"><button class="csv-btn" onclick="dlCSV('${ym}')">⬇ CSV 다운로드</button></div>`;
