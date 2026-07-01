@@ -62,8 +62,9 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 .mob-content{padding:0 10px 40px;display:flex;flex-direction:column;gap:8px}
 
 /* ── PC ── */
-#main-pc{display:none;height:100vh;grid-template-columns:380px 1fr;grid-template-rows:calc(54px + env(safe-area-inset-top)) 1fr}
-.pc-topbar{grid-column:1/-1;background:var(--card);border-bottom:1px solid var(--brd);display:flex;align-items:flex-end;padding-top:max(14px,env(safe-area-inset-top));padding-bottom:10px;padding-left:max(20px,env(safe-area-inset-left));padding-right:20px;gap:14px;min-height:calc(54px + env(safe-area-inset-top))}
+#main-pc{display:none;height:100vh;grid-template-columns:380px 1fr;grid-template-rows:auto 1fr}
+.pc-topbar{grid-column:1/-1;background:var(--card);border-bottom:1px solid var(--brd);padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)}
+.pc-topbar-inner{display:flex;align-items:center;height:56px;padding:0 20px;gap:14px;width:100%}
 .pc-logo{font-size:14px;font-weight:700}
 .pc-date{font-size:20px;font-weight:700;letter-spacing:-.5px}
 .pc-right{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--mu)}
@@ -219,13 +220,14 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 <!-- PC 메인 -->
 <div id="main-pc">
   <div class="pc-topbar">
-    
-    <div><span class="pc-date" id="pc-dm"></span><span style="font-size:13px;color:var(--mu);margin-left:6px" id="pc-ds"></span></div>
-    <div class="pc-right">
-      <div class="live-dot"></div><span style="margin-left:5px">실시간 공유</span>
-      <span id="pc-stats"></span>
-      <button class="btn-sm" onclick="retrySync()" style="width:34px;height:34px;padding:0;border-radius:50%;font-size:15px;justify-content:center">↻</button>
-      <button class="btn-sm" onclick="openAdmin()">관리자</button>
+    <div class="pc-topbar-inner">
+      <div><span class="pc-date" id="pc-dm"></span><span style="font-size:13px;color:var(--mu);margin-left:6px" id="pc-ds"></span></div>
+      <div class="pc-right">
+        <div class="live-dot"></div><span style="margin-left:5px">실시간 공유</span>
+        <span id="pc-stats"></span>
+        <button class="btn-sm" onclick="retrySync()" style="width:34px;height:34px;padding:0;border-radius:50%;font-size:15px;justify-content:center">↻</button>
+        <button class="btn-sm" onclick="openAdmin()">관리자</button>
+      </div>
     </div>
   </div>
   <div class="pc-sidebar">
@@ -435,12 +437,12 @@ function jumpToCls(cls){
 function scrollToCls(ti,cls){
   const el=document.getElementById('cls_'+ti+'_'+cls);if(!el)return;
   const pc=document.querySelector('.pc-content');
-  if(pc){
-    // PC/태블릿 PC: pc-content 내부 스크롤
+  // isMob()=false(PC/태블릿PC)일 때만 pc-content 스크롤
+  if(!isMob()&&pc){
     const top=pc.scrollTop+(el.getBoundingClientRect().top-pc.getBoundingClientRect().top)-10;
     pc.scrollTo({top,behavior:'smooth'});
   } else {
-    // 모바일: window 스크롤
+    // 모바일/태블릿모바일: window 스크롤
     const sticky=document.querySelector('.mob-sticky');
     const off=sticky?sticky.offsetHeight+6:0;
     const top=el.getBoundingClientRect().top+window.scrollY-off;
