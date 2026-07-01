@@ -59,7 +59,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 .ri{flex:1;background:var(--surf);border:1px solid #3a3a5a;border-radius:10px;color:var(--txt);font-size:14px;padding:10px 12px;font-family:inherit;outline:none}
 .ri:focus{border-color:var(--acc)}
 .saved-r{display:flex;align-items:center;border-bottom:1px solid var(--brd)}
-.contact-row{display:flex;flex-direction:column;gap:10px;padding:10px 14px 12px 52px;border-bottom:1px solid var(--brd)}
+.contact-row{display:flex;flex-direction:row;gap:16px;flex-wrap:wrap;padding:10px 14px 12px 52px;border-bottom:1px solid var(--brd)}
 .contact-item{display:flex;align-items:center;gap:8px;cursor:pointer}
 .contact-chk{width:22px;height:22px;border-radius:7px;border:2px solid #404060;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
 .contact-chk.on{border-color:var(--t1);background:var(--t1)}
@@ -68,17 +68,19 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 
 /* ── 모바일 전용 스타일 ── */
 @media(max-width:767px){
-  /* 버튼 크기 모바일 강화 */
-  .abtn{font-size:14px!important;font-weight:700;padding:10px 16px!important;border-radius:10px;border:none;cursor:pointer;font-family:inherit;white-space:nowrap}
-  .rbtn{font-size:15px!important;font-weight:700;padding:11px 20px!important;border-radius:10px;background:var(--acc);color:#fff;border:none;cursor:pointer;font-family:inherit;flex-shrink:0}
-  .rtag{font-size:13px;padding:8px 14px;border-radius:20px;border:1px solid var(--brd);background:var(--surf);color:var(--mu);cursor:pointer}
+  /* 버튼 크기 통일 (모바일) */
+  .abtn{font-size:14px!important;font-weight:700;padding:0 16px!important;height:44px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;display:inline-flex;align-items:center}
+  .rbtn{font-size:14px!important;font-weight:700;padding:0 20px!important;height:44px;border-radius:10px;background:var(--acc);color:#fff;border:none;cursor:pointer;font-family:inherit;flex-shrink:0;display:inline-flex;align-items:center}
+  .rtag{font-size:13px;padding:0 14px;height:36px;border-radius:10px;border:1px solid var(--brd);background:var(--surf);color:var(--mu);cursor:pointer;display:inline-flex;align-items:center}
   .chk{width:26px;height:26px}
+  .btn-sm{font-size:13px;padding:0 12px;height:36px;border-radius:9px;display:inline-flex;align-items:center}
 
   #main-mobile{display:block}
   #main-pc{display:none}
 
   /* 모바일 헤더 */
-  .mob-header{position:sticky;top:0;background:var(--bg);z-index:20;padding:max(20px,env(safe-area-inset-top,20px)) 14px 0}
+  .mob-sticky{position:sticky;top:0;background:var(--bg);z-index:20}
+.mob-header{padding:max(20px,env(safe-area-inset-top,20px)) 14px 0}
   .mob-drow{display:flex;align-items:center;gap:8px;margin-bottom:4px}
   .mob-dmain{font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1}
   .mob-dsub{font-size:15px;color:var(--mu)}
@@ -101,9 +103,9 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 /* ── PC 전용 스타일 ── */
 @media(min-width:768px){
   body{overflow:hidden;height:100vh}
-  .abtn{font-size:13px;font-weight:700;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;white-space:nowrap}
-  .rbtn{font-size:14px;font-weight:700;padding:9px 18px;border-radius:9px;background:var(--acc);color:#fff;border:none;cursor:pointer;font-family:inherit;flex-shrink:0}
-  .rtag{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--brd);background:var(--surf);color:var(--mu);cursor:pointer;transition:all .15s}
+  .abtn{font-size:13px;font-weight:700;padding:0 14px;height:36px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;display:inline-flex;align-items:center}
+  .rbtn{font-size:13px;font-weight:700;padding:0 18px;height:36px;border-radius:9px;background:var(--acc);color:#fff;border:none;cursor:pointer;font-family:inherit;flex-shrink:0;display:inline-flex;align-items:center}
+  .rtag{font-size:12px;padding:0 12px;height:32px;border-radius:8px;border:1px solid var(--brd);background:var(--surf);color:var(--mu);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center}
   .rtag:hover{border-color:var(--acc);color:var(--txt)}
 
   #main-mobile{display:none}
@@ -144,20 +146,38 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 }
 
 /* ── 관리자 공통 ── */
-#admin{display:none}
-.admin-topbar{background:var(--card);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 16px;gap:12px;height:58px}
+
+
+/* ── 타임 접힘/펼침 ── */
+.tblock-body{overflow:hidden;transition:max-height .3s ease}
+.tblock-body.collapsed{max-height:0}
+.tblock-body.expanded{max-height:9999px}
+.thd{cursor:pointer;user-select:none}
+.thd:hover{background:var(--brd)}
+.toggle-icon{margin-left:6px;font-size:12px;color:var(--mu);transition:transform .3s;display:inline-block}
+.toggle-icon.open{transform:rotate(180deg)}
+
+/* ── 반별 바로가기 탭 ── */
+.cls-tabs{display:flex;gap:6px;padding:0 14px 10px;overflow-x:auto;scrollbar-width:none}
+.cls-tabs::-webkit-scrollbar{display:none}
+.cls-tab{flex-shrink:0;padding:0 14px;height:34px;border-radius:20px;border:1px solid var(--brd);background:var(--surf);color:var(--mu);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.cls-tab.active{color:#fff;border-color:transparent}
+.cls-tab:not(.active):hover{border-color:var(--acc)}
+@media(min-width:768px){.cls-tabs{padding:0 0 12px}}
+#admin{display:none;height:100dvh;overflow:hidden}
+.admin-topbar{background:var(--card);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:max(0px,env(safe-area-inset-top)) 16px 0;gap:12px;min-height:58px;padding-top:max(14px,env(safe-area-inset-top));flex-shrink:0}
 .admin-topbar h1{font-size:17px;font-weight:700}
 .month-nav{display:flex;align-items:center;margin-left:auto}
 .mnbtn{background:var(--surf);border:1px solid var(--brd);color:var(--txt);font-size:20px;width:36px;height:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .month-label{font-size:14px;font-weight:600;padding:0 14px;min-width:110px;text-align:center}
-.admin-tabs{display:flex;border-bottom:1px solid var(--brd);padding:0 16px;background:var(--card);position:sticky;top:58px;z-index:10}
+.admin-tabs{display:flex;border-bottom:1px solid var(--brd);padding:0 16px;background:var(--card);flex-shrink:0}
 .tab{flex:1;padding:13px 0;text-align:center;font-size:14px;font-weight:500;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent}
 .tab.act{color:var(--acc);border-bottom-color:var(--acc)}
-.admin-body{overflow-y:auto;padding:16px;max-height:calc(100dvh - 116px)}
+.admin-body{overflow-y:auto;padding:16px;flex:1}
 @media(min-width:768px){
-  .admin-wrap{height:100vh;display:flex;flex-direction:column}
-  .admin-body{flex:1;overflow-y:auto;padding:20px;max-height:unset}
-  .admin-tabs{top:58px}
+  .admin-wrap{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+  .admin-body{flex:1;overflow-y:auto;padding:20px}
+  
   .admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
 }
 .admin-grid{display:flex;flex-direction:column;gap:10px}
@@ -206,6 +226,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 
 <!-- ── 모바일 메인 ── -->
 <div id="main-mobile">
+  <div class="mob-sticky">
   <div class="mob-header">
     <div class="mob-drow">
       <div class="mob-dmain" id="mob-dm"></div>
@@ -220,6 +241,8 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
     </div>
   </div>
   <div class="mob-nav" id="mob-nav"></div>
+  <div class="cls-tabs" id="cls-tabs"></div>
+  </div><!-- /mob-sticky -->
   <div class="mob-content" id="mob-ct"></div>
 </div>
 
@@ -243,6 +266,10 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
       <div class="cal-hd">목</div><div class="cal-hd">금</div><div class="cal-hd">토</div>
     </div>
     <div class="cal-grid" id="pc-cal"></div>
+  <div style="margin-top:12px">
+    <h3 style="margin-bottom:8px">반별 바로가기</h3>
+    <div class="cls-tabs" id="pc-cls-tabs" style="flex-direction:column;padding:0;gap:4px"></div>
+  </div>
   </div>
   <div class="pc-content" id="pc-ct"></div>
 </div>
@@ -281,6 +308,16 @@ let DB='',cur='',att={},drafts={},saveT=null,toastT=null,pollT=null;
 let adminYear=2026,adminMonth=7,adminTab=0,adminData={};
 const isMobile=()=>window.innerWidth<768;
 
+let openTimes={};
+function toggleTime(ti){
+  const body=document.getElementById('tbody_'+ti);
+  const icon=document.getElementById('icon_'+ti);
+  if(!body)return;
+  const isOpen=body.classList.contains('expanded');
+  body.className='tblock-body '+(isOpen?'collapsed':'expanded');
+  if(icon)icon.className='toggle-icon '+(isOpen?'':'open');
+  openTimes[ti]=!isOpen;
+}
 function toKey(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 async function fbGet(p){const r=await fetch(`${DB}/${p}.json`);if(!r.ok)throw r.status;return r.json()}
 async function fbPatch(p,d){const r=await fetch(`${DB}/${p}.json`,{method:'PATCH',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}});if(!r.ok)throw r.status}
@@ -321,6 +358,7 @@ function go(dk){
 function setContent(h){
   if(isMobile())document.getElementById('mob-ct').innerHTML=h;
   else document.getElementById('pc-ct').innerHTML=h;
+  buildClsTabs();
 }
 function ent(ti,n){return att[cur]?.[ti]?.[n]||{present:false,absent:false,reason:'',contact:false,contact2:false}}
 function upd(ti,n,p){
@@ -359,6 +397,7 @@ function buildNav(){
   updateDateHeader();
   if(isMobile())buildMobNav(tk);
   else buildPcCal(tk);
+  buildClsTabs();
 }
 function updateDateHeader(){
   const d=new Date(cur+'T12:00:00');
@@ -369,6 +408,31 @@ function updateDateHeader(){
   if(pcDm){pcDm.textContent=dm;pcDs.textContent=ds;}
   const btnT=document.getElementById('mob-btn-today');
   if(btnT)btnT.style.display=cur!==toKey(new Date())?'inline-block':'none';
+}
+function buildClsTabs(){
+  const sc=S[cur];
+  const activeCls=sc?CLS.filter(c=>TIMES.some(ti=>(sc[ti][c]||[]).length>0)):[];
+  // 모바일 탭
+  const mobTabs=document.getElementById('cls-tabs');
+  if(mobTabs){
+    mobTabs.innerHTML=activeCls.map(c=>`
+      <button class="cls-tab" onclick="scrollToCls('${c}')" id="ctab_${c}"
+        style="background:${CC[c]}22;color:${CC[c]};border-color:${CC[c]}44">
+        <span style="width:7px;height:7px;border-radius:50%;background:${CC[c]};display:inline-block"></span>${c}
+      </button>`).join('');
+  }
+  // PC 탭
+  const pcTabs=document.getElementById('pc-cls-tabs');
+  if(pcTabs){
+    pcTabs.innerHTML=activeCls.map(c=>`
+      <button class="cls-tab" onclick="scrollToCls('${c}')" style="width:100%;justify-content:flex-start;border-radius:9px;background:${CC[c]}18;color:${CC[c]};border-color:${CC[c]}44">
+        <span style="width:7px;height:7px;border-radius:50%;background:${CC[c]};display:inline-block"></span>${c}
+      </button>`).join('');
+  }
+}
+function scrollToCls(cls){
+  const el=document.getElementById('cls_'+cls);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function buildMobNav(tk){
   let h='';
@@ -413,11 +477,11 @@ function render(){
     const pc2=all.filter(({n})=>ent(ti,n).present).length;
     const ac=all.filter(({n})=>ent(ti,n).absent).length;
     const tc=TC[ti];
-    h+=`<div class="tblock"><div class="thd"><span class="tbadge" style="background:${tc}22;color:${tc}">${ti}</span><span class="trange">${TR[ti]}</span><span class="tcnt">출<b style="color:var(--green);margin:0 2px">${pc2}</b>결<b style="color:var(--red);margin:0 2px">${ac}</b>/${all.length}</span></div>`;
+    h+=`<div class="tblock" id="tblock_${ti}"><div class="thd" onclick="toggleTime('${ti}')"><span class="tbadge" style="background:${tc}22;color:${tc}">${ti}</span><span class="trange">${TR[ti]}</span><span class="tcnt">출<b style="color:var(--green);margin:0 3px">${pc2}</b>결<b style="color:var(--red);margin:0 3px">${ac}</b>/${all.length}명</span><span class="toggle-icon" id="icon_${ti}">▼</span></div><div class="tblock-body collapsed" id="tbody_${ti}">`;
     CLS.forEach(c=>{
       const ns=sc[ti][c]||[];if(!ns.length)return;
       const pad=isPC?'52px':'52px';
-      h+=`<div><div class="cls-hd"><div class="cls-dot" style="background:${CC[c]}"></div><span class="cls-nm" style="color:${CC[c]}">${c}</span></div>`;
+      h+=`<div id="cls_${c}"><div class="cls-hd"><div class="cls-dot" style="background:${CC[c]}"></div><span class="cls-nm" style="color:${CC[c]}">${c}</span></div>`;
       ns.forEach(name=>{
         const e=ent(ti,name);const rk=`${ti}:${name}`;const hd=drafts[rk]!==undefined;
         const chk=e.present&&!e.absent;const rid=`ri_${ti}_${name.replace(/[^가-힣a-z0-9]/gi,'')}`;
@@ -457,10 +521,16 @@ function render(){
       });
       h+=`</div>`;
     });
-    h+=`</div>`;
+    h+=`</div></div>`;
   });
   if(isPC)h+=`</div>`;
   setContent(h);
+  // 이전 열림 상태 복원
+  TIMES.forEach(ti=>{
+    const body=document.getElementById('tbody_'+ti);
+    const icon=document.getElementById('icon_'+ti);
+    if(body&&openTimes[ti]){body.className='tblock-body expanded';if(icon)icon.className='toggle-icon open';}
+  });
 }
 
 // ── 관리자 ────────────────────────────────────────────
