@@ -37,6 +37,11 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 
 /* 타임 블록 공통 */
 .tblock{border-radius:14px;overflow:hidden;border:1px solid var(--brd);background:var(--card)}
+/* ── 타임 컬럼 병렬 레이아웃 ── */
+.time-cols{display:flex;flex-direction:row;gap:8px;overflow-x:auto;scrollbar-width:none;align-items:flex-start}
+.time-cols::-webkit-scrollbar{display:none}
+.time-col{flex:1;min-width:min(260px,80vw)}
+
 .thd{display:flex;align-items:center;gap:8px;padding:12px 14px;background:var(--surf);border-bottom:1px solid var(--brd)}
 .tbadge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
 .trange{font-size:12px;color:var(--mu)}
@@ -80,11 +85,14 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 
   /* 모바일 헤더 */
   .mob-sticky{position:sticky;top:0;background:var(--bg);z-index:20}
-.mob-header{padding:max(20px,env(safe-area-inset-top,20px)) 14px 0}
-  .mob-drow{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-  .mob-dmain{font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1}
-  .mob-dsub{font-size:15px;color:var(--mu)}
-  .mob-statbar{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--mu);padding-bottom:12px;border-bottom:1px solid var(--brd);margin-bottom:12px}
+.mob-header{padding:max(22px,env(safe-area-inset-top,22px)) 16px 0}
+  .mob-drow{display:flex;align-items:center;gap:0;margin-bottom:6px}
+  .mob-date-left{display:flex;align-items:baseline;gap:8px;flex:1}
+  .mob-btns-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .mob-dmain{font-size:32px;font-weight:700;letter-spacing:-.8px;line-height:1}
+  .mob-dsub{font-size:18px;color:var(--mu);font-weight:400}
+  .mob-statbar{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--mu);padding-bottom:14px;border-bottom:1px solid var(--brd);margin-bottom:14px}
+  .mob-statbar b{font-size:15px}
   .mob-nav{display:flex;gap:4px;overflow-x:auto;padding:0 14px 12px;scrollbar-width:none}
   .mob-nav::-webkit-scrollbar{display:none}
   .nb{flex-shrink:0;width:38px;height:50px;border-radius:10px;border:1px solid var(--brd);background:var(--surf);color:var(--mu);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:inherit;gap:1px}
@@ -92,7 +100,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
   .nb.off{color:#2a2a40;border-color:#1e1e2e}
   .nb .nn{font-size:14px;font-weight:600}
   .nb .nw{font-size:10px}
-  .mob-content{padding:0 10px 40px;display:flex;flex-direction:column;gap:10px}
+  .mob-content{padding:0 10px 40px}
   .btn-sm{font-size:12px;padding:5px 12px;border-radius:8px;border:1px solid var(--brd);background:transparent;color:var(--mu);cursor:pointer;font-family:inherit}
 
   /* saved-r 모바일 */
@@ -151,7 +159,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 /* ── 타임 접힘/펼침 ── */
 .tblock-body{overflow:hidden;transition:max-height .3s ease}
 .tblock-body.collapsed{max-height:0}
-.tblock-body.expanded{max-height:9999px}
+.tblock-body.expanded{max-height:none}
 .thd{cursor:pointer;user-select:none}
 .thd:hover{background:var(--brd)}
 .toggle-icon{margin-left:6px;font-size:12px;color:var(--mu);transition:transform .3s;display:inline-block}
@@ -160,17 +168,24 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 /* ── 반별 바로가기 탭 ── */
 .cls-tabs{display:flex;gap:6px;padding:0 14px 10px;overflow-x:auto;scrollbar-width:none}
 .cls-tabs::-webkit-scrollbar{display:none}
-.cls-tab{flex-shrink:0;padding:0 14px;height:34px;border-radius:20px;border:1px solid var(--brd);background:var(--surf);color:var(--mu);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.cls-tab{flex-shrink:0;padding:0 10px;height:36px;border-radius:10px;border:1px solid var(--brd);background:var(--surf);color:var(--mu);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
 .cls-tab.active{color:#fff;border-color:transparent}
 .cls-tab:not(.active):hover{border-color:var(--acc)}
 @media(min-width:768px){.cls-tabs{padding:0 0 12px}}
 #admin{display:none;height:100dvh;overflow:hidden}
-.admin-topbar{background:var(--card);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:max(0px,env(safe-area-inset-top)) 16px 0;gap:12px;min-height:58px;padding-top:max(14px,env(safe-area-inset-top));flex-shrink:0}
+.admin-topbar{background:var(--bg);border-bottom:1px solid var(--brd);padding:max(22px,env(safe-area-inset-top,22px)) 16px 0;flex-shrink:0}
+.admin-topbar-row1{display:flex;align-items:center;gap:0;margin-bottom:6px}
+.admin-title-left{flex:1;display:flex;align-items:baseline;gap:8px}
+.admin-title-main{font-size:32px;font-weight:700;letter-spacing:-.8px;line-height:1}
+.admin-title-sub{font-size:18px;color:var(--mu);font-weight:400}
+.admin-btns-right{display:flex;align-items:center;gap:8px}
+.admin-topbar-row2{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--mu);padding-bottom:14px;border-bottom:1px solid var(--brd);margin-bottom:0}
 .admin-topbar h1{font-size:17px;font-weight:700}
 .month-nav{display:flex;align-items:center;margin-left:auto}
-.mnbtn{background:var(--surf);border:1px solid var(--brd);color:var(--txt);font-size:20px;width:36px;height:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mnbtn{background:var(--surf);border:1px solid var(--brd);color:var(--txt);font-size:20px;width:36px;height:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit}
+.mnbtn:hover{border-color:var(--acc);color:var(--acc)}
 .month-label{font-size:14px;font-weight:600;padding:0 14px;min-width:110px;text-align:center}
-.admin-tabs{display:flex;border-bottom:1px solid var(--brd);padding:0 16px;background:var(--card);flex-shrink:0}
+.admin-tabs{display:flex;border-bottom:1px solid var(--brd);padding:0 16px;background:var(--card);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 .tab{flex:1;padding:13px 0;text-align:center;font-size:14px;font-weight:500;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent}
 .tab.act{color:var(--acc);border-bottom-color:var(--acc)}
 .admin-body{overflow-y:auto;padding:16px;flex:1}
@@ -229,11 +244,16 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
   <div class="mob-sticky">
   <div class="mob-header">
     <div class="mob-drow">
-      <div class="mob-dmain" id="mob-dm"></div>
-      <div class="mob-dsub" id="mob-ds"></div>
-      <button class="btn-sm" id="mob-btn-today" style="display:none;margin-left:4px" onclick="go(toKey(new Date()))">오늘</button>
-      <span id="sync-err" onclick="retrySync()" style="margin-left:auto">⚠ 재시도</span>
-      <button class="btn-sm" style="margin-left:6px" onclick="openAdmin()">관리자</button>
+      <div class="mob-date-left">
+        <div class="mob-dmain" id="mob-dm"></div>
+        <div class="mob-dsub" id="mob-ds"></div>
+      </div>
+      <div class="mob-btns-right">
+        <button class="btn-sm" onclick="retrySync()" title="새로고침"
+          style="font-size:16px;padding:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center">↻</button>
+        <button class="btn-sm" id="mob-btn-today" style="display:none" onclick="go(toKey(new Date()))">오늘</button>
+        <button class="btn-sm" onclick="openAdmin()">관리자</button>
+      </div>
     </div>
     <div class="mob-statbar">
       <div class="live-dot"></div><span style="margin-left:5px">실시간 공유</span>
@@ -254,7 +274,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
     <div class="pc-stats">
       <span><div class="live-dot" style="margin-right:5px"></div>실시간 공유</span>
       <span id="pc-stats"></span>
-      <span id="pc-sync-err" style="display:none;font-size:12px;padding:5px 12px;border-radius:8px;background:var(--red);color:#fff;cursor:pointer" onclick="retrySync()">⚠ 재시도</span>
+      <button class="btn-sm" onclick="retrySync()" title="새로고침" style="font-size:16px;padding:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center">↻</button>
       <button class="btn-sm" onclick="openAdmin()">관리자 페이지</button>
     </div>
   </div>
@@ -278,14 +298,27 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 <div id="admin">
   <div class="admin-wrap">
     <div class="admin-topbar">
-      <button class="btn-sm" onclick="closeAdmin()">← 메인</button>
-      <h1>관리자</h1>
-      <div class="month-nav">
-        <button class="mnbtn" onclick="changeMonth(-1)">‹</button>
-        <span class="month-label" id="admin-month-label"></span>
-        <button class="mnbtn" onclick="changeMonth(1)">›</button>
+      <!-- 1행: 타이틀 + 버튼 -->
+      <div class="admin-topbar-row1">
+        <div class="admin-title-left">
+          <div class="admin-title-main">관리자</div>
+          <div class="admin-title-sub" id="admin-month-label"></div>
+        </div>
+        <div class="admin-btns-right">
+          <button class="btn-sm" onclick="loadAdminData()" title="새로고침"
+            style="font-size:16px;padding:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center">
+            ↻
+          </button>
+          <button class="btn-sm" onclick="closeAdmin()">← 메인</button>
+        </div>
       </div>
-      <span id="sync-err-admin" style="display:none;font-size:12px;padding:5px 12px;border-radius:8px;background:var(--red);color:#fff;cursor:pointer;margin-left:8px" onclick="loadAdminData()">⚠ 재시도</span>
+      <!-- 2행: 월 네비 + 라이브 -->
+      <div class="admin-topbar-row2">
+        <button class="mnbtn" onclick="changeMonth(-1)" style="width:30px;height:30px;font-size:18px">‹</button>
+        <div class="live-dot"></div>
+        <span>실시간 공유</span>
+        <button class="mnbtn" onclick="changeMonth(1)" style="width:30px;height:30px;font-size:18px;margin-left:auto">›</button>
+      </div>
     </div>
     <div class="admin-tabs">
       <div class="tab act" id="tab0" onclick="switchTab(0)">결석현황</div>
@@ -331,8 +364,8 @@ function toast(m,c='var(--green)'){
   const el=document.getElementById('toast');el.textContent=m;el.style.background=c;el.style.opacity='1';
   if(toastT)clearTimeout(toastT);toastT=setTimeout(()=>el.style.opacity='0',2000);
 }
-function syncOk(){document.getElementById('sync-err').style.display='none';const e=document.getElementById('pc-sync-err');if(e)e.style.display='none';}
-function syncFail(){document.getElementById('sync-err').style.display='inline-block';const e=document.getElementById('pc-sync-err');if(e)e.style.display='inline-block';}
+function syncOk(){}
+function syncFail(){toast('Firebase 연결 실패 — GitHub Pages URL로 열어주세요','var(--red)');}
 function retrySync(){load(cur)}
 
 function launch(){
@@ -356,7 +389,7 @@ function go(dk){
   else render();
 }
 function setContent(h){
-  if(isMobile())document.getElementById('mob-ct').innerHTML=h;
+  if(isMobile()) document.getElementById('mob-ct').innerHTML=h;
   else document.getElementById('pc-ct').innerHTML=h;
   buildClsTabs();
 }
@@ -411,28 +444,55 @@ function updateDateHeader(){
 }
 function buildClsTabs(){
   const sc=S[cur];
-  const activeCls=sc?CLS.filter(c=>TIMES.some(ti=>(sc[ti][c]||[]).length>0)):[];
-  // 모바일 탭
-  const mobTabs=document.getElementById('cls-tabs');
-  if(mobTabs){
-    mobTabs.innerHTML=activeCls.map(c=>`
-      <button class="cls-tab" onclick="scrollToCls('${c}')" id="ctab_${c}"
-        style="background:${CC[c]}22;color:${CC[c]};border-color:${CC[c]}44">
-        <span style="width:7px;height:7px;border-radius:50%;background:${CC[c]};display:inline-block"></span>${c}
-      </button>`).join('');
-  }
-  // PC 탭
+  const clsTabs=document.getElementById('cls-tabs');
   const pcTabs=document.getElementById('pc-cls-tabs');
-  if(pcTabs){
-    pcTabs.innerHTML=activeCls.map(c=>`
-      <button class="cls-tab" onclick="scrollToCls('${c}')" style="width:100%;justify-content:flex-start;border-radius:9px;background:${CC[c]}18;color:${CC[c]};border-color:${CC[c]}44">
-        <span style="width:7px;height:7px;border-radius:50%;background:${CC[c]};display:inline-block"></span>${c}
-      </button>`).join('');
+  if(!sc){
+    if(clsTabs)clsTabs.innerHTML='';
+    if(pcTabs)pcTabs.innerHTML='';
+    return;
   }
+
+  // 타임+반 조합으로 각각 탭 생성
+  const items=[];
+  TIMES.forEach(ti=>{
+    CLS.forEach(c=>{
+      if((sc[ti][c]||[]).length>0) items.push({ti,c});
+    });
+  });
+
+  // 타임 색상
+  const tiColor={'1타임':'#ff9f43','2타임':'#5cc8ff','3타임':'#a29bfe'};
+
+  function makeTab(ti,c,extra=''){
+    return `<button class="cls-tab" onclick="scrollToTiCls('${ti}','${c}')"
+      style="background:${CC[c]}18;color:${CC[c]};border-color:${CC[c]}33;${extra}">
+      <span style="background:${tiColor[ti]};color:#0f0f13;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;flex-shrink:0">${ti}</span>
+      <span>${c}</span>
+    </button>`;
+  }
+
+  if(clsTabs) clsTabs.innerHTML=items.map(({ti,c})=>makeTab(ti,c)).join('');
+  if(pcTabs)  pcTabs.innerHTML=items.map(({ti,c})=>makeTab(ti,c,'width:100%;justify-content:flex-start;border-radius:9px;')).join('');
 }
-function scrollToCls(cls){
-  const el=document.getElementById('cls_'+cls);
-  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+
+function scrollToTiCls(ti,cls){
+  // 해당 타임 열기
+  const body=document.getElementById('tbody_'+ti);
+  const icon=document.getElementById('icon_'+ti);
+  if(body&&body.classList.contains('collapsed')){
+    body.className='tblock-body expanded';
+    if(icon)icon.className='toggle-icon open';
+    openTimes[ti]=true;
+  }
+  // 스티키 헤더 오프셋 보정 스크롤
+  setTimeout(()=>{
+    const el=document.getElementById('cls_'+ti+'_'+cls);
+    if(!el)return;
+    const sticky=document.querySelector('.mob-sticky')||document.querySelector('.pc-topbar');
+    const offset=sticky?sticky.offsetHeight+8:0;
+    const top=el.getBoundingClientRect().top+window.scrollY-offset;
+    window.scrollTo({top,behavior:'smooth'});
+  },120);
 }
 function buildMobNav(tk){
   let h='';
@@ -469,7 +529,8 @@ function render(){
   if(!sc){setContent('<div class="closed-box">🌙&nbsp; 휴강입니다</div>');return;}
 
   const isPC=!isMobile();
-  let h=isPC?'<div class="pc-time-grid">':'';
+  const activeTimes=TIMES.filter(ti=>CLS.some(c=>(sc[ti][c]||[]).length>0));
+  let h=isPC?'<div class="pc-time-grid">':`<div class="time-cols">`;
 
   TIMES.forEach(ti=>{
     const all=CLS.flatMap(c=>(sc[ti][c]||[]).map(n=>{return{n,c};}));
@@ -477,11 +538,11 @@ function render(){
     const pc2=all.filter(({n})=>ent(ti,n).present).length;
     const ac=all.filter(({n})=>ent(ti,n).absent).length;
     const tc=TC[ti];
-    h+=`<div class="tblock" id="tblock_${ti}"><div class="thd" onclick="toggleTime('${ti}')"><span class="tbadge" style="background:${tc}22;color:${tc}">${ti}</span><span class="trange">${TR[ti]}</span><span class="tcnt">출<b style="color:var(--green);margin:0 3px">${pc2}</b>결<b style="color:var(--red);margin:0 3px">${ac}</b>/${all.length}명</span><span class="toggle-icon" id="icon_${ti}">▼</span></div><div class="tblock-body collapsed" id="tbody_${ti}">`;
+    h+=`<div class="time-col" id="tcol_${ti}"><div class="tblock" id="tblock_${ti}"><div class="thd" onclick="toggleTime('${ti}')"><span class="tbadge" style="background:${tc}22;color:${tc}">${ti}</span><span class="trange">${TR[ti]}</span><span class="tcnt">출<b style="color:var(--green);margin:0 3px">${pc2}</b>결<b style="color:var(--red);margin:0 3px">${ac}</b>/${all.length}명</span><span class="toggle-icon" id="icon_${ti}">▼</span></div><div class="tblock-body collapsed" id="tbody_${ti}">`;
     CLS.forEach(c=>{
       const ns=sc[ti][c]||[];if(!ns.length)return;
       const pad=isPC?'52px':'52px';
-      h+=`<div id="cls_${c}"><div class="cls-hd"><div class="cls-dot" style="background:${CC[c]}"></div><span class="cls-nm" style="color:${CC[c]}">${c}</span></div>`;
+      h+=`<div id="cls_${ti}_${c}"><div class="cls-hd"><div class="cls-dot" style="background:${CC[c]}"></div><span class="cls-nm" style="color:${CC[c]}">${c}</span></div>`;
       ns.forEach(name=>{
         const e=ent(ti,name);const rk=`${ti}:${name}`;const hd=drafts[rk]!==undefined;
         const chk=e.present&&!e.absent;const rid=`ri_${ti}_${name.replace(/[^가-힣a-z0-9]/gi,'')}`;
@@ -521,9 +582,9 @@ function render(){
       });
       h+=`</div>`;
     });
-    h+=`</div></div>`;
+    h+=(isPC?`</div></div>`:`</div></div></div>`);
   });
-  if(isPC)h+=`</div>`;
+  h+=`</div>`;
   setContent(h);
   // 이전 열림 상태 복원
   TIMES.forEach(ti=>{
