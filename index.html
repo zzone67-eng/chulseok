@@ -151,9 +151,37 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 .day-label{font-size:12px;font-weight:600;min-width:72px;flex-shrink:0}
 .empty{text-align:center;padding:40px 20px;color:var(--mu);font-size:14px}
 .csv-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;border:1px solid var(--brd);background:var(--surf);color:var(--txt);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:10px}
-@media(min-width:768px){
+@media(min-width:1100px){
   body{overflow:hidden;height:100vh}
   #main-pc{display:grid!important}
+}
+
+/* ── 태블릿 (600px ~ 1100px) ── */
+@media(min-width:600px) and (max-width:1099px){
+  .mob-dmain{font-size:38px}
+  .mob-dsub{font-size:20px}
+  .mob-header{padding:max(24px,env(safe-area-inset-top,24px)) 24px 0}
+  .mob-nav{padding:0 24px 12px}
+  .nb{width:42px;height:54px;border-radius:12px}
+  .nb .nn{font-size:15px}
+  .nb .nw{font-size:10px}
+  .cls-tabs{padding:0 24px 12px;gap:8px}
+  .cls-tab{height:38px;font-size:14px;padding:0 14px}
+  .time-tabs{padding:0 24px 10px;gap:8px}
+  .time-tab{height:42px;font-size:14px}
+  .mob-content{padding:0 24px 40px;gap:12px}
+  /* 태블릿: 멀티타임 나란히 표시 */
+  .tab-time-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .tblock{border-radius:16px}
+  .thd{padding:14px 18px}
+  .srow{padding:12px 18px}
+  .snm{font-size:15px}
+  .ssc{font-size:12px}
+  .absent-info{padding:8px 18px 8px 56px}
+  .rrow{padding:10px 18px 10px 56px}
+  .cls-hd{padding:8px 18px 3px}
+  .mob-statbar{font-size:14px}
+  .btn-sm{font-size:13px;height:38px;padding:0 14px}
 }
 </style>
 </head>
@@ -252,7 +280,8 @@ let cur='',att={},drafts={},curTime=null,saveTimer=null,toastTimer=null,pollTime
 let adminY=2026,adminM=7,adminTab=0,adminData={};
 
 function toKey(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-const isMob=()=>window.innerWidth<768;
+const isMob=()=>window.innerWidth<1100;
+const isTab=()=>window.innerWidth>=600&&window.innerWidth<1100;
 async function fbGet(p){const r=await fetch(`${DB}/${p}.json`);if(!r.ok)throw 0;return r.json()}
 async function fbSet(p,d){await fetch(`${DB}/${p}.json`,{method:'PATCH',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}})}
 
@@ -265,8 +294,8 @@ function retrySync(){load(cur)}
 // ── 앱 시작 ──────────────────────────────────────────
 function launch(){
   const su=document.getElementById('setup');if(su)su.style.display='none';
-  if(isMob()) document.getElementById('main-mob').style.display='block';
-  else        document.getElementById('main-pc').style.display='grid';
+  if(isMob()||isTab()) document.getElementById('main-mob').style.display='block';
+  else                   document.getElementById('main-pc').style.display='grid';
   cur=toKey(new Date());buildNav();load(cur);
   if(pollTimer)clearInterval(pollTimer);
   pollTimer=setInterval(()=>load(cur,false),30000);
@@ -372,7 +401,7 @@ function buildTimeTabs(){
   const sc=S[cur];
   const activeTimes=sc?TIMES.filter(ti=>CLS.some(c=>(sc[ti][c]||[]).length>0)):[];
   const tb=document.getElementById('time-tabs');if(!tb)return;
-  if(!isMob()||activeTimes.length<=1){tb.style.display='none';return;}
+  if(!isMob()||isTab()||activeTimes.length<=1){tb.style.display='none';return;}
   if(!curTime||!activeTimes.includes(curTime))curTime=activeTimes[0];
   tb.style.display='flex';
   tb.innerHTML=activeTimes.map(ti=>`
@@ -413,7 +442,7 @@ function render(){
   if(!sc){setContent('<div class="closed-box">🌙&nbsp; 휴강입니다</div>');return;}
   const isPC=!isMob();
   const activeTimes=TIMES.filter(ti=>CLS.some(c=>(sc[ti][c]||[]).length>0));
-  const showTimes=isPC?activeTimes:(activeTimes.length>1&&curTime)?[curTime]:activeTimes;
+  const showTimes=isPC||(isTab()&&activeTimes.length>1)?activeTimes:(activeTimes.length>1&&curTime)?[curTime]:activeTimes;
   let h=isPC?'<div class="pc-time-grid">':'';
 
   showTimes.forEach(ti=>{
@@ -472,7 +501,7 @@ function render(){
     });
     h+=`</div></div>`;
   });
-  if(isPC)h+=`</div>`;
+  if(useGrid)h+=`</div>`;
   setContent(h);
   buildClsTabs();
 }
@@ -483,7 +512,7 @@ function setContent(h){
 window.addEventListener('resize',()=>{
   if(document.getElementById('admin').style.display==='flex')return;
   const mob=document.getElementById('main-mob'),pc=document.getElementById('main-pc');
-  if(isMob()){mob.style.display='block';pc.style.display='none';}
+  if(isMob()||isTab()){mob.style.display='block';pc.style.display='none';}
   else{mob.style.display='none';pc.style.display='grid';}
   buildNav();render();
 });
