@@ -121,7 +121,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 .contact-label{font-size:11px}
 
 /* ── 관리자 ── */
-#admin{display:none;height:100dvh;flex-direction:column;overflow:hidden}
+#admin{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;flex-direction:column;overflow:hidden;background:var(--bg)}
 .admin-hd{background:var(--bg);border-bottom:1px solid var(--brd);padding:max(20px,env(safe-area-inset-top,20px)) 16px 0;flex-shrink:0}
 .admin-row1{display:flex;align-items:center;margin-bottom:5px}
 .admin-title{font-size:32px;font-weight:700;letter-spacing:-.8px;flex:1}
