@@ -165,23 +165,6 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 <body>
 <div id="toast"></div>
 
-<!-- 설정 -->
-<div id="setup">
-  <div class="setup-box">
-    <div style="font-size:48px;margin-bottom:10px">📋</div>
-    <h1>출석관리</h1>
-    <p>Firebase URL을 입력하면 모바일·PC 실시간 공유됩니다</p>
-    <div class="guide-box">
-      <b>① firebase.google.com</b> → 프로젝트 추가 (무료)<br>
-      <b>② Realtime Database</b> → 데이터베이스 만들기 → 테스트 모드<br>
-      <b>③ 상단 URL 복사</b> 후 아래 붙여넣기
-    </div>
-    <input class="db-input" id="db-url" type="url" placeholder="https://프로젝트명-rtdb.firebaseio.com">
-    <button class="btn-connect" onclick="connect()">연결하기</button>
-    <p style="font-size:11px;color:var(--mu);margin-top:12px">iPhone: 사파리로 열기 → 공유 → 홈 화면에 추가</p>
-  </div>
-</div>
-
 <!-- 모바일 메인 -->
 <div id="main-mob">
   <div class="mob-sticky">
@@ -282,11 +265,6 @@ async function fbSet(p,d){await fetch(`${DB}/${p}.json`,{method:'PATCH',body:JSO
 function toast(m,c='var(--green)'){
   const el=document.getElementById('toast');el.textContent=m;el.style.background=c;el.style.opacity='1';
   if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.opacity='0',2200);
-}
-function connect(){
-  const v=document.getElementById('db-url').value.trim().replace(/\/+$/,'');
-  if(!v.startsWith('http')){alert('URL 확인');return;}
-  DB=v;localStorage.setItem('db_url',v);launch();
 }
 function retrySync(){load(cur)}
 
@@ -612,14 +590,14 @@ function dlCSV(ym){
     TIMES.forEach(ti=>{const sc=S[dk];if(!sc)return;CLS.forEach(cls=>(sc[ti][cls]||[]).forEach(name=>{const e=(dd[ti]||{})[name]||{};if(e.absent)rows.push([dk,DW[d.getDay()],ti,cls,name,SCHOOL[name]||'',e.reason||'',e.contact?'완료':'',e.contact2?'완료':'']);}));});
   }
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['﻿'+rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('
-')],{type:'text/csv;charset=utf-8'}));
+  a.href=URL.createObjectURL(new Blob(['﻿'+rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n')],{type:'text/csv;charset=utf-8'}));
   a.download=`결석현황_${ym}.csv`;a.click();toast('CSV 다운로드 완료 ✓');
 }
 
 // ── 시작 ─────────────────────────────────────────────
-const saved=localStorage.getItem('db_url');
-if(saved)DB=saved;
+const _saved=localStorage.getItem('db_url');
+if(_saved)DB=_saved;
+else localStorage.setItem('db_url',DB); // 기본 URL 저장
 launch();
 </script>
 </body>
