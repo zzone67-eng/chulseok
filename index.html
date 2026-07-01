@@ -270,7 +270,7 @@ function retrySync(){load(cur)}
 
 // ── 앱 시작 ──────────────────────────────────────────
 function launch(){
-  document.getElementById('setup').style.display='none';
+  const su=document.getElementById('setup');if(su)su.style.display='none';
   if(isMob()) document.getElementById('main-mob').style.display='block';
   else        document.getElementById('main-pc').style.display='grid';
   cur=toKey(new Date());buildNav();load(cur);
@@ -353,13 +353,14 @@ function buildPcCal(tk){
 }
 function buildClsTabs(){
   const sc=S[cur];
-  const items=sc?TIMES.flatMap(ti=>CLS.filter(c=>(sc[ti][c]||[]).length>0).map(c=>({ti,c}))):[];
-  function tab(ti,c,extra=''){
-    return `<button class="cls-tab" onclick="jumpTo('${ti}','${c}')" style="background:${CC[c]}18;color:${CC[c]};border-color:${CC[c]}44;${extra}">
-      <span style="background:${TC[ti]};color:#0f0f13;font-size:10px;font-weight:700;padding:1px 5px;border-radius:5px">${ti}</span>${c}</button>`;
+  // 활성 반 목록 (중복 제거)
+  const activeCls=sc?CLS.filter(c=>TIMES.some(ti=>(sc[ti][c]||[]).length>0)):[];
+  function tab(c,extra=''){
+    return `<button class="cls-tab" onclick="jumpToCls('${c}')"
+      style="background:${CC[c]}18;color:${CC[c]};border-color:${CC[c]}44;${extra}">${c}</button>`;
   }
-  const ct=document.getElementById('cls-tabs');if(ct)ct.innerHTML=items.map(({ti,c})=>tab(ti,c)).join('');
-  const pt=document.getElementById('pc-cls-tabs');if(pt)pt.innerHTML=items.map(({ti,c})=>tab(ti,c,'width:100%;')).join('');
+  const ct=document.getElementById('cls-tabs');if(ct)ct.innerHTML=activeCls.map(c=>tab(c)).join('');
+  const pt=document.getElementById('pc-cls-tabs');if(pt)pt.innerHTML=activeCls.map(c=>tab(c,'width:100%;')).join('');
   buildTimeTabs();
 }
 function buildTimeTabs(){
@@ -375,14 +376,30 @@ function buildTimeTabs(){
 }
 function selectTime(ti){curTime=ti;render()}
 function jumpTo(ti,cls){
-  // 타임 탭 전환
   const sc=S[cur];const activeTimes=sc?TIMES.filter(t=>CLS.some(c=>(sc[t][c]||[]).length>0)):[];
-  if(isMob()&&activeTimes.length>1){curTime=ti;render();setTimeout(()=>{const el=document.getElementById('cls_'+ti+'_'+cls);if(el){const sticky=document.querySelector('.mob-sticky');const off=sticky?sticky.offsetHeight+4:0;const top=el.getBoundingClientRect().top+window.scrollY-off;window.scrollTo({top,behavior:'smooth'});}},120);}
-  else{
-    const body=document.getElementById('tbody_'+ti);const icon=document.getElementById('icon_'+ti);
-    if(body&&body.classList.contains('collapsed')){body.className='tblock-body expanded';if(icon)icon.className='toggle-icon open';openT[ti]=true;}
-    setTimeout(()=>{const el=document.getElementById('cls_'+ti+'_'+cls);if(!el)return;const sticky=document.querySelector('.mob-sticky')||document.querySelector('.pc-topbar');const off=sticky?sticky.offsetHeight+4:0;const top=el.getBoundingClientRect().top+window.scrollY-off;window.scrollTo({top,behavior:'smooth'});},120);
-  }
+  if(isMob()&&activeTimes.length>1){curTime=ti;render();setTimeout(()=>scrollToCls(ti,cls),130);}
+  else{openTime(ti);setTimeout(()=>scrollToCls(ti,cls),130);}
+}
+function jumpToCls(cls){
+  // 해당 반이 있는 첫 번째 타임으로 이동
+  const sc=S[cur];if(!sc)return;
+  const ti=TIMES.find(t=>(sc[t][cls]||[]).length>0);
+  if(!ti)return;
+  // 모바일 멀티타임: 해당 타임으로 전환
+  const activeTimes=TIMES.filter(t=>CLS.some(c=>(sc[t][c]||[]).length>0));
+  if(isMob()&&activeTimes.length>1){curTime=ti;render();setTimeout(()=>scrollToCls(ti,cls),130);}
+  else{openTime(ti);setTimeout(()=>scrollToCls(ti,cls),130);}
+}
+function openTime(ti){
+  const body=document.getElementById('tbody_'+ti),icon=document.getElementById('icon_'+ti);
+  if(body&&body.classList.contains('collapsed')){body.className='tblock-body expanded';if(icon)icon.className='toggle-icon open';openT[ti]=true;}
+}
+function scrollToCls(ti,cls){
+  const el=document.getElementById('cls_'+ti+'_'+cls);if(!el)return;
+  const sticky=document.querySelector('.mob-sticky')||document.querySelector('.pc-topbar');
+  const off=sticky?sticky.offsetHeight+6:0;
+  const top=el.getBoundingClientRect().top+window.scrollY-off;
+  window.scrollTo({top,behavior:'smooth'});
 }
 function toggleTime(ti){
   const body=document.getElementById('tbody_'+ti),icon=document.getElementById('icon_'+ti);
