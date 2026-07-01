@@ -100,7 +100,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 .snm{font-size:14px;font-weight:500}
 .snm.x{color:#444;text-decoration:line-through}
 .ssc{font-size:11px;color:var(--mu)}
-.abtn{font-size:12px;font-weight:700;padding:0 10px;height:30px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;white-space:nowrap}
+.abtn{font-size:11px;font-weight:700;padding:0 8px;height:22px;border-radius:6px;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;white-space:nowrap}
 /* 결석 편집 */
 .rrow{padding:8px 14px 8px 50px;border-bottom:1px solid var(--brd)}
 .rtags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
@@ -112,8 +112,8 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 .rbtn{font-size:13px;font-weight:700;padding:0 16px;height:38px;border-radius:9px;background:var(--acc);color:#fff;border:none;cursor:pointer;font-family:inherit;flex-shrink:0;display:inline-flex;align-items:center}
 /* 결석 compact 정보 */
 .absent-info{display:flex;align-items:center;gap:8px;padding:7px 14px 7px 50px;border-bottom:1px solid var(--brd)}
-.absent-reason{font-size:12px;color:#ff5c5c88;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.absent-edit{font-size:11px;font-weight:600;padding:3px 9px;border:1px solid var(--acc);border-radius:7px;background:transparent;color:var(--acc);cursor:pointer;font-family:inherit;flex-shrink:0}
+.absent-reason{font-size:12px;color:#ff5c5c99;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:underline dotted #ff5c5c44}
+
 .contact-mini{display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0}
 .chk-mini{width:16px;height:16px;border-radius:5px;border:1.5px solid #404060;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
 .chk-mini.on{border-color:var(--t1);background:var(--t1)}
@@ -455,8 +455,7 @@ function render(){
             </div>`;
           } else {
             h+=`<div class="absent-info">
-              <span class="absent-reason">${e.reason?'📌 '+e.reason:'사유 없음'}</span>
-              <button class="absent-edit" onclick="editR('${ti}','${name}')">수정</button>
+              <span class="absent-reason" onclick="editR('${ti}','${name}')" style="cursor:pointer">결석사유: ${e.reason||'(탭해서 입력)'}</span>
               <div class="contact-mini" onclick="tgC('${ti}','${name}')">
                 <div class="chk-mini${e.contact?' on':''}">${e.contact?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':''}</div>
                 <span class="contact-label" style="color:${e.contact?'var(--t1)':'var(--mu)'}">학부모</span>
