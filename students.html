@@ -402,8 +402,15 @@ function saveDB(d){
 async function syncFromFirebase(){
   try{
     const r=await fetch(`${FB_URL}/students.json`);
-    if(!r.ok)return;const d=await r.json();if(!d)return;
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(d));db=d;
+    if(!r.ok)return;
+    const d=await r.json();
+    if(d){
+      // Firebase에 데이터 있으면 가져오기
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(d));db=d;
+    } else {
+      // Firebase 비어있으면 현재 db를 Firebase에 업로드
+      saveDB(db);
+    }
   }catch(e){}
 }
 function getDB() {
@@ -500,8 +507,8 @@ function render(month) {
 }
 
 function makeCard(s, month) {
-  // 수강 없음(amount=0, remain 없음) 학생은 숨김
-  if (s.amount === 0 && s.remain == null) return null;
+  // 완전히 비어있는 학생만 숨김 (amount=0, remain 없음, 고정요금 아님)
+  if (s.amount === 0 && s.remain == null && !s.fixed) return null;
   const div = document.createElement('div');
   div.className = 'card' + (s.paid ? ' paid' : (s.amount > 0 ? ' unpaid' : ''));
   div.id = 'card-' + s.id;
