@@ -410,7 +410,25 @@ function saveDB(d){
 async function syncFromFirebase(){
   const statusEl = document.getElementById('fb-status');
   try{
-    const r=await fetch(`${FB_URL}/students.json`);
+    const r=await fetch(`${FB_URL}/paid.json`);
+    if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
+    const paidMap=await r.json();
+    if(paidMap && typeof paidMap==='object'){
+      ['jul','aug'].forEach(m=>{
+        db[m].forEach(s=>{ if(paidMap[s.id]!==undefined) s.paid=paidMap[s.id]; });
+      });
+      renderSidebar(); renderSummary();
+      if(statusEl)statusEl.textContent='';
+    }
+  }catch(e){
+    if(statusEl)statusEl.textContent='연결 실패';
+    console.error('Firebase 오류:',e);
+  }
+}
+async function _unused_old_sync(){
+  const statusEl = document.getElementById('fb-status');
+  try{
+    const r=await fetch(`${FB_URL}/paid.json`);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const d=await r.json();
     if(d && d.jul && d.jul.length > 0){
@@ -509,10 +527,10 @@ function renderSidebar() {
 
 // ── 요약 ──
 function renderSummary() {
-  const items = initData[curMonth] || [];
+  const items = db[curMonth] || [];
   if(!items.length) return;
   const total = items.reduce((a,s)=>a+(s.amount||0),0);
-  const paid = (db[curMonth]||[]).filter(s=>s.paid).reduce((a,s)=>a+(s.amount||0),0);
+  const paid = items.filter(s=>s.paid).reduce((a,s)=>a+(s.amount||0),0);
   const clsSums = {};
   ['입시반','예비반','중등반','취미반'].forEach(c=>clsSums[c]=0);
   items.forEach(s=>{ if(clsSums[s.cls]!==undefined) clsSums[s.cls]+=s.amount; });
@@ -688,6 +706,8 @@ renderSidebar();
 renderSummary();
 // Firebase 백그라운드 동기화 (재렌더 없음)
 syncFromFirebase();
+// 30초마다 paid 상태 동기화 (PC-모바일 연동)
+setInterval(syncFromFirebase, 30000);
 </script>
 </body>
 </html>

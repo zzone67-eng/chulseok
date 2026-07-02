@@ -427,7 +427,10 @@ async function syncFromFirebase(){
           if(paidMap[s.id] !== undefined) s.paid = paidMap[s.id];
         });
       });
-      render(Object.keys(db)[0]); renderSummary();
+      const activeMonth = document.querySelector('.tab.on') ? 
+        (document.getElementById('panel-aug') && document.getElementById('panel-aug').classList.contains('on') ? 'aug' : 'jul') 
+        : 'jul';
+      render(activeMonth); renderSummary(activeMonth);
       if(statusEl)statusEl.textContent='';
     }
   }catch(e){
@@ -672,12 +675,10 @@ function switchTab(month, el) {
 }
 
 function renderSummary(month) {
-  const items = initData[month] || [];
+  const items = db[month] || [];
   if (!items.length) return;
-  // 총액은 initData 기준(고정), 결제완료는 db 기준(실시간)
   const total = items.reduce((a,s) => a + (s.amount||0), 0);
-  const dbItems = (db[month] || []);
-  const paid = dbItems.filter(s => s.paid).reduce((a,s) => a + (s.amount||0), 0);
+  const paid = items.filter(s => s.paid).reduce((a,s) => a + (s.amount||0), 0);
   const unpaid = total - paid;
 
   const clsList = ['입시반','예비반','중등반','취미반'];
@@ -752,7 +753,9 @@ try { render('jul'); } catch(e) { console.error('render jul 오류:', e); }
 try { render('aug'); } catch(e) { console.error('render aug 오류:', e); }
 try { renderSummary('jul'); } catch(e) { console.error('renderSummary 오류:', e); }
 // Firebase 백그라운드 동기화
-try { syncFromFirebase(); } catch(e) {}
+try { syncFromFirebase();
+// 30초마다 paid 상태 동기화 (PC-모바일 연동)
+setInterval(syncFromFirebase, 30000); } catch(e) {}
 </script>
 </body>
 </html>
