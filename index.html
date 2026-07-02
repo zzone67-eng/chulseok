@@ -98,6 +98,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 .chk{width:22px;height:22px;border-radius:7px;border:2px solid #404060;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;user-select:none}
 .chk.on{border-color:var(--green);background:var(--green)}
 .chk.red{border-color:var(--red);background:var(--red)}
+.chk.early{border-color:#ff9f43;background:#ff9f43}
 .sinfo{flex:1;min-width:0}
 .snm{font-size:14px;font-weight:500}
 .snm.x{color:#444;text-decoration:line-through}
@@ -334,7 +335,7 @@ function go(dk){
   if(!att[dk]){const ct=isMob()?'mob-ct':'pc-ct';document.getElementById(ct).innerHTML='<div class="closed-box">불러오는 중…</div>';load(dk);}
   else render();
 }
-function ent(ti,n){return att[cur]?.[ti]?.[n]||{present:false,absent:false,reason:'',contact:false,contact2:false}}
+function ent(ti,n){return att[cur]?.[ti]?.[n]||{present:false,absent:false,earlyLeave:false,reason:'',contact:false,contact2:false}}
 function upd(ti,n,p){
   const e=ent(ti,n),nx={...e,...p};
   if(!att[cur])att[cur]={};if(!att[cur][ti])att[cur][ti]={};
@@ -343,6 +344,11 @@ function upd(ti,n,p){
   saveTimer=setTimeout(()=>fbSet(`att/${cur}/${ti}`,{[n]:nx}).then(()=>toast('저장됨 ✓')).catch(()=>toast('저장 실패','var(--red)')),500);
 }
 function tgP(ti,n){const e=ent(ti,n);if(!e.absent)upd(ti,n,{present:!e.present})}
+function tgE(ti,n){
+  const e=ent(ti,n);
+  if(e.earlyLeave){upd(ti,n,{earlyLeave:false});}
+  else{upd(ti,n,{earlyLeave:true,absent:false,present:false});}
+}
 function tgA(ti,n){
   const e=ent(ti,n);
   if(e.absent){upd(ti,n,{absent:false,reason:'',contact:false,contact2:false});delete drafts[ti+':'+n];}
@@ -464,8 +470,9 @@ function scrollToCls(ti,cls){
 // ── 렌더 ─────────────────────────────────────────────
 function render(){
   const sc=S[cur];let tot=0,pres=0,ab=0;
-  if(sc)TIMES.forEach(ti=>CLS.forEach(c=>(sc[ti][c]||[]).forEach(n=>{tot++;const e=ent(ti,n);if(e.present)pres++;if(e.absent)ab++;})));
-  const stat=sc?`출석 <b style="color:var(--green)">${pres}</b> · 결석 <b style="color:var(--red)">${ab}</b> · 미확인 <b>${tot-pres-ab}</b> / ${tot}명`:'휴강';
+  if(sc)TIMES.forEach(ti=>CLS.forEach(c=>(sc[ti][c]||[]).forEach(n=>{tot++;const e=ent(ti,n);if(e.present)pres++;if(e.absent)ab++;if(e.earlyLeave)ab++;})));
+  const early=sc?TIMES.reduce((s,ti)=>s+CLS.reduce((s2,c)=>s2+(sc[ti][c]||[]).filter(n=>ent(ti,n).earlyLeave).length,0),0):0;
+  const stat=sc?`출석 <b style="color:var(--green)">${pres}</b> · 조퇴 <b style="color:#ff9f43">${early}</b> · 결석 <b style="color:var(--red)">${ab}</b> · 미확인 <b>${tot-pres-ab-early}</b> / ${tot}명`:'휴강';
   ['mob-stats','pc-stats'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=stat;});
 
   buildTimeTabs();
@@ -499,13 +506,14 @@ function render(){
         const chk=e.present&&!e.absent;
         const rid='ri_'+ti+'_'+name.replace(/[^가-힣a-z0-9]/gi,'');
         h+=`<div>
-          <div class="srow" style="${e.absent?'background:#ff5c5c08':e.present?'background:#26de8108':''}">
-            <div class="chk${e.absent?'  red':chk?' on':''}" onclick="tgP('${ti}','${name}')">${chk?'<span style="font-size:12px;color:#0f0f13;font-weight:800">✓</span>':e.absent?'<span style="font-size:12px;color:#fff;font-weight:800">✕</span>':''}</div>
+          <div class="srow" style="${e.absent?'background:#ff5c5c08':e.earlyLeave?'background:#ff9f4308':e.present?'background:#26de8108':''}">
+            <div class="chk${e.absent?' red':e.earlyLeave?' early':chk?' on':''}" onclick="tgP('${ti}','${name}')">${chk?'<span style="font-size:12px;color:#0f0f13;font-weight:800">✓</span>':e.absent?'<span style="font-size:12px;color:#fff;font-weight:800">✕</span>':e.earlyLeave?'<span style="font-size:12px;color:#fff;font-weight:800">↙</span>':''}</div>
             <div class="sinfo"><div class="snm${e.absent?' x':''}">${name}</div><div class="ssc">${SCHOOL[name]||''}</div></div>
             ${PHONE[name]?`<a href="tel:${PHONE[name].replace(/-/g,'')}" style="text-decoration:none;padding:0 4px;flex-shrink:0;display:inline-flex;align-items:center" onclick="event.stopPropagation()">
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.01 21 3 13.99 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.21 2.2z" fill="#26de81"/>
 </svg></a>`:''}
+            <button class="abtn" onclick="tgE('${ti}','${name}')" style="background:${e.earlyLeave?'#ff9f43':'#2a2a3a'};color:${e.earlyLeave?'#fff':'var(--mu)'}">조퇴</button>
             <button class="abtn" onclick="tgA('${ti}','${name}')" style="background:${e.absent?'var(--red)':'#2a2a3a'};color:${e.absent?'#fff':'var(--mu)'}">${e.absent?'출석':'결석'}</button>
           </div>`;
         if(e.absent){
