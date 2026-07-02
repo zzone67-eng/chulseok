@@ -687,7 +687,16 @@ function closeUnpaid(e) {
   }
 }
 
-syncFromFirebase().then(()=>{render('jul');render('aug');renderSummary('jul');});
+// 로컬 데이터로 즉시 렌더
+render('jul');
+render('aug');
+renderSummary('jul');
+// Firebase 백그라운드 동기화 후 재렌더
+syncFromFirebase().then(()=>{
+  render('jul');
+  render('aug');
+  renderSummary('jul');
+});
 </script>
 </body>
 </html>
