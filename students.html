@@ -148,7 +148,7 @@ textarea.ef-input{resize:vertical;min-height:70px;}
       <div class="hdr-title">화강암플러스 수강생 관리</div>
       <div class="hdr-sub" id="hdrSub">2026년 7월</div>
     </div>
-    <div class="unpaid-badge" onclick="openUnpaid()">미납 확인</div>
+    <span id="fb-status" style="font-size:10px;color:rgba(255,255,255,.7);margin-right:8px"></span><div class="unpaid-badge" onclick="openUnpaid()">미납 확인</div>
   </div>
   <div class="summary" id="summaryBox"></div>
 </div>
@@ -403,19 +403,27 @@ function saveDB(d){
   fetch(`${FB_URL}/students.json`,{method:'PUT',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}}).catch(()=>{});
 }
 async function syncFromFirebase(){
+  const statusEl = document.getElementById('fb-status');
   try{
     const r=await fetch(`${FB_URL}/students.json`);
-    if(!r.ok)return;
+    if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const d=await r.json();
     if(d && d.jul && d.jul.length > 0){
-      // Firebase에 유효한 데이터 있으면 가져오기
       localStorage.setItem(STORAGE_KEY,JSON.stringify(d));
       db=d;
+      if(statusEl)statusEl.textContent='';
     } else {
-      // Firebase 비어있으면 현재 db를 Firebase에 업로드
-      saveDB(db);
+      // Firebase 비어있으면 현재 db 업로드
+      const uploadData=(db&&db.jul&&db.jul.length)?db:JSON.parse(JSON.stringify(initData));
+      db=uploadData;
+      saveDB(uploadData);
+      if(statusEl)statusEl.textContent='Firebase 초기화 완료';
+      setTimeout(()=>{if(statusEl)statusEl.textContent='';},3000);
     }
-  }catch(e){}
+  }catch(e){
+    if(statusEl)statusEl.textContent='Firebase 연결 실패: '+e.message;
+    console.error('Firebase 오류:',e);
+  }
 }
 function getDB() {
   const saved = loadDB();
@@ -635,8 +643,9 @@ function switchTab(month, el) {
 }
 
 function renderSummary(month) {
-  const items = db[month];
-  const total = items.reduce((a,s) => a + s.amount, 0);
+  const items = (db[month] && db[month].length) ? db[month] : (initData[month] || []);
+  if (!items.length) return;
+  const total = items.reduce((a,s) => a + (s.amount||0), 0);
   const paid = items.filter(s => s.paid).reduce((a,s) => a + s.amount, 0);
   const unpaid = total - paid;
 
