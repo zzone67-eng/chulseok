@@ -16,14 +16,24 @@
 body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
 /* 상단 헤더 */
-.topbar{background:var(--red);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.15);}
-.topbar-left{display:flex;align-items:center;gap:12px;}
-.topbar-title{color:#fff;font-size:16px;font-weight:700;letter-spacing:-.3px;white-space:nowrap;}
-.topbar-right{display:flex;align-items:center;gap:16px;position:relative;}
-.s-row{display:flex;align-items:center;gap:12px;}
-.s-toggle-btn{background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;padding:0 4px;flex-shrink:0;line-height:1;position:relative;z-index:2;}
+.topbar{background:var(--red);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-left{display:flex;align-items:center;gap:16px;}
+.topbar-title{color:#fff;font-size:17px;font-weight:700;}
+.month-tabs{display:flex;gap:2px;}
+.month-tab{padding:5px 14px;border-radius:999px;color:rgba(255,255,255,.65);font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;}
+.month-tab.on{background:rgba(255,255,255,.2);color:#fff;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.summary-pills{display:flex;gap:6px;}
+.s-pill{background:rgba(255,255,255,.15);color:#fff;font-size:12px;padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.s-pill strong{font-weight:700;}
+.unpaid-btn{background:rgba(0,0,0,.2);color:#fff;border:1px solid rgba(255,255,255,.15);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;}
+.unpaid-btn:hover{background:rgba(0,0,0,.3);}
+.sidebar-month{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);}
+.sm-btn{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);border:1px solid var(--border);background:transparent;cursor:pointer;border-radius:8px;transition:all .15s;}
+.sm-btn.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+.s-toggle-btn{background:none;border:none;color:rgba(255,255,255,.75);font-size:20px;cursor:pointer;padding:0 4px;flex-shrink:0;line-height:1;}
 .s-toggle-btn:hover{color:#fff;}
-.s-cls-panel{display:flex;align-items:center;gap:0;overflow:hidden;max-width:0;opacity:0;transition:max-width .35s ease,opacity .25s ease;position:absolute;right:28px;top:50%;transform:translateY(-50%);background:var(--red);z-index:1;white-space:nowrap;flex-direction:row-reverse;}
+.s-cls-panel{display:flex;align-items:center;gap:0;overflow:hidden;max-width:0;opacity:0;transition:max-width .35s ease,opacity .25s ease;position:absolute;right:28px;top:50%;transform:translateY(-50%);background:var(--red);z-index:1;white-space:nowrap;}
 .s-cls-panel.open{max-width:500px;opacity:1;}
 .s-cls-item{display:flex;flex-direction:column;align-items:flex-end;padding:0 10px;border-right:1px solid rgba(255,255,255,.15);flex-shrink:0;}
 .s-cls-item:last-child{border-right:none;padding-right:0;}
@@ -34,17 +44,13 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI'
 .s-lbl{font-size:10px;color:rgba(255,255,255,.55);margin-bottom:1px;}
 .s-val{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;}
 .s-val.remain{color:#FFB3AE;}
-.unpaid-btn{background:rgba(0,0,0,.2);color:#fff;border:1px solid rgba(255,255,255,.15);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
-.unpaid-btn:hover{background:rgba(0,0,0,.3);}
+.ai-btn{background:#fff;color:var(--red);border:none;padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;}
 
 /* 메인 레이아웃 */
 .main{display:flex;flex:1;overflow:hidden;}
 
 /* 사이드바 */
 .sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
-.sidebar-month{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);}
-.sm-btn{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);border:1px solid var(--border);background:transparent;cursor:pointer;border-radius:8px;transition:all .15s;}
-.sm-btn.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
 .sidebar-search{padding:12px 12px 8px;}
 .search-input{width:100%;padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:var(--bg);outline:none;}
 .search-input:focus{border-color:var(--blue);}
@@ -149,13 +155,13 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI'
   <div class="topbar-left">
     <div class="topbar-title">화강암플러스미술학원</div>
   </div>
-  <div class="topbar-right">
-    <div class="s-row" id="summaryRow1"></div>
+  <div class="topbar-right" style="position:relative;">
+    <div style="display:flex;align-items:center;gap:14px;" id="summaryRow1"></div>
     <button class="unpaid-btn" onclick="openUnpaid()">미납 확인</button>
   </div>
 </div>
 
-<!-- 메인<!-- 메인 -->
+<!-- 메인 -->
 <div class="main">
   <!-- 사이드바 -->
   <div class="sidebar">
@@ -265,8 +271,8 @@ const initData = {
       amount:0, fixed:false, paid:true, memo:'수능까지 수강 없음. 잔여타임 기록.', remain:13,
       schoolInfo:null },
     { id:'jul_김나연', name:'김나연', cls:'입시반', tags:['re:전월결석1'],
-      schedule:'수,목,금,토1,토2 주5회', days:'정규 15T / 특강 14T', absence:1, totalT:29, regularT:15, specialT:14,
-      amount:906250, fixed:false, paid:false, memo:'22/23결제 (전월결석 1T 차감)', remain:null },
+      schedule:'수,목,금,토1,토2 주5회', days:'정규 12T / 특강 14T', absence:1, totalT:26, regularT:12, specialT:14,
+      amount:812500, fixed:false, paid:false, memo:'22/23결제 (전월결석 1T 차감)', remain:null },
     { id:'jul_김나현', name:'김나현', cls:'입시반', tags:['dis:재수50%할인'],
       schedule:'수,목,금,토2 주4회', days:'정규 12T(50%할인) / 특강 14T', absence:0, totalT:26, regularT:12, specialT:14,
       amount:625000, fixed:false, paid:false, memo:'정규 50%할인+특강 정가 합산', remain:null },
@@ -278,8 +284,8 @@ const initData = {
       amount:360000, fixed:false, paid:false, memo:'', remain:null },
     { id:'jul_안시연', name:'안시연', cls:'중등반', tags:['re:전월결석5'],
       schedule:'토1,토2,일1,일2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 12T / 특강 10T', absence:5, totalT:17, regularT:12, specialT:10,
-      amount:531250, fixed:false, paid:false, memo:'특강 최대 10T 기준. 요일확정 후 변동가능.',
+      days:'정규 12T / 특강 10T', absence:9, totalT:13, regularT:12, specialT:10,
+      amount:406250, fixed:false, paid:false, memo:'특강 최대 10T 기준. 요일확정 후 변동가능.',
       schoolInfo:{ name:'혜화여중', exam:'6/29(월) ~ 7/1(수)', vacStart:'7/22(수)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
     { id:'jul_한지유', name:'한지유', cls:'중등반', tags:[],
       schedule:'토,일 주2회\n특강: 선택타임',
@@ -288,28 +294,28 @@ const initData = {
       schoolInfo:{ name:'초연중', exam:'6/24(수) ~ 6/26(금)', vacStart:'7/21(화)', vacEnd:'8/17(월) 추정', openDay:'8/18(화) 추정' } },
     { id:'jul_조제우', name:'조제우', cls:'중등반', tags:[],
       schedule:'수,금,토 주3회\n특강: 선택타임',
-      days:'정규 11T / 특강 14T', absence:0, totalT:25, regularT:11, specialT:14,
-      amount:781250, fixed:false, paid:false, memo:'',
+      days:'정규 8T / 특강 10T', absence:0, totalT:18, regularT:8, specialT:10,
+      amount:562500, fixed:false, paid:false, memo:'',
       schoolInfo:{ name:'초읍중', exam:'7/1(수) ~ 7/3(금)', vacStart:'7/24(목)', vacEnd:'8/13(목)', openDay:'8/14(금)' } },
     { id:'jul_전서빈', name:'전서빈', cls:'중등반', tags:['re:전월결석6'],
       schedule:'목,토1,토2 주3회\n특강: 선택타임',
-      days:'정규 10T / 특강 14T', absence:6, totalT:18, regularT:10, specialT:14,
-      amount:562500, fixed:false, paid:false, memo:'7/2까지 시험기간 포함 정산',
+      days:'정규 10T / 특강 10T', absence:6, totalT:14, regularT:10, specialT:10,
+      amount:437500, fixed:false, paid:false, memo:'7/2까지 시험기간 포함 정산',
       schoolInfo:{ name:'연일중', exam:'7/1(수) ~ 7/3(금)', vacStart:'7/22(수)', vacEnd:'8/23(일)', openDay:'8/24(월)' } },
     { id:'jul_권해원', name:'권해원', cls:'중등반', tags:['re:전월결석10'],
       schedule:'목,토1,토2 주3회\n특강: 선택타임',
-      days:'정규 10T / 특강 14T', absence:10, totalT:14, regularT:10, specialT:14,
-      amount:437500, fixed:false, paid:false, memo:'',
+      days:'정규 10T / 특강 10T', absence:10, totalT:10, regularT:10, specialT:10,
+      amount:312500, fixed:false, paid:false, memo:'',
       schoolInfo:{ name:'부산예술중', exam:'6/25(목) ~ 6/29(월)', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
     { id:'jul_김현준', name:'김현준', cls:'중등반', tags:['re:전월결석4'],
       schedule:'수,토,일 주3회',
-      days:'4,5,8,11,12,15,18,19,22,25,29(1,2)\n총12T - 전월결석4T = 8T',
+      days:'정규 9T / 특강 3T',
       absence:4, totalT:8, amount:250000, fixed:false, paid:false, memo:'6/28까지 포함 정산',
       schoolInfo:{ name:'부곡중', exam:'6/29(월) ~ 7/1(수)', vacStart:'7/17(금)', vacEnd:'8/16(일)', openDay:'8/17(월)' } },
     { id:'jul_최주연', name:'최주연', cls:'중등반', tags:['re:전월결석10'],
       schedule:'토1,토2,일 주3회\n특강: 선택타임',
-      days:'정규 9T / 특강 14T', absence:10, totalT:13, regularT:9, specialT:14,
-      amount:406250, fixed:false, paid:false, memo:'7/28까지 정산',
+      days:'정규 9T / 특강 10T', absence:10, totalT:9, regularT:9, specialT:10,
+      amount:281250, fixed:false, paid:false, memo:'7/28까지 정산',
       schoolInfo:{ name:'온천중', exam:'7/1(수) ~ 7/3(금)', vacStart:'7/22(수)', vacEnd:'8/18(화)', openDay:'8/19(수)' } },
     { id:'jul_나은솔', name:'나은솔', cls:'취미반', tags:['re:전월결석1'],
       schedule:'토1 주1회', days:'', absence:1, totalT:3, amount:75000, fixed:false, paid:false, memo:'', remain:null },
@@ -364,28 +370,28 @@ const initData = {
       schoolInfo:{ name:'초연중', exam:'', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
     { id:'aug_조제우', name:'조제우', cls:'중등반', tags:['special:특강'],
       schedule:'수,금,토 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34, regularT:8, specialT:26,
-      amount:1062500, fixed:false, paid:false, memo:'8월 예상',
+      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28, regularT:8, specialT:20,
+      amount:875000, fixed:false, paid:false, memo:'8월 예상',
       schoolInfo:{ name:'초읍중', exam:'', vacStart:'7/24(목)', vacEnd:'8/13(목)', openDay:'8/14(금)' } },
     { id:'aug_전서빈', name:'전서빈', cls:'중등반', tags:['special:특강'],
       schedule:'목,토1,토2 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34, regularT:8, specialT:26,
-      amount:1062500, fixed:false, paid:false, memo:'8월 예상',
+      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28, regularT:8, specialT:20,
+      amount:875000, fixed:false, paid:false, memo:'8월 예상',
       schoolInfo:{ name:'연일중', exam:'', vacStart:'7/22(수)', vacEnd:'8/23(일)', openDay:'8/24(월)' } },
     { id:'aug_권해원', name:'권해원', cls:'중등반', tags:['special:특강'],
       schedule:'목,토1,토2 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34, regularT:8, specialT:26,
-      amount:1062500, fixed:false, paid:false, memo:'8월 예상',
+      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28, regularT:8, specialT:20,
+      amount:875000, fixed:false, paid:false, memo:'8월 예상',
       schoolInfo:{ name:'부산예술중', exam:'', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
     { id:'aug_김현준', name:'김현준', cls:'중등반', tags:['special:특강'],
       schedule:'수,토,일 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34, regularT:8, specialT:26,
-      amount:1062500, fixed:false, paid:false, memo:'8월 예상',
+      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28, regularT:8, specialT:20,
+      amount:875000, fixed:false, paid:false, memo:'8월 예상',
       schoolInfo:{ name:'부곡중', exam:'', vacStart:'7/17(금)', vacEnd:'8/16(일)', openDay:'8/17(월)' } },
     { id:'aug_최주연', name:'최주연', cls:'중등반', tags:['special:특강'],
       schedule:'토1,토2,일 주3회\n특강: 선택타임',
-      days:'정규 9T / 특강 26T = 총 35T', absence:0, totalT:35, regularT:9, specialT:26,
-      amount:1093750, fixed:false, paid:false, memo:'8월 예상',
+      days:'정규 9T / 특강 20T = 총 29T', absence:0, totalT:29, regularT:9, specialT:20,
+      amount:906250, fixed:false, paid:false, memo:'8월 예상',
       schoolInfo:{ name:'온천중', exam:'', vacStart:'7/22(수)', vacEnd:'8/18(화)', openDay:'8/19(수)' } },
     { id:'aug_나은솔', name:'나은솔', cls:'취미반', tags:[], schedule:'토1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
     { id:'aug_김건휘', name:'김건휘', cls:'취미반', tags:[], schedule:'일1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
@@ -404,32 +410,40 @@ const initData = {
 const FB_URL='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
 // loadDB: localStorage만 (동기)
 function loadDB(){
-  try{const s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}
+  return JSON.parse(JSON.stringify(initData));
 }
 // saveDB: localStorage + Firebase 비동기
 function saveDB(d){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}catch(e){}
-  fetch(`${FB_URL}/students.json`,{method:'PUT',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}}).catch(()=>{});
+  const paidMap = {};
+  ['jul','aug'].forEach(m=>{
+    if(d[m]) d[m].forEach(s=>{ paidMap[s.id] = s.paid; });
+  });
+  fetch(`${FB_URL}/paid.json`,{method:'PUT',body:JSON.stringify(paidMap),headers:{'Content-Type':'application/json'}}).catch(()=>{});
 }
 // Firebase 동기화 (앱 시작 시 최신 데이터 가져오기)
 async function syncFromFirebase(){
   const statusEl = document.getElementById('fb-status');
   try{
-    const r=await fetch(`${FB_URL}/students.json`);
+    const r = await fetch(`${FB_URL}/paid.json`);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
-    const d=await r.json();
-    if(d && d.jul && d.jul.length > 0){
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(d));
-      if(statusEl)statusEl.textContent='';
-    } else {
-      const uploadData=(db&&db.jul&&db.jul.length)?db:JSON.parse(JSON.stringify(initData));
-      db=uploadData;
-      saveDB(uploadData);
-      if(statusEl)statusEl.textContent='';
+    const paidMap = await r.json();
+    if(paidMap && typeof paidMap === 'object'){
+      ['jul','aug'].forEach(m=>{
+        if(db[m]) db[m].forEach(s=>{
+          if(paidMap[s.id] !== undefined) s.paid = paidMap[s.id];
+        });
+      });
+      if(typeof render === 'function') render(Object.keys(db)[0]);
+      if(typeof renderSidebar === 'function') renderSidebar();
+      if(typeof renderSummary === 'function'){
+        const m = document.getElementById('panel-aug') && document.getElementById('panel-aug').classList.contains('on') ? 'aug' : 'jul';
+        renderSummary(m);
+      }
+      if(statusEl) statusEl.textContent = '';
     }
   }catch(e){
-    if(statusEl)statusEl.textContent='Firebase 연결 실패';
-    console.error('Firebase 오류:',e);
+    if(statusEl) statusEl.textContent = '연결 실패';
+    console.error('Firebase 오류:', e);
   }
 }
 function getDB() {
@@ -523,7 +537,6 @@ function renderSummary() {
   const clsTotal = {};
   clsList.forEach(c=>clsTotal[c]=0);
   items.forEach(s=>{ if(clsTotal[s.cls]!==undefined) clsTotal[s.cls]+=(s.amount||0); });
-
   const row = document.getElementById('summaryRow1');
   if(!row) return;
   row.innerHTML = `
@@ -546,9 +559,8 @@ function toggleCls() {
   const btn = document.getElementById('clsToggleBtn');
   if(!panel) return;
   panel.classList.toggle('open');
-  btn.textContent = panel.classList.contains('open') ? '›' : '‹';
+  btn.textContent = panel.classList.contains('open') ? '‹' : '›';
 }
-
 
 function renderFilters() {
   const fc = document.getElementById('classFilters');

@@ -229,8 +229,8 @@ const initData = {
       amount:0, fixed:false, paid:true,
       memo:'수능까지 수강 없음. 잔여타임만 기록.', remain:13 },
     { id:'jul_김나연', name:'김나연', cls:'입시반', tags:['re:전월결석1'],
-      schedule:'수,목,금,토1,토2 주5회', days:'정규 15T / 특강 14T', absence:1, totalT:29,
-      amount:906250, fixed:false, paid:false,
+      schedule:'수,목,금,토1,토2 주5회', days:'정규 12T / 특강 14T', absence:1, totalT:26,
+      amount:812500, fixed:false, paid:false,
       memo:'22/23결제 (전월결석 1T 차감)', remain:null },
     { id:'jul_김나현', name:'김나현', cls:'입시반', tags:['dis:재수50%할인'],
       schedule:'수,목,금,토2 주4회', days:'정규 12T / 특강 14T', absence:0, totalT:26,
@@ -248,8 +248,8 @@ const initData = {
     // 중등반
     { id:'jul_안시연', name:'안시연', cls:'중등반', tags:['re:전월결석5'],
       schedule:'토1,토2,일1,일2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 12T / 특강 10T', absence:5, totalT:17,
-      amount:531250, fixed:false, paid:false,
+      days:'정규 12T / 특강 10T', absence:9, totalT:13,
+      amount:406250, fixed:false, paid:false,
       memo:'특강 최대 10T 기준. 요일확정 후 변동가능.', remain:null },
     { id:'jul_한지유', name:'한지유', cls:'중등반', tags:[],
       schedule:'토,일 주2회\n특강: 선택타임',
@@ -258,29 +258,29 @@ const initData = {
       memo:'특강 최대 10T 기준. 요일확정 후 변동가능.', remain:null },
     { id:'jul_조제우', name:'조제우', cls:'중등반', tags:[],
       schedule:'수,금,토 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 11T / 특강 14T', absence:0, totalT:25,
-      amount:781250, fixed:false, paid:false,
+      days:'정규 8T / 특강 10T', absence:0, totalT:18,
+      amount:562500, fixed:false, paid:false,
       memo:'', remain:null },
     { id:'jul_전서빈', name:'전서빈', cls:'중등반', tags:['re:전월결석6'],
       schedule:'목,토1,토2 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 10T / 특강 14T', absence:6, totalT:18,
-      amount:562500, fixed:false, paid:false,
+      days:'정규 10T / 특강 10T', absence:6, totalT:14,
+      amount:437500, fixed:false, paid:false,
       memo:'7/2까지 시험기간 포함 정산', remain:null },
     { id:'jul_권해원', name:'권해원', cls:'중등반', tags:['re:전월결석10'],
       schedule:'목,토1,토2 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 10T / 특강 14T', absence:10, totalT:14,
-      amount:437500, fixed:false, paid:false,
+      days:'정규 10T / 특강 10T', absence:10, totalT:10,
+      amount:312500, fixed:false, paid:false,
       memo:'', remain:null },
     { id:'jul_김현준', name:'김현준', cls:'중등반', tags:['re:전월결석4'],
       schedule:'수,토,일 주3회',
-      days:'4,5,8,11,12,15,18,19,22,25,29(1,2)\n총12T - 전월결석4T = 8T',
+      days:'정규 9T / 특강 3T',
       absence:4, totalT:8,
       amount:250000, fixed:false, paid:false,
       memo:'6/28까지 포함 정산', remain:null },
     { id:'jul_최주연', name:'최주연', cls:'중등반', tags:['re:전월결석10'],
       schedule:'토1,토2,일 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 9T / 특강 14T', absence:10, totalT:13,
-      amount:406250, fixed:false, paid:false,
+      days:'정규 9T / 특강 10T', absence:10, totalT:9,
+      amount:281250, fixed:false, paid:false,
       memo:'7/28까지 정산', remain:null },
     // 취미반
     { id:'jul_나은솔', name:'나은솔', cls:'취미반', tags:['re:전월결석1'],
@@ -345,24 +345,24 @@ const initData = {
       amount:812500, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_조제우', name:'조제우', cls:'중등반', tags:['특강'],
       schedule:'수,금,토 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34,
-      amount:1062500, fixed:false, paid:false, memo:'8월 예상', remain:null },
+      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
+      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_전서빈', name:'전서빈', cls:'중등반', tags:['특강'],
       schedule:'목,토1,토2 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34,
-      amount:1062500, fixed:false, paid:false, memo:'8월 예상', remain:null },
+      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
+      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_권해원', name:'권해원', cls:'중등반', tags:['특강'],
       schedule:'목,토1,토2 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34,
-      amount:1062500, fixed:false, paid:false, memo:'8월 예상', remain:null },
+      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
+      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_김현준', name:'김현준', cls:'중등반', tags:['특강'],
       schedule:'수,토,일 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34,
-      amount:1062500, fixed:false, paid:false, memo:'8월 예상', remain:null },
+      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
+      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_최주연', name:'최주연', cls:'중등반', tags:['특강'],
       schedule:'토1,토2,일 주3회\n특강: 선택타임',
-      days:'정규 9T / 특강 26T = 총 35T', absence:0, totalT:35,
-      amount:1093750, fixed:false, paid:false, memo:'8월 예상', remain:null },
+      days:'정규 9T / 특강 20T = 총 29T', absence:0, totalT:29,
+      amount:906250, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_나은솔', name:'나은솔', cls:'취미반', tags:[],
       schedule:'토1 주1회', days:'4주', absence:0, totalT:4,
       amount:100000, fixed:false, paid:false, memo:'', remain:null },
@@ -397,24 +397,17 @@ const initData = {
 };
 
 // ── 스토리지 ──
-// paid 값만 Firebase에 저장, 나머지는 항상 initData 기준
 const FB_URL='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
-
 function loadDB(){
-  // 항상 initData 기준으로 새로 시작
   return JSON.parse(JSON.stringify(initData));
 }
-
-// paid 상태만 Firebase에 저장
 function saveDB(d){
   const paidMap = {};
-  ['jul','aug'].forEach(m => {
-    d[m].forEach(s => { paidMap[s.id] = s.paid; });
+  ['jul','aug'].forEach(m=>{
+    if(d[m]) d[m].forEach(s=>{ paidMap[s.id] = s.paid; });
   });
   fetch(`${FB_URL}/paid.json`,{method:'PUT',body:JSON.stringify(paidMap),headers:{'Content-Type':'application/json'}}).catch(()=>{});
 }
-
-// Firebase에서 paid 값만 불러와서 현재 db에 합치기
 async function syncFromFirebase(){
   const statusEl = document.getElementById('fb-status');
   try{
@@ -422,20 +415,22 @@ async function syncFromFirebase(){
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const paidMap = await r.json();
     if(paidMap && typeof paidMap === 'object'){
-      ['jul','aug'].forEach(m => {
-        db[m].forEach(s => {
+      ['jul','aug'].forEach(m=>{
+        if(db[m]) db[m].forEach(s=>{
           if(paidMap[s.id] !== undefined) s.paid = paidMap[s.id];
         });
       });
-      const activeMonth = document.querySelector('.tab.on') ? 
-        (document.getElementById('panel-aug') && document.getElementById('panel-aug').classList.contains('on') ? 'aug' : 'jul') 
-        : 'jul';
-      render(activeMonth); renderSummary(activeMonth);
-      if(statusEl)statusEl.textContent='';
+      if(typeof render === 'function') render(Object.keys(db)[0]);
+      if(typeof renderSidebar === 'function') renderSidebar();
+      if(typeof renderSummary === 'function'){
+        const m = document.getElementById('panel-aug') && document.getElementById('panel-aug').classList.contains('on') ? 'aug' : 'jul';
+        renderSummary(m);
+      }
+      if(statusEl) statusEl.textContent = '';
     }
   }catch(e){
-    if(statusEl)statusEl.textContent='연결 실패';
-    console.error('Firebase 오류:',e);
+    if(statusEl) statusEl.textContent = '연결 실패';
+    console.error('Firebase 오류:', e);
   }
 }
 function getDB() {
@@ -675,10 +670,12 @@ function switchTab(month, el) {
 }
 
 function renderSummary(month) {
-  const items = db[month] || [];
+  const items = initData[month] || [];
   if (!items.length) return;
+  // 총액은 initData 기준(고정), 결제완료는 db 기준(실시간)
   const total = items.reduce((a,s) => a + (s.amount||0), 0);
-  const paid = items.filter(s => s.paid).reduce((a,s) => a + (s.amount||0), 0);
+  const dbItems = (db[month] || []);
+  const paid = dbItems.filter(s => s.paid).reduce((a,s) => a + (s.amount||0), 0);
   const unpaid = total - paid;
 
   const clsList = ['입시반','예비반','중등반','취미반'];
@@ -753,9 +750,7 @@ try { render('jul'); } catch(e) { console.error('render jul 오류:', e); }
 try { render('aug'); } catch(e) { console.error('render aug 오류:', e); }
 try { renderSummary('jul'); } catch(e) { console.error('renderSummary 오류:', e); }
 // Firebase 백그라운드 동기화
-try { syncFromFirebase();
-// 30초마다 paid 상태 동기화 (PC-모바일 연동)
-setInterval(syncFromFirebase, 30000); } catch(e) {}
+try { syncFromFirebase(); } catch(e) {}
 </script>
 </body>
 </html>
