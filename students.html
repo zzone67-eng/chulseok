@@ -12,22 +12,23 @@
   --yellow:#E8A020; --radius:14px; --radius-sm:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;padding-top:0;}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;padding-top:0;margin:0;}
 
 /* 헤더 */
-.hdr{background:var(--red);padding:max(18px,env(safe-area-inset-top,18px)) 16px 12px;position:sticky;top:0;z-index:200;}
-.summary{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;}
-.sum-box{background:rgba(255,255,255,.15);border-radius:10px;padding:8px 10px;}
-.sum-box.full{grid-column:1/-1;}
-.sum-lbl{font-size:10px;color:rgba(255,255,255,.65);font-weight:500;margin-bottom:2px;}
-.sum-val{font-size:15px;font-weight:700;color:#fff;}
+.hdr{background:var(--red);padding:max(14px,env(safe-area-inset-top,14px)) 14px 8px;position:sticky;top:0;z-index:200;}
+.summary{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
+.sum-box{background:rgba(255,255,255,.15);border-radius:7px;padding:5px 8px;}
+.sum-box.full{background:rgba(255,255,255,.1);}
+.sum-lbl{color:rgba(255,255,255,.65);font-size:10px;}
+.sum-val{color:#fff;font-size:13px;font-weight:700;}
 .sum-val.sm{font-size:13px;}
-.sum-cls{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
-.sum-cls-item{background:rgba(255,255,255,.15);border-radius:8px;padding:6px 10px;font-size:12px;color:#fff;line-height:1.6;}
+.sum-cls{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+.sum-cls-item{white-space:nowrap;font-size:11px;color:rgba(255,255,255,.85);}
 .sum-cls-item span{font-weight:700;font-size:14px;display:block;}
-.hdr-top{display:flex;justify-content:space-between;align-items:center;}
-.hdr-title{color:#fff;font-size:17px;font-weight:700;}
-.hdr-sub{color:rgba(255,255,255,.65);font-size:11px;margin-top:2px;}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.hdr-title{color:#fff;font-size:14px;font-weight:700;}
+.hdr-sub{color:rgba(255,255,255,.6);font-size:11px;}
 .unpaid-badge{background:rgba(255,255,255,.2);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;cursor:pointer;}
 
 /* 탭 */
@@ -491,25 +492,30 @@ function render(month) {
     hdr.className = 'sec-hdr';
     hdr.textContent = cls;
     list.appendChild(hdr);
-    groups[cls].forEach(s => list.appendChild(makeCard(s, month)));
+    groups[cls].forEach(s => {
+    const card = makeCard(s, month);
+    if (card) list.appendChild(card);
+  });
   });
 }
 
 function makeCard(s, month) {
+  // 수강 없음(amount=0, remain 없음) 학생은 숨김
+  if (s.amount === 0 && s.remain == null) return null;
   const div = document.createElement('div');
   div.className = 'card' + (s.paid ? ' paid' : (s.amount > 0 ? ' unpaid' : ''));
   div.id = 'card-' + s.id;
 
-  const amtDisplay = s.remain !== null
+  const amtDisplay = s.remain != null
     ? `잔여 ${s.remain}T`
     : (s.amount === 0 ? '수강없음' : fmt(s.amount));
 
-  const tDisplay = s.remain !== null
+  const tDisplay = s.remain != null
     ? '수강 없음'
     : (s.totalT > 0 ? `총 ${s.totalT}T` : (s.fixed ? '고정요금' : ''));
 
   const tagsStr = s.tags.map(t => tagHtml(t)).join('');
-  const remainBadge = s.remain !== null ? `<div class="remain-badge">잔여 ${s.remain}T</div>` : '';
+  const remainBadge = s.remain != null ? `<div class="remain-badge">잔여 ${s.remain}T</div>` : '';
 
   div.innerHTML = `
     <div class="card-top" onclick="toggleDetail('${s.id}','${month}')">
@@ -628,18 +634,20 @@ function renderSummary(month) {
 
   const box = document.getElementById('summaryBox');
   box.innerHTML = `
-    <div class="sum-box">
-      <div class="sum-lbl">총 수강료</div>
-      <div class="sum-val">${fmt2(total)}</div>
-    </div>
-    <div class="sum-box">
-      <div class="sum-lbl">결제 완료</div>
-      <div class="sum-val">${fmt2(paid)}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">
+      <div class="sum-box">
+        <div class="sum-lbl">총 수강료</div>
+        <div class="sum-val">${fmt2(total)}</div>
+      </div>
+      <div class="sum-box">
+        <div class="sum-lbl">결제 완료</div>
+        <div class="sum-val">${fmt2(paid)}</div>
+      </div>
     </div>
     <div class="sum-box full">
-      <div class="sum-lbl">반별 수강료</div>
-      <div class="sum-cls">
-        ${clsList.map(c => `<div class="sum-cls-item">${c} <span>${fmt2(clsSums[c])}</span></div>`).join('')}
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none">
+        
+        ${clsList.map(c => `<span style="white-space:nowrap;font-size:11px;color:#fff"><span style="opacity:.7">${c}</span> <b>${fmt2(clsSums[c])}</b></span>`).join('<span style="color:rgba(255,255,255,.3)">·</span>')}
       </div>
     </div>
   `;
