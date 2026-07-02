@@ -410,7 +410,8 @@ async function syncFromFirebase(){
     const d=await r.json();
     if(d && d.jul && d.jul.length > 0){
       localStorage.setItem(STORAGE_KEY,JSON.stringify(d));
-      db=d;
+      // db는 메모리에만 업데이트 (화면 재렌더 없음 - 안정성 우선)
+      // 다음 번 새로고침 시 Firebase 데이터 사용
       if(statusEl)statusEl.textContent='';
     } else {
       // Firebase 비어있으면 현재 db 업로드
@@ -711,16 +712,12 @@ function closeUnpaid(e) {
   }
 }
 
-// 로컬 데이터로 즉시 렌더
+// 로컬(initData) 데이터로 즉시 렌더
 render('jul');
 render('aug');
 renderSummary('jul');
-// Firebase 백그라운드 동기화 후 재렌더
-syncFromFirebase().then(()=>{
-  render('jul');
-  render('aug');
-  renderSummary('jul');
-});
+// Firebase 백그라운드 동기화 (데이터 저장용, 재렌더 없음)
+syncFromFirebase();
 </script>
 </body>
 </html>
