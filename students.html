@@ -2,6 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>화강암플러스 수강생 관리</title>
 <style>
@@ -404,9 +407,10 @@ async function syncFromFirebase(){
     const r=await fetch(`${FB_URL}/students.json`);
     if(!r.ok)return;
     const d=await r.json();
-    if(d){
-      // Firebase에 데이터 있으면 가져오기
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(d));db=d;
+    if(d && d.jul && d.jul.length > 0){
+      // Firebase에 유효한 데이터 있으면 가져오기
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(d));
+      db=d;
     } else {
       // Firebase 비어있으면 현재 db를 Firebase에 업로드
       saveDB(db);
@@ -415,7 +419,11 @@ async function syncFromFirebase(){
 }
 function getDB() {
   const saved = loadDB();
-  if (!saved) { saveDB(initData); return JSON.parse(JSON.stringify(initData)); }
+  if (!saved || !saved.jul || !saved.jul.length) {
+    const fresh = JSON.parse(JSON.stringify(initData));
+    saveDB(fresh);
+    return fresh;
+  }
   // merge new students
   ['jul','aug'].forEach(m => {
     initData[m].forEach(init => {
