@@ -427,19 +427,36 @@ async function syncFromFirebase(){
   }
 }
 function getDB() {
-  const saved = loadDB();
-  if (!saved || !saved.jul || !saved.jul.length) {
+  try {
+    const saved = loadDB();
+    if (!saved || !saved.jul || !saved.jul.length) {
+      const fresh = JSON.parse(JSON.stringify(initData));
+      saveDB(fresh);
+      return fresh;
+    }
+    // 각 학생에 누락 필드 보완
+    ['jul','aug'].forEach(m => {
+      if (!saved[m]) return;
+      saved[m].forEach(s => {
+        if (!s.tags) s.tags = [];
+        if (s.remain === undefined) s.remain = null;
+        if (s.amount === undefined) s.amount = 0;
+        if (s.paid === undefined) s.paid = false;
+        if (s.fixed === undefined) s.fixed = false;
+        if (s.totalT === undefined) s.totalT = 0;
+      });
+      // initData에서 새 학생 추가
+      initData[m].forEach(init => {
+        if (!saved[m].find(s => s.id === init.id)) saved[m].push(init);
+      });
+    });
+    return saved;
+  } catch(e) {
+    console.error('getDB 오류, initData 사용:', e);
     const fresh = JSON.parse(JSON.stringify(initData));
     saveDB(fresh);
     return fresh;
   }
-  // merge new students
-  ['jul','aug'].forEach(m => {
-    initData[m].forEach(init => {
-      if (!saved[m].find(s => s.id === init.id)) saved[m].push(init);
-    });
-  });
-  return saved;
 }
 
 let db = getDB();
@@ -540,8 +557,8 @@ function makeCard(s, month) {
     ? '수강 없음'
     : (s.totalT > 0 ? `총 ${s.totalT}T` : (s.fixed ? '고정요금' : ''));
 
-  const tagsStr = s.tags.map(t => tagHtml(t)).join('');
-  const remainBadge = s.remain != null ? `<div class="remain-badge">잔여 ${s.remain}T</div>` : '';
+  const tagsStr = (s.tags||[]).map(t => tagHtml(t)).join('');
+  const remainBadge = (s.remain != null && s.remain !== undefined) ? `<div class="remain-badge">잔여 ${s.remain}T</div>` : '';
 
   div.innerHTML = `
     <div class="card-top" onclick="toggleDetail('${s.id}','${month}')">
@@ -718,11 +735,11 @@ function closeUnpaid(e) {
 }
 
 // 로컬(initData) 데이터로 즉시 렌더
-render('jul');
-render('aug');
-renderSummary('jul');
-// Firebase 백그라운드 동기화 (데이터 저장용, 재렌더 없음)
-syncFromFirebase();
+try { render('jul'); } catch(e) { console.error('render jul 오류:', e); }
+try { render('aug'); } catch(e) { console.error('render aug 오류:', e); }
+try { renderSummary('jul'); } catch(e) { console.error('renderSummary 오류:', e); }
+// Firebase 백그라운드 동기화
+try { syncFromFirebase(); } catch(e) {}
 </script>
 </body>
 </html>
