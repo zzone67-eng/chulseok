@@ -2,6 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>화강암플러스 수강생 관리</title>
 <style>
@@ -485,8 +488,10 @@ window.addEventListener('scroll', () => {
 });
 
 function render(month) {
+  if (!db[month]) return; // month 데이터 없으면 skip
   const filter = currentFilter[month];
   const list = document.getElementById('list-' + month);
+  if (!list) return;
   list.innerHTML = '';
   const items = db[month].filter(s => {
     if (searchQuery && !s.name.toLowerCase().includes(searchQuery)) return false;
