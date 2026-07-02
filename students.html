@@ -19,7 +19,8 @@ html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;padding-top:0;margin:0;}
 
 /* 헤더 */
-.hdr{background:var(--red);padding:max(14px,env(safe-area-inset-top,14px)) 14px 8px;position:sticky;top:0;z-index:200;}
+.sticky-wrap{position:sticky;top:0;z-index:200;}
+.hdr{background:var(--red);padding:max(14px,env(safe-area-inset-top,14px)) 14px 8px;}
 .summary{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
 .sum-box{background:rgba(255,255,255,.15);border-radius:7px;padding:5px 8px;}
 .sum-box.full{background:rgba(255,255,255,.1);}
@@ -35,7 +36,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD 
 .unpaid-badge{background:rgba(255,255,255,.2);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;cursor:pointer;}
 
 /* 탭 */
-.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:199;overflow-x:auto;overflow-y:hidden;}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;overflow-y:hidden;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab{flex:1;min-width:70px;padding:11px 6px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap;}
 .tab.on{color:var(--red);border-bottom-color:var(--red);font-weight:700;}
@@ -142,6 +143,7 @@ textarea.ef-input{resize:vertical;min-height:70px;}
 </head>
 <body>
 
+<div class="sticky-wrap">
 <div class="hdr" id="mainHdr">
   <div class="hdr-top">
     <div>
@@ -157,6 +159,7 @@ textarea.ef-input{resize:vertical;min-height:70px;}
   <div class="tab on" onclick="switchTab('jul',this)">7월</div>
   <div class="tab" onclick="switchTab('aug',this)">8월(예정)</div>
 </div>
+</div><!-- /sticky-wrap -->
 
 <div class="search-wrap">
   <div class="search-wrap-inner">
@@ -663,12 +666,12 @@ function switchTab(month, el) {
 }
 
 function renderSummary(month) {
-  // initData 기준으로 항상 계산 (Firebase 상태와 무관하게 안정적)
   const items = initData[month] || [];
-  console.log('renderSummary:', month, items.length, '명');
-  if (!items.length) { console.error('items 비어있음!'); return; }
+  if (!items.length) return;
+  // 총액은 initData 기준(고정), 결제완료는 db 기준(실시간)
   const total = items.reduce((a,s) => a + (s.amount||0), 0);
-  const paid = items.filter(s => s.paid).reduce((a,s) => a + s.amount, 0);
+  const dbItems = (db[month] || []);
+  const paid = dbItems.filter(s => s.paid).reduce((a,s) => a + (s.amount||0), 0);
   const unpaid = total - paid;
 
   const clsList = ['입시반','예비반','중등반','취미반'];
@@ -681,7 +684,7 @@ function renderSummary(month) {
   const box = document.getElementById('summaryBox');
   if(!box){console.error('summaryBox not found');return;}
   box.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px">
       <div class="sum-box">
         <div class="sum-lbl">총 수강료</div>
         <div class="sum-val">${fmt2(total)}</div>
@@ -689,6 +692,10 @@ function renderSummary(month) {
       <div class="sum-box">
         <div class="sum-lbl">결제 완료</div>
         <div class="sum-val">${fmt2(paid)}</div>
+      </div>
+      <div class="sum-box">
+        <div class="sum-lbl">잔여 수강료</div>
+        <div class="sum-val" style="color:${unpaid>0?'#ffcc88':'#26de81'}">${fmt2(unpaid)}</div>
       </div>
     </div>
     <div class="sum-box full">
