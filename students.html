@@ -248,8 +248,8 @@ const initData = {
     // 중등반
     { id:'jul_안시연', name:'안시연', cls:'중등반', tags:['re:전월결석5'],
       schedule:'토1,토2,일1,일2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 12T / 특강 10T', absence:9, totalT:13,
-      amount:406250, fixed:false, paid:false,
+      days:'정규 12T / 특강 10T', absence:5, totalT:17,
+      amount:531250, fixed:false, paid:false,
       memo:'특강 최대 10T 기준. 요일확정 후 변동가능.', remain:null },
     { id:'jul_한지유', name:'한지유', cls:'중등반', tags:[],
       schedule:'토,일 주2회\n특강: 선택타임',
@@ -258,29 +258,29 @@ const initData = {
       memo:'특강 최대 10T 기준. 요일확정 후 변동가능.', remain:null },
     { id:'jul_조제우', name:'조제우', cls:'중등반', tags:[],
       schedule:'수,금,토 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 8T / 특강 10T', absence:0, totalT:18,
-      amount:562500, fixed:false, paid:false,
+      days:'정규 11T / 특강 14T', absence:0, totalT:25,
+      amount:781250, fixed:false, paid:false,
       memo:'', remain:null },
     { id:'jul_전서빈', name:'전서빈', cls:'중등반', tags:['re:전월결석6'],
       schedule:'목,토1,토2 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 10T / 특강 10T', absence:6, totalT:14,
-      amount:437500, fixed:false, paid:false,
+      days:'정규 10T / 특강 14T', absence:6, totalT:18,
+      amount:562500, fixed:false, paid:false,
       memo:'7/2까지 시험기간 포함 정산', remain:null },
     { id:'jul_권해원', name:'권해원', cls:'중등반', tags:['re:전월결석10'],
       schedule:'목,토1,토2 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 10T / 특강 10T', absence:10, totalT:10,
-      amount:312500, fixed:false, paid:false,
+      days:'정규 10T / 특강 14T', absence:10, totalT:14,
+      amount:437500, fixed:false, paid:false,
       memo:'', remain:null },
     { id:'jul_김현준', name:'김현준', cls:'중등반', tags:['re:전월결석4'],
       schedule:'수,토,일 주3회',
-      days:'정규 9T / 특강 3T',
+      days:'4,5,8,11,12,15,18,19,22,25,29(1,2)\n총12T - 전월결석4T = 8T',
       absence:4, totalT:8,
       amount:250000, fixed:false, paid:false,
       memo:'6/28까지 포함 정산', remain:null },
     { id:'jul_최주연', name:'최주연', cls:'중등반', tags:['re:전월결석10'],
       schedule:'토1,토2,일 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 9T / 특강 10T', absence:10, totalT:9,
-      amount:281250, fixed:false, paid:false,
+      days:'정규 9T / 특강 14T', absence:10, totalT:13,
+      amount:406250, fixed:false, paid:false,
       memo:'7/28까지 정산', remain:null },
     // 취미반
     { id:'jul_나은솔', name:'나은솔', cls:'취미반', tags:['re:전월결석1'],
@@ -345,24 +345,24 @@ const initData = {
       amount:812500, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_조제우', name:'조제우', cls:'중등반', tags:['특강'],
       schedule:'수,금,토 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
-      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
+      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34,
+      amount:1062500, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_전서빈', name:'전서빈', cls:'중등반', tags:['특강'],
       schedule:'목,토1,토2 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
-      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
+      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34,
+      amount:1062500, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_권해원', name:'권해원', cls:'중등반', tags:['특강'],
       schedule:'목,토1,토2 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
-      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
+      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34,
+      amount:1062500, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_김현준', name:'김현준', cls:'중등반', tags:['특강'],
       schedule:'수,토,일 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
-      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
+      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34,
+      amount:1062500, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_최주연', name:'최주연', cls:'중등반', tags:['특강'],
       schedule:'토1,토2,일 주3회\n특강: 선택타임',
-      days:'정규 9T / 특강 20T = 총 29T', absence:0, totalT:29,
-      amount:906250, fixed:false, paid:false, memo:'8월 예상', remain:null },
+      days:'정규 9T / 특강 26T = 총 35T', absence:0, totalT:35,
+      amount:1093750, fixed:false, paid:false, memo:'8월 예상', remain:null },
     { id:'aug_나은솔', name:'나은솔', cls:'취미반', tags:[],
       schedule:'토1 주1회', days:'4주', absence:0, totalT:4,
       amount:100000, fixed:false, paid:false, memo:'', remain:null },
@@ -397,35 +397,41 @@ const initData = {
 };
 
 // ── 스토리지 ──
+// paid 값만 Firebase에 저장, 나머지는 항상 initData 기준
 const FB_URL='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
+
 function loadDB(){
-  try{const s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}
+  // 항상 initData 기준으로 새로 시작
+  return JSON.parse(JSON.stringify(initData));
 }
+
+// paid 상태만 Firebase에 저장
 function saveDB(d){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}catch(e){}
-  fetch(`${FB_URL}/students.json`,{method:'PUT',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}}).catch(()=>{});
+  const paidMap = {};
+  ['jul','aug'].forEach(m => {
+    d[m].forEach(s => { paidMap[s.id] = s.paid; });
+  });
+  fetch(`${FB_URL}/paid.json`,{method:'PUT',body:JSON.stringify(paidMap),headers:{'Content-Type':'application/json'}}).catch(()=>{});
 }
+
+// Firebase에서 paid 값만 불러와서 현재 db에 합치기
 async function syncFromFirebase(){
   const statusEl = document.getElementById('fb-status');
   try{
-    const r=await fetch(`${FB_URL}/students.json`);
+    const r = await fetch(`${FB_URL}/paid.json`);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
-    const d=await r.json();
-    if(d && d.jul && d.jul.length > 0){
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(d));
-      // db는 메모리에만 업데이트 (화면 재렌더 없음 - 안정성 우선)
-      // 다음 번 새로고침 시 Firebase 데이터 사용
+    const paidMap = await r.json();
+    if(paidMap && typeof paidMap === 'object'){
+      ['jul','aug'].forEach(m => {
+        db[m].forEach(s => {
+          if(paidMap[s.id] !== undefined) s.paid = paidMap[s.id];
+        });
+      });
+      render(Object.keys(db)[0]); renderSummary();
       if(statusEl)statusEl.textContent='';
-    } else {
-      // Firebase 비어있으면 현재 db 업로드
-      const uploadData=(db&&db.jul&&db.jul.length)?db:JSON.parse(JSON.stringify(initData));
-      db=uploadData;
-      saveDB(uploadData);
-      if(statusEl)statusEl.textContent='Firebase 초기화 완료';
-      setTimeout(()=>{if(statusEl)statusEl.textContent='';},3000);
     }
   }catch(e){
-    if(statusEl)statusEl.textContent='Firebase 연결 실패: '+e.message;
+    if(statusEl)statusEl.textContent='연결 실패';
     console.error('Firebase 오류:',e);
   }
 }
