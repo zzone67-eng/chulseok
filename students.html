@@ -2,6 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>화강암플러스 수강생 관리</title>
 <style>
@@ -12,26 +15,28 @@
   --yellow:#E8A020; --radius:14px; --radius-sm:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;padding-top:0;margin:0;}
 
 /* 헤더 */
-.hdr{background:var(--red);padding:18px 16px 12px;position:sticky;top:0;z-index:200;}
-.summary{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;}
-.sum-box{background:rgba(255,255,255,.15);border-radius:10px;padding:8px 10px;}
-.sum-box.full{grid-column:1/-1;}
-.sum-lbl{font-size:10px;color:rgba(255,255,255,.65);font-weight:500;margin-bottom:2px;}
-.sum-val{font-size:15px;font-weight:700;color:#fff;}
+.sticky-wrap{position:sticky;top:0;z-index:200;}
+.hdr{background:var(--red);padding:max(14px,env(safe-area-inset-top,14px)) 14px 8px;}
+.summary{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
+.sum-box{background:rgba(255,255,255,.15);border-radius:7px;padding:5px 8px;}
+.sum-box.full{background:rgba(255,255,255,.1);}
+.sum-lbl{color:rgba(255,255,255,.65);font-size:10px;}
+.sum-val{color:#fff;font-size:13px;font-weight:700;}
 .sum-val.sm{font-size:13px;}
-.sum-cls{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
-.sum-cls-item{background:rgba(255,255,255,.15);border-radius:8px;padding:6px 10px;font-size:12px;color:#fff;line-height:1.6;}
+.sum-cls{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+.sum-cls-item{white-space:nowrap;font-size:11px;color:rgba(255,255,255,.85);}
 .sum-cls-item span{font-weight:700;font-size:14px;display:block;}
-.hdr-top{display:flex;justify-content:space-between;align-items:center;}
-.hdr-title{color:#fff;font-size:17px;font-weight:700;}
-.hdr-sub{color:rgba(255,255,255,.65);font-size:11px;margin-top:2px;}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.hdr-title{color:#fff;font-size:14px;font-weight:700;}
+.hdr-sub{color:rgba(255,255,255,.6);font-size:11px;}
 .unpaid-badge{background:rgba(255,255,255,.2);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;cursor:pointer;}
 
 /* 탭 */
-.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:199;overflow-x:auto;overflow-y:hidden;}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;overflow-y:hidden;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab{flex:1;min-width:70px;padding:11px 6px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap;}
 .tab.on{color:var(--red);border-bottom-color:var(--red);font-weight:700;}
@@ -138,21 +143,23 @@ textarea.ef-input{resize:vertical;min-height:70px;}
 </head>
 <body>
 
+<div class="sticky-wrap">
 <div class="hdr" id="mainHdr">
   <div class="hdr-top">
     <div>
       <div class="hdr-title">화강암플러스 수강생 관리</div>
       <div class="hdr-sub" id="hdrSub">2026년 7월</div>
     </div>
-    <div class="unpaid-badge" onclick="openUnpaid()">미납 확인</div>
+    <span id="fb-status" style="font-size:10px;color:rgba(255,255,255,.7);margin-right:8px"></span><div class="unpaid-badge" onclick="openUnpaid()">미납 확인</div>
   </div>
-  <div class="summary" id="summaryBox"></div>
+  <div class="summary" id="summaryBox" style="min-height:20px;color:white;font-size:12px">로딩중...</div>
 </div>
 
 <div class="tabs">
   <div class="tab on" onclick="switchTab('jul',this)">7월</div>
   <div class="tab" onclick="switchTab('aug',this)">8월(예정)</div>
 </div>
+</div><!-- /sticky-wrap -->
 
 <div class="search-wrap">
   <div class="search-wrap-inner">
@@ -390,25 +397,69 @@ const initData = {
 };
 
 // ── 스토리지 ──
-function loadDB() {
-  try {
-    const s = localStorage.getItem(STORAGE_KEY);
-    return s ? JSON.parse(s) : null;
-  } catch(e) { return null; }
+const FB_URL='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
+function loadDB(){
+  try{const s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}
 }
-function saveDB(db) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch(e) {}
+function saveDB(d){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}catch(e){}
+  fetch(`${FB_URL}/students.json`,{method:'PUT',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}}).catch(()=>{});
+}
+async function syncFromFirebase(){
+  const statusEl = document.getElementById('fb-status');
+  try{
+    const r=await fetch(`${FB_URL}/students.json`);
+    if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
+    const d=await r.json();
+    if(d && d.jul && d.jul.length > 0){
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(d));
+      // db는 메모리에만 업데이트 (화면 재렌더 없음 - 안정성 우선)
+      // 다음 번 새로고침 시 Firebase 데이터 사용
+      if(statusEl)statusEl.textContent='';
+    } else {
+      // Firebase 비어있으면 현재 db 업로드
+      const uploadData=(db&&db.jul&&db.jul.length)?db:JSON.parse(JSON.stringify(initData));
+      db=uploadData;
+      saveDB(uploadData);
+      if(statusEl)statusEl.textContent='Firebase 초기화 완료';
+      setTimeout(()=>{if(statusEl)statusEl.textContent='';},3000);
+    }
+  }catch(e){
+    if(statusEl)statusEl.textContent='Firebase 연결 실패: '+e.message;
+    console.error('Firebase 오류:',e);
+  }
 }
 function getDB() {
-  const saved = loadDB();
-  if (!saved) { saveDB(initData); return JSON.parse(JSON.stringify(initData)); }
-  // merge new students
-  ['jul','aug'].forEach(m => {
-    initData[m].forEach(init => {
-      if (!saved[m].find(s => s.id === init.id)) saved[m].push(init);
+  try {
+    const saved = loadDB();
+    if (!saved || !saved.jul || !saved.jul.length) {
+      const fresh = JSON.parse(JSON.stringify(initData));
+      saveDB(fresh);
+      return fresh;
+    }
+    // 각 학생에 누락 필드 보완
+    ['jul','aug'].forEach(m => {
+      if (!saved[m]) return;
+      saved[m].forEach(s => {
+        if (!s.tags) s.tags = [];
+        if (s.remain === undefined) s.remain = null;
+        if (s.amount === undefined) s.amount = 0;
+        if (s.paid === undefined) s.paid = false;
+        if (s.fixed === undefined) s.fixed = false;
+        if (s.totalT === undefined) s.totalT = 0;
+      });
+      // initData에서 새 학생 추가
+      initData[m].forEach(init => {
+        if (!saved[m].find(s => s.id === init.id)) saved[m].push(init);
+      });
     });
-  });
-  return saved;
+    return saved;
+  } catch(e) {
+    console.error('getDB 오류, initData 사용:', e);
+    const fresh = JSON.parse(JSON.stringify(initData));
+    saveDB(fresh);
+    return fresh;
+  }
 }
 
 let db = getDB();
@@ -457,8 +508,10 @@ window.addEventListener('scroll', () => {
 });
 
 function render(month) {
+  if (!db[month]) return; // month 데이터 없으면 skip
   const filter = currentFilter[month];
   const list = document.getElementById('list-' + month);
+  if (!list) return;
   list.innerHTML = '';
   const items = db[month].filter(s => {
     if (searchQuery && !s.name.toLowerCase().includes(searchQuery)) return false;
@@ -485,25 +538,30 @@ function render(month) {
     hdr.className = 'sec-hdr';
     hdr.textContent = cls;
     list.appendChild(hdr);
-    groups[cls].forEach(s => list.appendChild(makeCard(s, month)));
+    groups[cls].forEach(s => {
+    const card = makeCard(s, month);
+    if (card) list.appendChild(card);
+  });
   });
 }
 
 function makeCard(s, month) {
+  // 완전히 비어있는 학생만 숨김 (amount=0, remain 없음, 고정요금 아님)
+  if (s.amount === 0 && s.remain == null && !s.fixed) return null;
   const div = document.createElement('div');
   div.className = 'card' + (s.paid ? ' paid' : (s.amount > 0 ? ' unpaid' : ''));
   div.id = 'card-' + s.id;
 
-  const amtDisplay = s.remain !== null
+  const amtDisplay = s.remain != null
     ? `잔여 ${s.remain}T`
     : (s.amount === 0 ? '수강없음' : fmt(s.amount));
 
-  const tDisplay = s.remain !== null
+  const tDisplay = s.remain != null
     ? '수강 없음'
     : (s.totalT > 0 ? `총 ${s.totalT}T` : (s.fixed ? '고정요금' : ''));
 
-  const tagsStr = s.tags.map(t => tagHtml(t)).join('');
-  const remainBadge = s.remain !== null ? `<div class="remain-badge">잔여 ${s.remain}T</div>` : '';
+  const tagsStr = (s.tags||[]).map(t => tagHtml(t)).join('');
+  const remainBadge = (s.remain != null && s.remain !== undefined) ? `<div class="remain-badge">잔여 ${s.remain}T</div>` : '';
 
   div.innerHTML = `
     <div class="card-top" onclick="toggleDetail('${s.id}','${month}')">
@@ -608,9 +666,12 @@ function switchTab(month, el) {
 }
 
 function renderSummary(month) {
-  const items = db[month];
-  const total = items.reduce((a,s) => a + s.amount, 0);
-  const paid = items.filter(s => s.paid).reduce((a,s) => a + s.amount, 0);
+  const items = initData[month] || [];
+  if (!items.length) return;
+  // 총액은 initData 기준(고정), 결제완료는 db 기준(실시간)
+  const total = items.reduce((a,s) => a + (s.amount||0), 0);
+  const dbItems = (db[month] || []);
+  const paid = dbItems.filter(s => s.paid).reduce((a,s) => a + (s.amount||0), 0);
   const unpaid = total - paid;
 
   const clsList = ['입시반','예비반','중등반','취미반'];
@@ -621,19 +682,26 @@ function renderSummary(month) {
   const fmt2 = n => n.toLocaleString('ko-KR') + '원';
 
   const box = document.getElementById('summaryBox');
+  if(!box){console.error('summaryBox not found');return;}
   box.innerHTML = `
-    <div class="sum-box">
-      <div class="sum-lbl">총 수강료</div>
-      <div class="sum-val">${fmt2(total)}</div>
-    </div>
-    <div class="sum-box">
-      <div class="sum-lbl">결제 완료</div>
-      <div class="sum-val">${fmt2(paid)}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px">
+      <div class="sum-box">
+        <div class="sum-lbl">총 수강료</div>
+        <div class="sum-val">${fmt2(total)}</div>
+      </div>
+      <div class="sum-box">
+        <div class="sum-lbl">결제 완료</div>
+        <div class="sum-val">${fmt2(paid)}</div>
+      </div>
+      <div class="sum-box">
+        <div class="sum-lbl">잔여 수강료</div>
+        <div class="sum-val" style="color:${unpaid>0?'#ffcc88':'#26de81'}">${fmt2(unpaid)}</div>
+      </div>
     </div>
     <div class="sum-box full">
-      <div class="sum-lbl">반별 수강료</div>
-      <div class="sum-cls">
-        ${clsList.map(c => `<div class="sum-cls-item">${c} <span>${fmt2(clsSums[c])}</span></div>`).join('')}
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none">
+        
+        ${clsList.map(c => `<span style="white-space:nowrap;font-size:11px;color:#fff"><span style="opacity:.7">${c}</span> <b>${fmt2(clsSums[c])}</b></span>`).join('<span style="color:rgba(255,255,255,.3)">·</span>')}
       </div>
     </div>
   `;
@@ -673,9 +741,12 @@ function closeUnpaid(e) {
   }
 }
 
-render('jul');
-render('aug');
-renderSummary('jul');
+// 로컬(initData) 데이터로 즉시 렌더
+try { render('jul'); } catch(e) { console.error('render jul 오류:', e); }
+try { render('aug'); } catch(e) { console.error('render aug 오류:', e); }
+try { renderSummary('jul'); } catch(e) { console.error('renderSummary 오류:', e); }
+// Firebase 백그라운드 동기화
+try { syncFromFirebase(); } catch(e) {}
 </script>
 </body>
 </html>
