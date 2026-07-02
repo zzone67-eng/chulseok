@@ -12,10 +12,10 @@
   --yellow:#E8A020; --radius:14px; --radius-sm:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;padding-top:0;}
 
 /* 헤더 */
-.hdr{background:var(--red);padding:18px 16px 12px;position:sticky;top:0;z-index:200;}
+.hdr{background:var(--red);padding:max(18px,env(safe-area-inset-top,18px)) 16px 12px;position:sticky;top:0;z-index:200;}
 .summary{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;}
 .sum-box{background:rgba(255,255,255,.15);border-radius:10px;padding:8px 10px;}
 .sum-box.full{grid-column:1/-1;}
@@ -391,15 +391,19 @@ const initData = {
 
 // ── 스토리지 ──
 const FB_URL='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
-async function loadDB(){
-  try{const r=await fetch(`${FB_URL}/students.json`);
-    if(r.ok){const d=await r.json();if(d){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));return d;}}
-  }catch(e){}
+function loadDB(){
   try{const s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}
 }
-function saveDB(db){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}catch(e){}
-  fetch(`${FB_URL}/students.json`,{method:'PUT',body:JSON.stringify(db),headers:{'Content-Type':'application/json'}}).catch(()=>{});
+function saveDB(d){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}catch(e){}
+  fetch(`${FB_URL}/students.json`,{method:'PUT',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}}).catch(()=>{});
+}
+async function syncFromFirebase(){
+  try{
+    const r=await fetch(`${FB_URL}/students.json`);
+    if(!r.ok)return;const d=await r.json();if(!d)return;
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(d));db=d;
+  }catch(e){}
 }
 function getDB() {
   const saved = loadDB();
@@ -675,7 +679,7 @@ function closeUnpaid(e) {
   }
 }
 
-(async()=>{await loadDB();render('jul');render('aug');renderSummary('jul');})();
+syncFromFirebase().then(()=>{render('jul');render('aug');renderSummary('jul');});
 </script>
 </body>
 </html>
