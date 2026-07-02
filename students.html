@@ -150,7 +150,7 @@ textarea.ef-input{resize:vertical;min-height:70px;}
     </div>
     <span id="fb-status" style="font-size:10px;color:rgba(255,255,255,.7);margin-right:8px"></span><div class="unpaid-badge" onclick="openUnpaid()">미납 확인</div>
   </div>
-  <div class="summary" id="summaryBox"></div>
+  <div class="summary" id="summaryBox" style="min-height:20px;color:white;font-size:12px">로딩중...</div>
 </div>
 
 <div class="tabs">
@@ -648,7 +648,8 @@ function switchTab(month, el) {
 function renderSummary(month) {
   // initData 기준으로 항상 계산 (Firebase 상태와 무관하게 안정적)
   const items = initData[month] || [];
-  if (!items.length) return;
+  console.log('renderSummary:', month, items.length, '명');
+  if (!items.length) { console.error('items 비어있음!'); return; }
   const total = items.reduce((a,s) => a + (s.amount||0), 0);
   const paid = items.filter(s => s.paid).reduce((a,s) => a + s.amount, 0);
   const unpaid = total - paid;
@@ -661,6 +662,7 @@ function renderSummary(month) {
   const fmt2 = n => n.toLocaleString('ko-KR') + '원';
 
   const box = document.getElementById('summaryBox');
+  if(!box){console.error('summaryBox not found');return;}
   box.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">
       <div class="sum-box">
