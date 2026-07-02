@@ -11,99 +11,147 @@
 <title>화강암 미술학원</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{
-  font-family:-apple-system,'Noto Sans KR',sans-serif;
-  background:#0f0f13;
-  color:#f0f0f5;
-  min-height:100dvh;
-  padding:max(52px,env(safe-area-inset-top,52px)) 20px max(32px,env(safe-area-inset-bottom,32px));
-  display:flex;
-  flex-direction:column;
+:root{--bg:#0f0f13;--card:#1a1a24;--brd:#2a2a3a;--txt:#f0f0f5;--mu:#555;--acc:#6c6cff}
+body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh}
+
+/* ── 모바일 ── */
+@media(max-width:899px){
+  body{
+    display:flex;flex-direction:column;
+    padding:max(56px,env(safe-area-inset-top,56px)) 22px max(32px,env(safe-area-inset-bottom,32px));
+  }
+  .top{margin-bottom:auto;padding-top:8px}
+  .academy{font-size:11px;font-weight:600;color:#333;letter-spacing:2.5px;margin-bottom:12px}
+  .title{font-size:44px;font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:8px}
+  .title em{font-style:normal;color:var(--acc)}
+  .desc{font-size:13px;color:#555;line-height:1.6}
+  .divider{height:1px;background:#1a1a24;margin:28px 0}
+  .section-label{font-size:10px;font-weight:600;color:#333;letter-spacing:1.5px;margin-bottom:8px}
+  .menu{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+  .item{
+    display:flex;align-items:center;padding:16px 18px;
+    border-radius:12px;text-decoration:none;color:var(--txt);gap:14px;
+  }
+  .item:active{opacity:.7}
+  .item-left{flex:1}
+  .item-name{font-size:15px;font-weight:600;margin-bottom:2px}
+  .item-sub{font-size:11px;color:#444}
+  .item-arrow{font-size:16px;color:#333}
+  .item-att{background:#16162a;border:1px solid #2a2a50}
+  .item-att .item-name{color:#9999ff}
+  .item-stu{background:#121e12;border:1px solid #1e3a1e}
+  .item-stu .item-name{color:#77bb77}
+  .footer{margin-top:28px;font-size:10px;color:#222;text-align:right}
+  /* PC 전용 숨김 */
+  .pc-only{display:none}
 }
 
-/* 상단 */
-.top{margin-bottom:auto;padding-top:16px}
-.academy{font-size:12px;font-weight:600;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
-.title{font-size:42px;font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:8px}
-.title em{font-style:normal;color:#6c6cff}
-.desc{font-size:14px;color:#7878a0;line-height:1.6}
-
-/* 구분선 */
-.divider{height:1px;background:#1e1e28;margin:32px 0}
-
-/* 메뉴 */
-.menu{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
-
-.item{
-  display:flex;align-items:center;
-  padding:18px 20px;
-  border-radius:14px;
-  text-decoration:none;
-  color:#f0f0f5;
-  transition:background .15s;
-  gap:16px;
-}
-.item:active{background:#ffffff08}
-
-.item-left{flex:1}
-.item-name{font-size:17px;font-weight:600;margin-bottom:2px}
-.item-sub{font-size:12px;color:#555}
-
-.item-arrow{font-size:18px;color:#333}
-
-/* 출석관리 - 강조 */
-.item-att{
-  background:#1a1a2e;
-  border:1px solid #2e2e5a;
-}
-.item-att .item-name{color:#8888ff}
-.item-att .item-arrow{color:#4444aa}
-
-/* 수강생 - 기본 */
-.item-stu{
-  background:#1a1e1a;
-  border:1px solid #2a3a2a;
-}
-.item-stu .item-name{color:#88cc88}
-.item-stu .item-arrow{color:#336633}
-
-/* 하단 */
-.bottom{
-  font-size:11px;
-  color:#2a2a35;
-  text-align:right;
+/* ── PC ── */
+@media(min-width:900px){
+  body{overflow:hidden;height:100vh;display:grid;grid-template-columns:380px 1fr}
+  /* 왼쪽 사이드 */
+  .sidebar{
+    background:#0a0a0f;border-right:1px solid #1a1a24;
+    padding:60px 40px 40px;
+    display:flex;flex-direction:column;
+  }
+  .academy{font-size:11px;font-weight:600;color:#333;letter-spacing:2.5px;margin-bottom:20px}
+  .title{font-size:52px;font-weight:800;letter-spacing:-2.5px;line-height:1;margin-bottom:12px}
+  .title em{font-style:normal;color:var(--acc)}
+  .desc{font-size:13px;color:#444;line-height:1.7;margin-bottom:auto}
+  .footer{font-size:10px;color:#222;margin-top:40px}
+  /* 오른쪽 메뉴 */
+  .main-area{
+    padding:60px 48px;
+    display:flex;flex-direction:column;
+    overflow-y:auto;
+  }
+  .section-label{font-size:10px;font-weight:600;color:#333;letter-spacing:1.5px;margin-bottom:12px}
+  .divider{display:none}
+  .menu{display:flex;flex-direction:column;gap:10px;margin-bottom:36px}
+  .item{
+    display:flex;align-items:center;padding:20px 24px;
+    border-radius:14px;text-decoration:none;color:var(--txt);gap:16px;
+    cursor:pointer;transition:opacity .15s;
+  }
+  .item:hover{opacity:.8}
+  .item-left{flex:1}
+  .item-name{font-size:16px;font-weight:600;margin-bottom:3px}
+  .item-sub{font-size:12px;color:#444}
+  .item-arrow{font-size:18px;color:#2a2a3a}
+  .item-att{background:#13132a;border:1px solid #252550}
+  .item-att .item-name{color:#9999ff}
+  .item-att .item-arrow{color:#3a3a70}
+  .item-stu{background:#0f1f0f;border:1px solid #1a3a1a}
+  .item-stu .item-name{color:#77bb77}
+  .item-stu .item-arrow{color:#2a4a2a}
+  /* 모바일 전용 숨김 */
+  .mob-only{display:none}
+  .top{display:contents}
 }
 </style>
 </head>
 <body>
 
+<!-- 모바일: 위아래 / PC: 왼쪽 사이드바 -->
+<div class="sidebar mob-only" style="display:none"></div>
 <div class="top">
-  <div class="academy">Hwagangam Art Academy</div>
+  <div class="academy">HWA GANG AM ART ACADEMY</div>
   <div class="title">화강암<br>미술학원<em>.</em></div>
-  <div class="desc">선생님 전용 관리 페이지입니다</div>
+  <div class="desc">선생님 전용 관리 시스템입니다</div>
+  <div class="footer">2026 · 화강암 미술학원</div>
 </div>
 
-<div class="divider"></div>
+<!-- PC에서는 오른쪽, 모바일에서는 아래 -->
+<div class="main-area" id="main-area">
+  <div class="divider"></div>
 
-<div class="menu">
-  <a class="item item-att" href="https://zzone67-eng.github.io/chulseok/">
-    <div class="item-left">
-      <div class="item-name">출석 관리</div>
-      <div class="item-sub">출결 · 결석사유 · 실시간 공유</div>
-    </div>
-    <div class="item-arrow">→</div>
-  </a>
+  <div class="section-label">출석 관리</div>
+  <div class="menu">
+    <a class="item item-att" href="https://zzone67-eng.github.io/chulseok/">
+      <div class="item-left">
+        <div class="item-name">출석관리 — 모바일</div>
+        <div class="item-sub">출결 체크 · 결석사유 · 실시간 공유</div>
+      </div>
+      <div class="item-arrow">→</div>
+    </a>
+    <a class="item item-att" href="https://zzone67-eng.github.io/chulseok/" target="_blank">
+      <div class="item-left">
+        <div class="item-name">출석관리 — PC</div>
+        <div class="item-sub">사이드바 달력 · 타임 그리드 · 관리자</div>
+      </div>
+      <div class="item-arrow">→</div>
+    </a>
+  </div>
 
-  <a class="item item-stu" href="https://zzone67-eng.github.io/chulseok/students.html">
-    <div class="item-left">
-      <div class="item-name">수강료 관리</div>
-      <div class="item-sub">수강료 · 납부현황 · 월별 관리</div>
-    </div>
-    <div class="item-arrow">→</div>
-  </a>
+  <div class="section-label">수강료 관리</div>
+  <div class="menu">
+    <a class="item item-stu" href="https://zzone67-eng.github.io/chulseok/students.html">
+      <div class="item-left">
+        <div class="item-name">수강료관리 — 모바일</div>
+        <div class="item-sub">납부현황 · 월별 수강료 · 학생별 관리</div>
+      </div>
+      <div class="item-arrow">→</div>
+    </a>
+    <a class="item item-stu" href="https://zzone67-eng.github.io/chulseok/students-pc.html" target="_blank">
+      <div class="item-left">
+        <div class="item-name">수강료관리 — PC</div>
+        <div class="item-sub">전체 현황 · 미납 집계 · 상세 편집</div>
+      </div>
+      <div class="item-arrow">→</div>
+    </a>
+  </div>
 </div>
 
-<div class="bottom">2026 · 화강암 미술학원</div>
-
+<script>
+// PC에서는 sidebar에 top 내용 이동
+if(window.innerWidth>=900){
+  const sb=document.querySelector('.sidebar');
+  const top=document.querySelector('.top');
+  sb.style.display='flex';
+  sb.appendChild(top);
+}
+window.addEventListener('resize',()=>location.reload());
+</script>
 </body>
 </html>

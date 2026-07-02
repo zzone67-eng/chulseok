@@ -116,24 +116,7 @@ textarea.ef-input{resize:vertical;min-height:70px;}
 /* 잔여타임 뱃지 */
 .remain-badge{display:inline-block;background:#FEF3E2;color:#7A4A00;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600;margin-top:4px;}
 
-/* AI 입력 패널 */
-.ai-fab{position:fixed;bottom:24px;left:16px;width:48px;height:48px;border-radius:50%;background:var(--blue);color:#fff;border:none;font-size:22px;cursor:pointer;z-index:299;box-shadow:0 4px 14px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;}
-.ai-panel{position:fixed;inset:0;z-index:400;display:none;flex-direction:column;justify-content:flex-end;}
-.ai-panel.on{display:flex;}
-.ai-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);}
-.ai-sheet{position:relative;background:var(--surface);border-radius:22px 22px 0 0;padding:20px 16px 36px;max-height:90vh;overflow-y:auto;}
-.ai-sheet-title{font-size:16px;font-weight:700;margin-bottom:4px;}
-.ai-sheet-sub{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6;}
-.ai-textarea{width:100%;min-height:110px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;font-family:inherit;resize:none;background:var(--bg);color:var(--text);outline:none;}
-.ai-textarea:focus{border-color:var(--blue);}
-.ai-examples{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
-.ai-ex{background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:4px 11px;font-size:11px;color:var(--text2);cursor:pointer;}
-.ai-send{width:100%;margin-top:10px;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;}
-.ai-send:disabled{opacity:.5;}
-.ai-result{margin-top:14px;background:var(--bg);border-radius:var(--radius-sm);padding:12px;font-size:13px;line-height:1.7;display:none;white-space:pre-wrap;}
-.ai-result.on{display:block;}
-.ai-apply{width:100%;margin-top:8px;padding:11px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;display:none;}
-.ai-apply.on{display:block;}
+
 .ai-loading{text-align:center;padding:16px;color:var(--text2);font-size:13px;display:none;}
 .ai-loading.on{display:block;}
 .ai-month-sel{display:flex;gap:8px;margin-bottom:12px;}
@@ -181,31 +164,7 @@ textarea.ef-input{resize:vertical;min-height:70px;}
 
 <button class="top-btn" id="topBtn" onclick="scrollToTop()">↑</button>
 
-<button class="ai-fab" onclick="openAI()" title="AI 입력">✦</button>
 
-<div class="ai-panel" id="aiPanel">
-  <div class="ai-backdrop" onclick="closeAI()"></div>
-  <div class="ai-sheet">
-    <div class="ai-sheet-title">AI 수강생 입력 / 수정</div>
-    <div class="ai-sheet-sub">자유롭게 입력하면 AI가 알아서 정리해드립니다.<br>신규 추가, 기존 수정, 수강료 계산 모두 가능해요.</div>
-    <div class="ai-month-sel">
-      <button class="ai-month-btn on" id="aiMonthJul" onclick="setAIMonth('jul')">7월</button>
-      <button class="ai-month-btn" id="aiMonthAug" onclick="setAIMonth('aug')">8월</button>
-    </div>
-    <textarea class="ai-textarea" id="aiInput" placeholder="예) 김철수 중등반 토일 주2회 전월결석2회 8T&#10;예) 박민지 잔여타임 10T로 수정&#10;예) 이영희 취미반 토1 주1회 신규 결제완료&#10;여러 명 한번에 입력 가능"></textarea>
-    <div class="ai-examples">
-      <span class="ai-ex" onclick="fillEx('김철수 중등반 수금토 주3회 전월결석3회')">중등반 신규</span>
-      <span class="ai-ex" onclick="fillEx('박민지 잔여타임 10T로 수정')">잔여타임 수정</span>
-      <span class="ai-ex" onclick="fillEx('이영희 취미반 토1 주1회 결제완료')">결제처리</span>
-      <span class="ai-ex" onclick="fillEx('안시연 결석 3회 추가')">결석 수정</span>
-      <span class="ai-ex" onclick="fillEx('김나연 결제완료')">결제완료</span>
-    </div>
-    <button class="ai-send" id="aiSend" onclick="sendAI()">AI에게 정리 요청</button>
-    <div class="ai-loading" id="aiLoading">AI가 정리 중입니다...</div>
-    <div class="ai-result" id="aiResult"></div>
-    <button class="ai-apply" id="aiApply" onclick="applyAI()">적용하기</button>
-  </div>
-</div>
 
 <div class="panel on" id="panel-jul">
   <div class="filters">
@@ -431,36 +390,16 @@ const initData = {
 };
 
 // ── 스토리지 ──
-const FB_URL = 'https://hwa1-c1ad9-default-rtdb.firebaseio.com';
-
-async function loadDB() {
-  // Firebase 우선, 실패 시 localStorage 폴백
-  try {
-    const r = await fetch(`${FB_URL}/students.json`);
-    if (r.ok) {
-      const d = await r.json();
-      if (d) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
-        return d;
-      }
-    }
-  } catch(e) {}
-  // 폴백: localStorage
-  try {
-    const s = localStorage.getItem(STORAGE_KEY);
-    return s ? JSON.parse(s) : null;
-  } catch(e) { return null; }
+const FB_URL='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
+async function loadDB(){
+  try{const r=await fetch(`${FB_URL}/students.json`);
+    if(r.ok){const d=await r.json();if(d){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));return d;}}
+  }catch(e){}
+  try{const s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}
 }
-
-function saveDB(db) {
-  // localStorage에 즉시 저장
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch(e) {}
-  // Firebase에 비동기 저장
-  fetch(`${FB_URL}/students.json`, {
-    method: 'PUT',
-    body: JSON.stringify(db),
-    headers: {'Content-Type': 'application/json'}
-  }).catch(()=>{});
+function saveDB(db){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}catch(e){}
+  fetch(`${FB_URL}/students.json`,{method:'PUT',body:JSON.stringify(db),headers:{'Content-Type':'application/json'}}).catch(()=>{});
 }
 function getDB() {
   const saved = loadDB();
@@ -489,136 +428,7 @@ function tagHtml(t) {
     k === 'bo' ? 'tag-bo' : k === 'new' ? 'tag-new' : 'tag-fix';
   return `<span class="tag ${cls}">${label}</span>`;
 }
-let aiMonth = 'jul';
-let aiParsed = null;
 
-function openAI() {
-  document.getElementById('aiPanel').classList.add('on');
-  document.getElementById('aiResult').classList.remove('on');
-  document.getElementById('aiApply').classList.remove('on');
-  document.getElementById('aiLoading').classList.remove('on');
-  document.getElementById('aiInput').focus();
-}
-function closeAI() {
-  document.getElementById('aiPanel').classList.remove('on');
-}
-function setAIMonth(m) {
-  aiMonth = m;
-  document.getElementById('aiMonthJul').classList.toggle('on', m==='jul');
-  document.getElementById('aiMonthAug').classList.toggle('on', m==='aug');
-}
-function fillEx(txt) {
-  document.getElementById('aiInput').value = txt;
-}
-
-async function sendAI() {
-  const input = document.getElementById('aiInput').value.trim();
-  if (!input) return;
-  const btn = document.getElementById('aiSend');
-  btn.disabled = true;
-  document.getElementById('aiLoading').classList.add('on');
-  document.getElementById('aiResult').classList.remove('on');
-  document.getElementById('aiApply').classList.remove('on');
-  aiParsed = null;
-
-  const existingNames = db[aiMonth].map(s => s.name).join(', ');
-  const systemPrompt = `당신은 미술학원 수강생 관리 AI입니다.
-수강료 단가: 입시반/중등반 1T당 31,250원, 예비반 1T당 30,000원, 취미반 주1회 100,000원/월 주2회 200,000원/월 (결석 1회당 25,000원 차감).
-고정 수강료: 박선영 312,500원, 박하영 250,000원.
-재수생(김나현) 정규수업 50% 할인, 특강은 할인없음.
-기존 학생 목록(${aiMonth}월): ${existingNames}
-
-사용자 입력을 분석해서 반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트 없이 JSON만.
-여러 학생이면 배열에 모두 포함.
-
-[
-  {
-    "action": "add" 또는 "update",
-    "name": "학생명",
-    "cls": "입시반/예비반/중등반/취미반",
-    "schedule": "요일 및 수업일정 (개행은 \\n)",
-    "days": "수업일자/시수 내역",
-    "absence": 결석T수(숫자),
-    "totalT": 총시수(숫자),
-    "amount": 수강료(숫자, 원단위),
-    "fixed": true/false,
-    "paid": true/false,
-    "memo": "메모",
-    "remain": null 또는 잔여타임수(숫자),
-    "tags": ["태그:라벨"],
-    "summary": "한줄요약 (사람이 읽기 편하게)"
-  }
-]
-
-tags 형식: re:전월결석N회, dis:재수50%할인, fix:월고정, pause:수능까지휴식, bo:보강예정, new:신규, 특강
-action이 update면 해당 필드만 바꾸고 나머지는 기존값 유지.
-amount 계산: 총시수 × 단가 - 결석차감액. 취미반은 월정액 기준.`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: input }]
-      })
-    });
-    const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
-    const jsonMatch = raw.match(/\[.*\]/s);
-    if (!jsonMatch) throw new Error('파싱 실패');
-    aiParsed = JSON.parse(jsonMatch[0]);
-
-    const preview = aiParsed.map(s =>
-      `[${s.action === 'add' ? '신규추가' : '수정'}] ${s.name} (${s.cls})\n${s.summary}\n수강료: ${s.amount ? s.amount.toLocaleString()+'원' : '-'}${s.remain!=null?' / 잔여'+s.remain+'T':''}`
-    ).join('\n\n');
-
-    document.getElementById('aiResult').textContent = preview;
-    document.getElementById('aiResult').classList.add('on');
-    document.getElementById('aiApply').classList.add('on');
-  } catch(e) {
-    document.getElementById('aiResult').textContent = 'AI 처리 중 오류가 발생했습니다. 다시 시도해주세요.\n' + e.message;
-    document.getElementById('aiResult').classList.add('on');
-  }
-  document.getElementById('aiLoading').classList.remove('on');
-  btn.disabled = false;
-}
-
-function applyAI() {
-  if (!aiParsed) return;
-  aiParsed.forEach(s => {
-    const existing = db[aiMonth].find(x => x.name === s.name);
-    if (s.action === 'update' && existing) {
-      if (s.schedule !== undefined) existing.schedule = s.schedule;
-      if (s.days !== undefined) existing.days = s.days;
-      if (s.absence !== undefined) existing.absence = s.absence;
-      if (s.totalT !== undefined) existing.totalT = s.totalT;
-      if (s.amount !== undefined) existing.amount = s.amount;
-      if (s.fixed !== undefined) existing.fixed = s.fixed;
-      if (s.paid !== undefined) existing.paid = s.paid;
-      if (s.memo !== undefined) existing.memo = s.memo;
-      if (s.remain !== undefined) existing.remain = s.remain;
-      if (s.tags !== undefined) existing.tags = s.tags;
-    } else if (s.action === 'add') {
-      const newId = aiMonth + '_' + s.name + '_' + Date.now();
-      db[aiMonth].push({
-        id: newId, name: s.name, cls: s.cls,
-        schedule: s.schedule || '', days: s.days || '',
-        absence: s.absence || 0, totalT: s.totalT || 0,
-        amount: s.amount || 0, fixed: s.fixed || false,
-        paid: s.paid || false, memo: s.memo || '',
-        remain: s.remain ?? null, tags: s.tags || []
-      });
-    }
-  });
-  saveDB(db);
-  render(aiMonth);
-  renderSummary(aiMonth);
-  closeAI();
-  document.getElementById('aiInput').value = '';
-}
 
 
 function getActiveMonth() {
@@ -865,17 +675,7 @@ function closeUnpaid(e) {
   }
 }
 
-// Firebase에서 데이터 로드 후 렌더
-(async () => {
-  const fb = await loadDB();
-  if (fb) {
-    // Firebase 데이터로 localStorage 최신화 완료
-    console.log('Firebase 데이터 로드 완료');
-  }
-  render('jul');
-  render('aug');
-  renderSummary('jul');
-})();
+(async()=>{await loadDB();render('jul');render('aug');renderSummary('jul');})();
 </script>
 </body>
 </html>
