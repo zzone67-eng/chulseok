@@ -18,6 +18,12 @@
   --sidebar:220px; --right:280px;
   --safe-top:env(safe-area-inset-top); --safe-bot:env(safe-area-inset-bottom);
 }
+/* 스크롤바 */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--text3);}
+* {scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo','Segoe UI',sans-serif;display:flex;flex-direction:column;}
