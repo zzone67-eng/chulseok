@@ -63,6 +63,9 @@ body{
 .item-stu{background:#0e1a0e;border:1px solid #1a321a}
 .item-stu .item-name{color:#77bb77}
 .item-stu .item-arrow{color:#1a3a1a}
+.item-tim{background:#1a1214;border:1px solid #3a1a22}
+.item-tim .item-name{color:#dd8899}
+.item-tim .item-arrow{color:#3a1a22}
 
 /* PC 전용 버튼 - 모바일에서 비활성화 */
 .item-pc{opacity:0.3;cursor:default}
@@ -141,6 +144,24 @@ body{
       <div class="item-left">
         <div class="item-name">수강료관리 — PC</div>
         <div class="item-sub">전체 현황 · 미납 집계 · 상세 편집</div>
+      </div>
+      <div class="item-arrow">→</div>
+    </div>
+  </div>
+
+  <div class="section-label">시간표 관리</div>
+  <div class="menu">
+    <div class="item item-tim item-mob" onclick="nav('./schedule.html')">
+      <div class="item-left">
+        <div class="item-name">시간표관리</div>
+        <div class="item-sub">수업일 체크 · 시수 관리 · 메모 · 문자</div>
+      </div>
+      <div class="item-arrow">→</div>
+    </div>
+    <div class="item item-tim item-pc" onclick="navPC('./schedule.html')">
+      <div class="item-left">
+        <div class="item-name">시간표관리 — PC</div>
+        <div class="item-sub">달력형 시간표 · 3타임 관리 · 수강료 자동계산</div>
       </div>
       <div class="item-arrow">→</div>
     </div>

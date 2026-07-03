@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>화강암+ 스케줄</title>
+<style>
+:root {
+  --bg:#111114; --surface:#1C1C20; --surface2:#252529;
+  --border:#2E2E34; --border2:#3A3A42;
+  --text:#E2E0DA; --text2:#8A8880; --text3:#46464E;
+  --red:#C0392B; --blue:#4A90D0; --green:#2A9A52; --yellow:#C88010;
+  --blue-dim:#152336; --blue-mid:#1E3A52; --blue-border:#2E5A80;
+  --yellow-dim:#231A08; --yellow-border:#705418;
+  --r:12px; --r-sm:8px; --r-xs:6px;
+  --sidebar:220px; --right:280px;
+  --safe-top:env(safe-area-inset-top); --safe-bot:env(safe-area-inset-bottom);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo','Segoe UI',sans-serif;display:flex;flex-direction:column;}
+
+/* ── 탑바 ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:calc(12px + var(--safe-top)) 16px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:100;}
+.topbar-bar{width:4px;height:20px;background:var(--red);border-radius:2px;flex-shrink:0;}
+.topbar-title{font-size:16px;font-weight:700;flex:1;}
+.sync-btn{padding:7px 14px;background:var(--surface2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.sync-btn.synced{color:var(--green);border-color:var(--green);}
+.sync-btn.syncing{color:var(--yellow);border-color:var(--yellow-border);}
+
+/* ── 모바일 탭 ── */
+.mob-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+.mob-tab{flex:1;padding:11px 0;text-align:center;font-size:13px;font-weight:600;color:var(--text3);border:none;background:transparent;cursor:pointer;border-bottom:2.5px solid transparent;}
+.mob-tab.on{color:var(--red);border-bottom-color:var(--red);}
+
+/* ── 레이아웃 ── */
+.layout{flex:1;display:flex;overflow:hidden;}
+
+/* ── 사이드바 (PC) ── */
+.sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.month-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.month-tab{flex:1;padding:10px;text-align:center;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;}
+.month-tab.on{background:var(--red);color:#fff;}
+.cls-lbl{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;padding:10px 12px 4px;text-transform:uppercase;}
+.stu-btn{width:100%;text-align:left;padding:9px 12px;background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--text2);display:flex;justify-content:space-between;align-items:center;transition:background .1s;}
+.stu-btn:hover{background:var(--surface2);}
+.stu-btn.on{background:var(--blue-dim);color:var(--blue);font-weight:700;border-right:3px solid var(--blue);}
+.stu-t{font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-dim);padding:2px 7px;border-radius:999px;}
+
+/* ── 메인 콘텐츠 ── */
+.main{flex:1;overflow:hidden;display:flex;}
+
+/* 달력 영역 */
+.cal-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* 우측 패널 (PC) */
+.right-panel{width:var(--right);background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.right-sec{flex:1;display:flex;flex-direction:column;border-bottom:1px solid var(--border);overflow:hidden;}
+.right-sec:last-child{border-bottom:none;}
+.right-title{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.05em;padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;}
+.right-ta{flex:1;width:100%;background:transparent;border:none;color:var(--text);font-size:13px;font-family:inherit;line-height:1.7;padding:10px 14px;resize:none;outline:none;}
+.right-ta::placeholder{color:var(--text3);}
+
+/* 학생 헤더 (달력 상단) */
+.stu-header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;}
+.stu-back{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:none;color:var(--text2);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.stu-info{flex:1;}
+.stu-hname{font-size:15px;font-weight:700;}
+.stu-hcls{font-size:11px;color:var(--text2);margin-top:1px;}
+.stu-stats{display:flex;gap:12px;}
+.stat{text-align:right;}
+.stat-lbl{font-size:9px;color:var(--text3);}
+.stat-val{font-size:14px;font-weight:700;color:var(--blue);}
+.stat-val.y{color:var(--yellow);}
+.stat-val.sm{font-size:12px;}
+
+/* 빠른 액션 */
+.actions{display:flex;gap:8px;padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--border);}
+.act-btn{flex:1;padding:8px;border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;border:none;text-align:center;}
+.act-btn.red{background:#2A1210;color:#E05050;border:1px solid #5A2020;}
+.act-btn.dim{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
+
+/* ── 달력 ── */
+.cal-wrap{padding:10px;}
+.dow-row{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+.dow{text-align:center;font-size:10px;font-weight:700;color:var(--text3);padding:4px 0;}
+.dow.sun{color:#E05050;} .dow.sat{color:var(--blue);}
+.weeks{display:flex;flex-direction:column;gap:4px;}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+
+/* 날짜 카드 */
+.day{background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--border);overflow:hidden;}
+.day.empty{background:var(--bg);border-color:transparent;}
+.day-head{display:flex;justify-content:space-between;align-items:center;padding:4px 7px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.day-n{font-size:12px;font-weight:700;color:var(--text2);}
+.day-n.sun{color:#E05050;} .day-n.sat{color:var(--blue);}
+.day-t{font-size:10px;font-weight:700;color:var(--blue);}
+.day-slots{display:flex;flex-direction:column;gap:3px;padding:4px;}
+
+/* 슬롯 */
+.slot{border-radius:5px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text3);background:var(--surface2);cursor:pointer;padding:5px 0;user-select:none;transition:opacity .1s;}
+.slot:active{opacity:.6;}
+.slot.regular{background:var(--blue-mid);border-color:var(--blue-border);color:var(--blue);}
+.slot.special{background:var(--yellow-dim);border-color:var(--yellow-border);color:var(--yellow);}
+.slot.excluded{background:#1A1A1E;border-color:var(--border);color:var(--text3);text-decoration:line-through;opacity:.4;}
+.slot.ghost{background:transparent;border-color:var(--border);color:var(--text3);opacity:.18;}
+
+/* 범례 */
+.legend{display:flex;gap:12px;padding:8px 14px;background:var(--surface);border-top:1px solid var(--border);font-size:11px;color:var(--text2);flex-shrink:0;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:4px;}
+.leg-box{width:10px;height:10px;border-radius:3px;}
+
+/* ── 모바일 전용 뷰 ── */
+.mob-student-view{padding:12px;}
+.mob-month-sel{display:flex;gap:8px;margin-bottom:14px;}
+.mob-month-btn{flex:1;padding:9px;text-align:center;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-weight:600;color:var(--text2);background:transparent;cursor:pointer;}
+.mob-month-btn.on{background:var(--red);color:#fff;border-color:var(--red);}
+.mob-cls-sec{margin-bottom:16px;}
+.mob-cls-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:0 2px 6px;}
+.mob-stu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.mob-stu-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 8px;cursor:pointer;text-align:center;}
+.mob-stu-card.on{background:var(--blue-mid);border-color:var(--blue-border);}
+.mob-stu-name{font-size:13px;font-weight:600;margin-bottom:4px;}
+.mob-stu-t{font-size:12px;font-weight:700;color:var(--blue);}
+
+/* 메모 탭 */
+.note-view{padding:12px;display:flex;flex-direction:column;gap:12px;}
+.note-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);}
+.note-card-title{font-size:11px;font-weight:700;color:var(--text2);padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);border-radius:var(--r) var(--r) 0 0;}
+.note-ta{width:100%;min-height:130px;background:transparent;border:none;color:var(--text);font-size:13px;font-family:inherit;line-height:1.7;padding:12px 14px;resize:none;outline:none;}
+.note-ta::placeholder{color:var(--text3);}
+
+/* ── 반응형 ── */
+/* PC: 사이드바 + 달력 + 우측패널 */
+@media (min-width: 900px) {
+  .mob-tabs{display:none;}
+  .sidebar{display:flex;}
+  .right-panel{display:flex;}
+  .mob-student-view{display:none !important;}
+  .mob-tabs-content{display:none !important;}
+  #calArea{display:block !important;}
+  .stu-back{display:none;}
+  .cal-area{display:block !important;}
+}
+/* 모바일: 탭 네비 + 싱글 컬럼 */
+@media (max-width: 899px) {
+  .sidebar{display:none;}
+  .right-panel{display:none;}
+  .mob-tabs{display:flex;}
+  .cal-area{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-bar"></div>
+  <div class="topbar-title">화강암+ 스케줄</div>
+  <button class="sync-btn" id="syncBtn" onclick="syncToFirebase()">Firebase 동기화</button>
+</div>
+
+<!-- 모바일 탭 -->
+<div class="mob-tabs">
+  <button class="mob-tab on" onclick="mobTab('list',this)">학생</button>
+  <button class="mob-tab" onclick="mobTab('cal',this)">달력</button>
+  <button class="mob-tab" onclick="mobTab('note',this)">메모/문자</button>
+</div>
+
+<div class="layout">
+
+  <!-- PC 사이드바 -->
+  <div class="sidebar">
+    <div class="month-tabs">
+      <button class="month-tab on" onclick="setMonth(7,this)">7월</button>
+      <button class="month-tab" onclick="setMonth(8,this)">8월</button>
+    </div>
+    <div id="pcStudentList"></div>
+  </div>
+
+  <div class="main">
+
+    <!-- 달력 영역 -->
+    <div class="cal-area" id="calArea">
+
+      <!-- 모바일: 학생 선택 -->
+      <div id="mobListView" class="mob-student-view">
+        <div class="mob-month-sel">
+          <button class="mob-month-btn on" onclick="setMonth(7,this,'mob')">7월</button>
+          <button class="mob-month-btn" onclick="setMonth(8,this,'mob')">8월</button>
+        </div>
+        <div id="mobStudentList"></div>
+      </div>
+
+      <!-- 달력 뷰 (PC는 항상, 모바일은 학생 선택 후) -->
+      <div id="calView" style="display:none;">
+        <div class="stu-header">
+          <button class="stu-back" onclick="backToList()">‹</button>
+          <div class="stu-info">
+            <div class="stu-hname" id="stuName">-</div>
+            <div class="stu-hcls" id="stuCls">-</div>
+          </div>
+          <div class="stu-stats">
+            <div class="stat"><div class="stat-lbl">정규</div><div class="stat-val" id="sR">0T</div></div>
+            <div class="stat"><div class="stat-lbl">특강</div><div class="stat-val y" id="sS">0T</div></div>
+            <div class="stat"><div class="stat-lbl">수강료</div><div class="stat-val sm" id="sAmt">-</div></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="act-btn red" onclick="setAllOff()">이번달 전체 휴강</button>
+          <button class="act-btn dim" onclick="resetMonth()">초기화</button>
+        </div>
+        <div class="cal-wrap">
+          <div class="dow-row">
+            <div class="dow sun">일</div><div class="dow">월</div><div class="dow">화</div>
+            <div class="dow">수</div><div class="dow">목</div><div class="dow">금</div>
+            <div class="dow sat">토</div>
+          </div>
+          <div class="weeks" id="calWeeks"></div>
+        </div>
+        <div class="legend">
+          <span class="leg"><span class="leg-box" style="background:var(--blue-mid);border:1px solid var(--blue-border);"></span>정규</span>
+          <span class="leg"><span class="leg-box" style="background:var(--yellow-dim);border:1px solid var(--yellow-border);"></span>특강</span>
+          <span class="leg"><span class="leg-box" style="background:#1A1A1E;border:1px solid var(--border);"></span>제외</span>
+          <span style="margin-left:auto;color:var(--text3);font-size:10px;">탭: 토글 | 길게누르기/우클릭: 정규↔특강</span>
+        </div>
+      </div>
+
+      <!-- 모바일 메모/문자 탭 -->
+      <div id="mobNoteView" style="display:none;">
+        <div class="note-view" id="noteInner">
+          <div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">학생을 먼저 선택하세요</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PC 우측 패널 -->
+    <div class="right-panel">
+      <div class="right-sec">
+        <div class="right-title">메모</div>
+        <textarea class="right-ta" id="pc_memo" placeholder="수업 메모, 특이사항..."></textarea>
+      </div>
+      <div class="right-sec">
+        <div class="right-title">문자 내용</div>
+        <textarea class="right-ta" id="pc_msg" placeholder="학부모 전달 문자..."></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const DB='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
+const YEAR=2026;
+const STUDENTS={
+  '입시반':[{name:'박민지',days:['수','목','금','토']},{name:'김나연',days:['수','목','금','토','토']},{name:'박선영',days:['수','목','금','토','토']},{name:'김나현',days:['수','목','금','토']}],
+  '예비반':[{name:'김도훈',days:['토','토','일']},{name:'박하영',days:['수','목','금']}],
+  '중등반':[{name:'안시연',days:['토','토','일','일']},{name:'한지유',days:['토','일']},{name:'조제우',days:['수','금','토']},{name:'전서빈',days:['목','토','토']},{name:'권해원',days:['목','토','토']},{name:'김현준',days:['수','토','일']},{name:'최주연',days:['토','토','일']}],
+  '취미반':[{name:'나은솔',days:['토']},{name:'김건휘',days:['일']},{name:'김예진',days:['목','토']},{name:'최다윤',days:['일']},{name:'신유나',days:['토']},{name:'최현우',days:['토']},{name:'김윤재',days:['토','일']},{name:'김가람',days:['토','일']},{name:'이지아',days:['토']},{name:'명지민',days:['토']}]
+};
+const DAY_NAMES=['일','월','화','수','목','금','토'];
+let db=JSON.parse(localStorage.getItem('schedule_v1')||'{}');
+let curMonth=7,curStudent=null,curClass=null,curMobTab='list';
+let pressTimer=null;
+
+function getDays(m){return new Date(YEAR,m,0).getDate();}
+function getFirst(m){return new Date(YEAR,m-1,1).getDay();}
+function skey(c,n,m){return `${c}_${n}_${m}`;}
+function save(){localStorage.setItem('schedule_v1',JSON.stringify(db));}
+function fmtAmt(n){return n.toLocaleString('ko-KR')+'원';}
+
+function getData(cls,name,month){
+  const key=skey(cls,name,month);
+  if(!db[key]){
+    const s=STUDENTS[cls].find(x=>x.name===name);
+    const total=getDays(month),first=getFirst(month),lessons=[];
+    for(let d=1;d<=total;d++){
+      const dow=(first+d-1)%7,cnt=s.days.filter(x=>x===DAY_NAMES[dow]).length;
+      for(let t=1;t<=cnt;t++) lessons.push({day:d,tim:t,type:'regular'});
+    }
+    db[key]={lessons,special:[],excluded:[]};save();
+  }
+  return db[key];
+}
+
+const isPC=()=>window.innerWidth>=900;
+
+// ── 모바일 탭 ──
+function mobTab(tab,el){
+  curMobTab=tab;
+  document.querySelectorAll('.mob-tab').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('mobListView').style.display=tab==='list'?'':'none';
+  document.getElementById('calView').style.display=tab==='cal'&&curStudent?'':'none';
+  document.getElementById('mobNoteView').style.display=tab==='note'?'':'none';
+  if(tab==='note') renderMobNote();
+  if(tab==='cal'&&!curStudent){
+    // 학생 없으면 list로 redirect
+    document.querySelectorAll('.mob-tab')[0].click();
+  }
+}
+
+// ── 학생 목록 렌더 ──
+function renderLists(){
+  renderPCList(); renderMobList();
+}
+
+function renderPCList(){
+  const list=document.getElementById('pcStudentList');
+  list.innerHTML='';
+  Object.entries(STUDENTS).forEach(([cls,students])=>{
+    const lbl=document.createElement('div');lbl.className='cls-lbl';lbl.textContent=cls;list.appendChild(lbl);
+    students.forEach(s=>{
+      const d=getData(cls,s.name,curMonth),t=d.lessons.length+d.special.length;
+      const btn=document.createElement('button');
+      btn.className='stu-btn'+(curStudent===s.name&&curClass===cls?' on':'');
+      btn.innerHTML=`<span>${s.name}</span><span class="stu-t">${t}T</span>`;
+      btn.onclick=()=>selectStudent(cls,s.name);
+      list.appendChild(btn);
+    });
+  });
+}
+
+function renderMobList(){
+  const list=document.getElementById('mobStudentList');
+  list.innerHTML='';
+  Object.entries(STUDENTS).forEach(([cls,students])=>{
+    const sec=document.createElement('div');sec.className='mob-cls-sec';
+    sec.innerHTML=`<div class="mob-cls-title">${cls}</div>`;
+    const grid=document.createElement('div');grid.className='mob-stu-grid';
+    students.forEach(s=>{
+      const d=getData(cls,s.name,curMonth),t=d.lessons.length+d.special.length;
+      const card=document.createElement('div');
+      card.className='mob-stu-card'+(curStudent===s.name&&curClass===cls?' on':'');
+      card.innerHTML=`<div class="mob-stu-name">${s.name}</div><div class="mob-stu-t">${t}T</div>`;
+      card.onclick=()=>selectStudent(cls,s.name);
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);list.appendChild(sec);
+  });
+}
+
+// ── 학생 선택 ──
+function selectStudent(cls,name){
+  saveNote();
+  curClass=cls;curStudent=name;
+  document.getElementById('stuName').textContent=name;
+  document.getElementById('stuCls').textContent=cls;
+  // PC: 달력 바로 보여줌
+  document.getElementById('calView').style.display='';
+  document.getElementById('mobListView').style.display='none';
+  document.getElementById('mobNoteView').style.display='none';
+  // 모바일: 달력 탭으로 자동 전환
+  if(!isPC()){
+    document.querySelectorAll('.mob-tab')[1].click();
+  }
+  renderCalendar();updateStats();loadNote();renderLists();
+}
+
+function backToList(){
+  saveNote();
+  document.getElementById('calView').style.display='none';
+  document.getElementById('mobListView').style.display='';
+  renderMobList();
+}
+
+// ── 월 변경 ──
+function setMonth(m,el,ctx){
+  saveNote();curMonth=m;
+  if(ctx==='mob'){
+    document.querySelectorAll('.mob-month-btn').forEach(b=>b.classList.remove('on'));
+  } else {
+    document.querySelectorAll('.month-tab').forEach(b=>b.classList.remove('on'));
+  }
+  el.classList.add('on');
+  if(curStudent){renderCalendar();updateStats();}
+  renderLists();
+}
+
+// ── 통계 ──
+function updateStats(){
+  if(!curStudent) return;
+  const d=getData(curClass,curStudent,curMonth);
+  const rate=curClass==='예비반'?30000:31250,t=d.lessons.length+d.special.length;
+  document.getElementById('sR').textContent=d.lessons.length+'T';
+  document.getElementById('sS').textContent=d.special.length+'T';
+  document.getElementById('sAmt').textContent=fmtAmt(t*rate);
+}
+
+// ── 달력 렌더 ──
+function renderCalendar(){
+  const container=document.getElementById('calWeeks');
+  container.innerHTML='';
+  if(!curStudent) return;
+  const d=getData(curClass,curStudent,curMonth);
+  const s=STUDENTS[curClass].find(x=>x.name===curStudent);
+  const total=getDays(curMonth),first=getFirst(curMonth);
+  const cells=[];
+  for(let i=0;i<first;i++) cells.push(null);
+  for(let day=1;day<=total;day++) cells.push(day);
+  while(cells.length%7!==0) cells.push(null);
+
+  for(let w=0;w<cells.length/7;w++){
+    const row=document.createElement('div');row.className='week';
+    for(let i=0;i<7;i++){
+      const day=cells[w*7+i],card=document.createElement('div');
+      if(!day){card.className='day empty';row.appendChild(card);continue;}
+      card.className='day';
+      const dow=i,dowName=DAY_NAMES[dow];
+      const defCnt=s.days.filter(x=>x===dowName).length;
+      const isExcl=d.excluded.includes(day);
+      const rl=d.lessons.filter(l=>l.day===day),sp=d.special.filter(l=>l.day===day);
+      const tot=rl.length+sp.length;
+      const head=document.createElement('div');head.className='day-head';
+      head.innerHTML=`<span class="day-n${dow===0?' sun':dow===6?' sat':''}">${day}</span>${tot>0?`<span class="day-t">${tot}T</span>`:''}`;
+      card.appendChild(head);
+      const slots=document.createElement('div');slots.className='day-slots';
+      for(let tim=1;tim<=3;tim++){
+        const slot=document.createElement('div');
+        const hasR=rl.some(l=>l.tim===tim),hasS=sp.some(l=>l.tim===tim),isDef=tim<=defCnt;
+        if(isExcl&&isDef&&!hasR&&!hasS) slot.className='slot excluded';
+        else if(hasR) slot.className='slot regular';
+        else if(hasS) slot.className='slot special';
+        else if(isDef) slot.className='slot';
+        else slot.className='slot ghost';
+        slot.textContent=tim+'T';
+        slot.dataset.day=day;slot.dataset.tim=tim;slot.dataset.dow=dowName;slot.dataset.def=defCnt;
+        slots.appendChild(slot);
+      }
+      card.appendChild(slots);row.appendChild(card);
+    }
+    container.appendChild(row);
+  }
+
+  // 이벤트 위임
+  container.onclick=e=>{
+    const slot=e.target.closest('.slot');
+    if(!slot) return;
+    if(_lock) return;_lock=true;setTimeout(()=>_lock=false,250);
+    toggleSlot(+slot.dataset.day,+slot.dataset.tim,slot.dataset.dow,+slot.dataset.def);
+  };
+  container.oncontextmenu=e=>{
+    e.preventDefault();
+    const slot=e.target.closest('.slot');
+    if(slot) toggleSpecial(+slot.dataset.day,+slot.dataset.tim);
+  };
+  container.addEventListener('touchstart',e=>{
+    const slot=e.target.closest('.slot');
+    if(!slot) return;
+    pressTimer=setTimeout(()=>toggleSpecial(+slot.dataset.day,+slot.dataset.tim),600);
+  },{passive:true});
+  container.addEventListener('touchend',()=>{clearTimeout(pressTimer);},{passive:true});
+  container.addEventListener('touchmove',()=>{clearTimeout(pressTimer);},{passive:true});
+}
+
+let _lock=false;
+function toggleSlot(day,tim,dowName,defCnt){
+  const d=getData(curClass,curStudent,curMonth);
+  const hasR=d.lessons.some(l=>l.day===day&&l.tim===tim);
+  const hasS=d.special.some(l=>l.day===day&&l.tim===tim);
+  const isDef=tim<=defCnt;
+  if(hasR){
+    d.lessons=d.lessons.filter(l=>!(l.day===day&&l.tim===tim));
+    if(isDef&&!d.excluded.includes(day)) d.excluded.push(day);
+  } else if(hasS){
+    d.special=d.special.filter(l=>!(l.day===day&&l.tim===tim));
+  } else {
+    d.excluded=d.excluded.filter(x=>x!==day);
+    d.lessons.push({day,tim,type:'regular'});
+  }
+  save();renderCalendar();updateStats();renderLists();
+}
+
+function toggleSpecial(day,tim){
+  const d=getData(curClass,curStudent,curMonth);
+  const hasR=d.lessons.some(l=>l.day===day&&l.tim===tim);
+  const hasS=d.special.some(l=>l.day===day&&l.tim===tim);
+  if(hasR){d.lessons=d.lessons.filter(l=>!(l.day===day&&l.tim===tim));d.special.push({day,tim,type:'special'});}
+  else if(hasS){d.special=d.special.filter(l=>!(l.day===day&&l.tim===tim));d.lessons.push({day,tim,type:'regular'});}
+  save();renderCalendar();updateStats();
+}
+
+function setAllOff(){
+  if(!curStudent||!confirm(`${curStudent} ${curMonth}월 전체 휴강?`)) return;
+  const d=getData(curClass,curStudent,curMonth);
+  const s=STUDENTS[curClass].find(x=>x.name===curStudent);
+  const total=getDays(curMonth),first=getFirst(curMonth);
+  d.lessons=[];d.special=[];d.excluded=[];
+  for(let day=1;day<=total;day++){const dow=(first+day-1)%7;if(s.days.includes(DAY_NAMES[dow]))d.excluded.push(day);}
+  save();renderCalendar();updateStats();renderLists();
+}
+
+function resetMonth(){
+  if(!curStudent||!confirm(`${curStudent} ${curMonth}월 초기화?`)) return;
+  delete db[skey(curClass,curStudent,curMonth)];
+  save();renderCalendar();updateStats();renderLists();
+}
+
+// ── 메모/문자 ──
+function nkey(f){return `note_${curClass}_${curStudent}_${curMonth}_${f}`;}
+function saveNote(){
+  if(!curStudent) return;
+  ['memo','msg'].forEach(f=>{
+    const pc=document.getElementById('pc_'+f);
+    const mob=document.getElementById('mob_'+f);
+    const val=(pc||mob)?.value||'';
+    localStorage.setItem(nkey(f),val);
+  });
+}
+function loadNote(){
+  if(!curStudent) return;
+  ['memo','msg'].forEach(f=>{
+    const val=localStorage.getItem(nkey(f))||'';
+    const pc=document.getElementById('pc_'+f);
+    const mob=document.getElementById('mob_'+f);
+    if(pc){pc.value=val;pc.oninput=saveNote;}
+    if(mob){mob.value=val;mob.oninput=saveNote;}
+  });
+}
+function renderMobNote(){
+  const inner=document.getElementById('noteInner');
+  if(!curStudent){inner.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">학생을 먼저 선택하세요</div>';return;}
+  inner.innerHTML=`
+    <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px;">${curStudent} · ${curMonth}월</div>
+    <div class="note-card"><div class="note-card-title">메모</div><textarea class="note-ta" id="mob_memo" placeholder="수업 메모, 특이사항..."></textarea></div>
+    <div class="note-card"><div class="note-card-title">문자 내용</div><textarea class="note-ta" id="mob_msg" placeholder="학부모 전달 문자..."></textarea></div>`;
+  loadNote();
+}
+
+// ── Firebase 동기화 ──
+async function syncToFirebase(){
+  const btn=document.getElementById('syncBtn');
+  btn.textContent='동기화 중...';btn.className='sync-btn syncing';
+  try{
+    const schedule={};
+    [7,8].forEach(month=>{
+      const total=getDays(month),first=getFirst(month);
+      for(let day=1;day<=total;day++){
+        const ds=`${YEAR}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        schedule[ds]={'1타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]},'2타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]},'3타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]}};
+        Object.entries(STUDENTS).forEach(([cls,students])=>{
+          students.forEach(s=>{
+            const d=getData(cls,s.name,month);
+            if(d.excluded.includes(day)) return;
+            [...d.lessons,...d.special].filter(l=>l.day===day).forEach(l=>{
+              const tk=l.tim+'타임';
+              if(!schedule[ds][tk][cls].includes(s.name)) schedule[ds][tk][cls].push(s.name);
+            });
+          });
+        });
+      }
+    });
+    await fetch(`${DB}/timetable.json`,{method:'PUT',body:JSON.stringify(schedule),headers:{'Content-Type':'application/json'}});
+    btn.textContent='✓ 동기화됨';btn.className='sync-btn synced';
+    setTimeout(()=>{btn.textContent='Firebase 동기화';btn.className='sync-btn';},3000);
+  }catch(e){
+    btn.textContent='실패';btn.className='sync-btn';console.error(e);
+  }
+}
+
+// ── 초기화 ──
+// PC면 달력 뷰 표시
+if(window.innerWidth>=900){
+  document.getElementById('mobListView').style.display='none';
+}
+renderLists();
+</script>
+</body>
+</html>
