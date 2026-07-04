@@ -411,6 +411,7 @@ function saveDB(d){
 async function syncFromFirebase(){
   const statusEl = document.getElementById('fb-status');
   try{
+    // 1. paid.json 로드
     const r = await fetch(`${FB_URL}/paid.json`);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const paidMap = await r.json();
@@ -420,16 +421,76 @@ async function syncFromFirebase(){
           if(paidMap[s.id] !== undefined) s.paid = paidMap[s.id];
         });
       });
-      if(typeof render === 'function') render(Object.keys(db)[0]);
-      if(typeof renderSidebar === 'function') renderSidebar();
-      if(typeof renderSummary === 'function'){
-        const m = document.getElementById('panel-aug') && document.getElementById('panel-aug').classList.contains('on') ? 'aug' : 'jul';
-        renderSummary(m);
-      }
-      if(statusEl) statusEl.textContent = '';
     }
+
+    // 2. timetable.json에서 시수 읽어서 수강료 업데이트
+    const tr = await fetch(`${FB_URL}/timetable.json`);
+    if(tr.ok){
+      const timetable = await tr.json();
+      if(timetable && typeof timetable === 'object'){
+        // 학생별 7월/8월 시수 집계
+        const fees = {};
+        Object.entries(timetable).forEach(([dateStr, dayData])=>{
+          const [y,m,d] = dateStr.split('-').map(Number);
+          const mon = m === 7 ? 'jul' : m === 8 ? 'aug' : null;
+          if(!mon) return;
+          ['1타임','2타임','3타임'].forEach((tim, ti)=>{
+            if(!dayData[tim]) return;
+            ['입시반','예비반','중등반','취미반'].forEach(cls=>{
+              (dayData[tim][cls]||[]).forEach(name=>{
+                const key = mon+'_'+name;
+                if(!fees[key]) fees[key]={regular:0,special:0};
+                fees[key].regular++;
+              });
+            });
+          });
+        });
+
+        // db 수강료 업데이트
+        const RATE = {
+          '박선영': {type:'fix', amt:312500},
+          '박하영': {type:'fix', amt:250000},
+          '박민지': {type:'remain'},
+          '김나현': {type:'discount50'},
+        };
+        const TAKUMI = ['나은솔','김건휘','김예진','최다윤','신유나','최현우','김윤재','김가람','이지아','명지민'];
+
+        ['jul','aug'].forEach(mon=>{
+          if(!db[mon]) return;
+          db[mon].forEach(s=>{
+            const name = s.name;
+            const key = mon+'_'+name;
+            const fc = fees[key];
+            if(!fc) return;
+
+            const r = RATE[name];
+            if(r && r.type==='fix') return; // 고정 금액은 건드리지 않음
+            if(r && r.type==='remain') return; // 잔여 안내도 건드리지 않음
+
+            const isTakumi = TAKUMI.includes(name);
+            const rate = s.cls==='예비반' ? 30000 : 31250;
+            const totalT = fc.regular;
+
+            if(r && r.type==='discount50'){
+              // 재수생: 정규 50% + 특강 full (timetable에서 구분 어려워 전체 적용)
+              s.amount = Math.round(totalT * rate * 0.5);
+            } else if(isTakumi){
+              // 취미반은 고정 유지
+            } else {
+              s.amount = totalT * rate;
+            }
+            s.totalT = totalT;
+          });
+        });
+      }
+    }
+
+    if(typeof render==='function') render();
+    if(typeof renderSidebar==='function') renderSidebar();
+    if(typeof renderSummary==='function') renderSummary();
+    if(statusEl) statusEl.textContent='';
   }catch(e){
-    if(statusEl) statusEl.textContent = '연결 실패';
+    if(statusEl) statusEl.textContent='연결 실패';
     console.error('Firebase 오류:', e);
   }
 }
