@@ -640,6 +640,11 @@ async function syncFB(){
   btn.textContent='동기화 중...';btn.className='sync-btn ing';
   try{
     for(const month of [7]){
+      // [수정] 모든 학생 데이터를 미리 초기화 — 한 번도 클릭 안 한 학생도 sync에 포함
+      Object.entries(STUDENTS).forEach(([cls,stus])=>{
+        stus.forEach(s=>getData(cls,s.name,month));
+      });
+
       const sch={};
       const tot=getDays(month),fst=getFirst(month);
       for(let day=1;day<=tot;day++){
@@ -656,7 +661,11 @@ async function syncFB(){
           });
         });
       }
-      await fetch(DB+'/timetable/2026-'+String(month).padStart(2,'0')+'.json',{method:'PUT',body:JSON.stringify(sch),headers:{'Content-Type':'application/json'}});
+      // index.html이 읽는 경로: /timetable/2026-07 → 날짜별로 /timetable/2026-07/{YYYY-MM-DD} 에 저장
+      const monthKey='timetable/'+YEAR+'-'+String(month).padStart(2,'0');
+      for(const [ds,dayData] of Object.entries(sch)){
+        await fetch(DB+'/'+monthKey+'/'+ds+'.json',{method:'PUT',body:JSON.stringify(dayData),headers:{'Content-Type':'application/json'}});
+      }
     }
     await fetch(DB+'/schedule_backup.json',{method:'PUT',body:JSON.stringify(db),headers:{'Content-Type':'application/json'}});
     btn.textContent='✓ 동기화됨';btn.className='sync-btn ok';
