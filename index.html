@@ -292,7 +292,10 @@ let S = {}; // Firebase에서 로드
 
 async function loadTimetable() {
   try {
-    const data = await fbGet('timetable');
+    // 월별로 저장된 데이터 합치기
+    let data = {};
+    const mdata = await fbGet('timetable/2026-07');
+    if(mdata) Object.assign(data, mdata);
     if(data && typeof data === 'object') {
       // 각 날짜의 타임 구조 검증 및 보정
       const fixed = {};
@@ -346,8 +349,6 @@ function launch(){
 }
 async function load(dk,show=true){
   if(show){const ct=isMob()?'mob-ct':'pc-ct';const el=document.getElementById(ct);if(el)el.innerHTML='<div class="closed-box">불러오는 중…</div>';}
-  // S가 아직 비어있으면 먼저 로드
-  if(Object.keys(S).length===0) await loadTimetable();
   try{const d=await fbGet(`att/${dk}`);att[dk]=d||{};}
   catch(err){if(!att[dk])att[dk]={};console.error('load err:',err);}
   if(dk===cur)render();
@@ -494,7 +495,6 @@ function scrollToCls(ti,cls){
 
 // ── 렌더 ─────────────────────────────────────────────
 function render(){
-  if(Object.keys(S).length===0){loadTimetable().then(()=>render());return;}
   const sc=S[cur];let tot=0,pres=0,ab=0;
   if(sc)TIMES.forEach(ti=>CLS.forEach(c=>(sc[ti][c]||[]).forEach(n=>{tot++;const e=ent(ti,n);if(e.present)pres++;if(e.absent)ab++;if(e.earlyLeave)ab++;})));
   const early=sc?TIMES.reduce((s,ti)=>s+CLS.reduce((s2,c)=>s2+(sc[ti][c]||[]).filter(n=>ent(ti,n).earlyLeave).length,0),0):0;

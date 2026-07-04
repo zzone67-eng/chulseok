@@ -176,7 +176,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
   <div class="sidebar">
     <div class="month-row">
       <button class="mth-btn on" onclick="setMonth(7,this)">7월</button>
-      <button class="mth-btn" onclick="setMonth(8,this)">8월</button>
+      
     </div>
     <div class="sb-list" id="sbList"></div>
   </div>
@@ -188,7 +188,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
     <div class="mob-list-view" id="mobListView">
       <div class="mob-month-row">
         <button class="mob-mth on" onclick="setMonth(7,this,'mob')">7월</button>
-        <button class="mob-mth" onclick="setMonth(8,this,'mob')">8월</button>
+
       </div>
       <div id="mobListInner"></div>
     </div>
@@ -639,8 +639,8 @@ async function syncFB(){
   const btn=document.getElementById('syncBtn');
   btn.textContent='동기화 중...';btn.className='sync-btn ing';
   try{
-    const sch={};
-    [7,8].forEach(month=>{
+    for(const month of [7]){
+      const sch={};
       const tot=getDays(month),fst=getFirst(month);
       for(let day=1;day<=tot;day++){
         const ds=YEAR+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0');
@@ -656,14 +656,9 @@ async function syncFB(){
           });
         });
       }
-    });
-    // 수업 있는 날만 필터링해서 저장 (데이터 크기 줄이기)
-    const filtered = {};
-    Object.entries(sch).forEach(([date, dayData]) => {
-      const hasAny = Object.values(dayData).some(tim => Object.values(tim).some(arr => arr.length > 0));
-      if(hasAny) filtered[date] = dayData;
-    });
-    await fetch(DB+'/timetable.json',{method:'PUT',body:JSON.stringify(filtered),headers:{'Content-Type':'application/json'}});
+      await fetch(DB+'/timetable/2026-'+String(month).padStart(2,'0')+'.json',{method:'PUT',body:JSON.stringify(sch),headers:{'Content-Type':'application/json'}});
+    }
+    await fetch(DB+'/schedule_backup.json',{method:'PUT',body:JSON.stringify(db),headers:{'Content-Type':'application/json'}});
     btn.textContent='✓ 동기화됨';btn.className='sync-btn ok';
     setTimeout(()=>{btn.textContent='Firebase 동기화';btn.className='sync-btn';},3000);
   }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error(e);}
