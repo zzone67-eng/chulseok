@@ -34,7 +34,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 
 /* ── 모바일 ── */
 #main-mob{display:none}
-.mob-sticky{position:fixed;top:0;left:0;right:0;background:var(--bg);z-index:20}
+.mob-sticky{position:sticky;top:0;background:var(--bg);z-index:20}
 .mob-header{padding:max(20px,env(safe-area-inset-top,20px)) 14px 0}
 .mob-drow{display:flex;align-items:center;margin-bottom:5px}
 .mob-date{display:flex;align-items:baseline;gap:8px;flex:1}
@@ -59,7 +59,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 .time-tab{flex:1;height:38px;border-radius:10px;border:1.5px solid var(--brd);background:var(--surf);color:var(--mu);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .time-tab.on{border-color:transparent;color:#fff}
 /* 컨텐츠 */
-.mob-content{padding:0 10px 40px;display:flex;flex-direction:column;gap:8px;padding-top:0}
+.mob-content{padding:0 10px 40px;display:flex;flex-direction:column;gap:8px}
 
 /* ── PC ── */
 #main-pc{display:none;height:100vh;grid-template-columns:380px 1fr;grid-template-rows:auto 1fr}
@@ -350,14 +350,6 @@ function launch(){
   if(isMob()||isTab()) document.getElementById('main-mob').style.display='block';
   else                   document.getElementById('main-pc').style.display='grid';
   cur=toKey(new Date());loadTimetable().then(()=>{buildNav();load(cur);});
-  // fixed 헤더 높이만큼 콘텐츠 padding-top 설정
-  function adjustStickyPad(){
-    const s=document.querySelector('.mob-sticky');
-    const c=document.getElementById('mob-ct');
-    if(s&&c)c.style.paddingTop=s.offsetHeight+'px';
-  }
-  adjustStickyPad();
-  new ResizeObserver(adjustStickyPad).observe(document.querySelector('.mob-sticky'));
   const sd=document.getElementById('sch-date');if(sd)sd.textContent=SCHEDULE_UPDATED;
   if(pollTimer)clearInterval(pollTimer);
   pollTimer=setInterval(()=>loadTimetable().then(()=>{buildNav();load(cur,false);}),30000);
@@ -515,8 +507,6 @@ function buildNav(){
   if(isMob()) buildMobNav(tk);
   else buildPcCal(tk);
   buildClsTabs();
-  // 탭/날짜 변경 후 헤더 높이 재계산
-  if(typeof adjustStickyPad==='function')setTimeout(adjustStickyPad,50);
 }
 function buildMobNav(tk){
   let h='';
@@ -872,7 +862,7 @@ function rStats(ym,days){
     TIMES.forEach(ti=>CLS.forEach(cls=>(sc[ti][cls]||[]).forEach(name=>{
       if(!ss[name])ss[name]={cls,s:0,p:0,a:0,m:0,reasons:[]};
       ss[name].s++;const e=(dd[ti]||{})[name]||{};
-      if(e.present)ss[name].p++;if(e.absent){if(e.makeup){ss[name].m++;}else{ss[name].a++;if(e.reason)ss[name].reasons.push(`${i}일:${e.reason}`);}}}
+      if(e.present)ss[name].p++;if(e.absent){if(e.makeup){ss[name].m++;}else{ss[name].a++;if(e.reason)ss[name].reasons.push(`${i}일:${e.reason}`);}}
     })));
   }
   if(!Object.keys(ss).length){document.getElementById('admin-ct').innerHTML='<div class="empty">데이터 없음</div>';return;}
