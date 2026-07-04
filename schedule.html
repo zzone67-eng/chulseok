@@ -398,9 +398,8 @@ function calcFee(){
   const rate=curCls==='예비반'?30000:31250;
   const s=STUDENTS[curCls].find(x=>x.name===curStu);
   const abs=getAbs(),sp=d.special.length;
-  let reg,finalT;
-  if(abs===0){reg=s.days.length*4;finalT=reg+sp;}
-  else{reg=d.lessons.length;finalT=Math.max(0,reg+sp-abs);}
+  let reg=d.lessons.length;
+  let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curStu==='김나현'){
     const rT=abs===0?s.days.length*4:d.lessons.length;
