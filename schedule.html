@@ -106,12 +106,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD 
 .day-slots{display:flex;flex-direction:column;gap:3px;padding:4px;}
 
 /* 슬롯 */
-.slot{border-radius:5px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text3);background:var(--surface2);cursor:pointer;padding:5px 0;user-select:none;transition:opacity .1s;}
+.slot{border-radius:5px;border:1px solid transparent;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text3);background:var(--surface);cursor:pointer;padding:5px 0;user-select:none;transition:opacity .1s;}
 .slot:active{opacity:.6;}
 .slot.regular{background:var(--blue-mid);border-color:var(--blue-border);color:var(--blue);}
 .slot.special{background:var(--yellow-dim);border-color:var(--yellow-border);color:var(--yellow);}
-.slot.excluded{background:#1A1A1E;border-color:var(--border);color:var(--text3);text-decoration:line-through;opacity:.4;}
-.slot.ghost{background:transparent;border-color:var(--border);color:var(--text3);opacity:.18;}
+.slot.excluded{background:var(--surface);border-color:transparent;color:var(--text3);text-decoration:line-through;opacity:.4;}
+
 
 /* 범례 */
 .legend{display:flex;gap:12px;padding:8px 14px;background:var(--surface);border-top:1px solid var(--border);font-size:11px;color:var(--text2);flex-shrink:0;flex-wrap:wrap;}
@@ -430,7 +430,7 @@ function renderCalendar(){
         else if(hasR) slot.className='slot regular';
         else if(hasS) slot.className='slot special';
         else if(isDef) slot.className='slot';
-        else slot.className='slot ghost';
+        else slot.className='slot';
         slot.textContent=tim+'T';
         slot.dataset.day=day;slot.dataset.tim=tim;slot.dataset.dow=dowName;slot.dataset.def=defCnt;
         slots.appendChild(slot);
@@ -444,7 +444,7 @@ function renderCalendar(){
   container.onclick=e=>{
     const slot=e.target.closest('.slot');
     if(!slot) return;
-    if(_lock) return;_lock=true;setTimeout(()=>_lock=false,250);
+    if(_lock) return; _lock=true; setTimeout(()=>_lock=false,250);
     toggleSlot(+slot.dataset.day,+slot.dataset.tim,slot.dataset.dow,+slot.dataset.def);
   };
   container.oncontextmenu=e=>{
