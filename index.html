@@ -331,7 +331,7 @@ function toast(m,c='var(--green)'){
   const el=document.getElementById('toast');el.textContent=m;el.style.background=c;el.style.opacity='1';
   if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.opacity='0',2200);
 }
-function retrySync(){load(cur)}
+function retrySync(){loadTimetable().then(()=>{buildNav();load(cur);});}
 
 // ── 앱 시작 ──────────────────────────────────────────
 function launch(){
@@ -345,7 +345,7 @@ function launch(){
   cur=toKey(new Date());loadTimetable().then(()=>{buildNav();load(cur);});
   const sd=document.getElementById('sch-date');if(sd)sd.textContent=SCHEDULE_UPDATED;
   if(pollTimer)clearInterval(pollTimer);
-  pollTimer=setInterval(()=>load(cur,false),30000);
+  pollTimer=setInterval(()=>loadTimetable().then(()=>{buildNav();load(cur,false);}),30000);
 }
 async function load(dk,show=true){
   if(show){const ct=isMob()?'mob-ct':'pc-ct';const el=document.getElementById(ct);if(el)el.innerHTML='<div class="closed-box">불러오는 중…</div>';}
