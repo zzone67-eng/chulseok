@@ -412,43 +412,66 @@ function saveDB(d){
 async function syncFromFirebase(){
   const statusEl = document.getElementById('fb-status');
   try {
+    // 1. paid.json - 결제 여부
     const r = await fetch(`${FB_URL}/paid.json`);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const paidMap = await r.json();
     if(paidMap && typeof paidMap==='object'){
       ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{ if(paidMap[s.id]!==undefined) s.paid=paidMap[s.id]; }); });
     }
-    const tr = await fetch(`${FB_URL}/timetable.json`);
-    if(tr.ok){
-      const timetable = await tr.json();
-      if(timetable && typeof timetable==='object'){
-        const fees = {};
-        Object.entries(timetable).forEach(([dateStr,dayData])=>{
-          const [y,m,d2] = dateStr.split('-').map(Number);
-          const mon = m===7?'jul':m===8?'aug':null; if(!mon) return;
-          ['1타임','2타임','3타임'].forEach(tim=>{ if(!dayData[tim]) return;
-            ['입시반','예비반','중등반','취미반'].forEach(cls=>{
-              (dayData[tim][cls]||[]).forEach(name=>{ const k=mon+'_'+name; if(!fees[k])fees[k]={regular:0}; fees[k].regular++; });
-            });
-          });
-        });
-        const RATE={'박선영':{type:'fix'},'박하영':{type:'fix'},'박민지':{type:'remain'},'김나현':{type:'discount50'}};
-        const TAKUMI=['나은솔','김건휘','김예진','최다윤','신유나','최현우','김윤재','김가람','이지아','명지민'];
-        ['jul','aug'].forEach(mon=>{ if(!db[mon]) return;
-          db[mon].forEach(s=>{ const fc=fees[mon+'_'+s.name]; if(!fc) return;
-            const r2=RATE[s.name];
-            if(r2&&(r2.type==='fix'||r2.type==='remain')) return;
-            const rate=s.cls==='예비반'?30000:31250;
-            if(r2&&r2.type==='discount50') s.amount=Math.round(fc.regular*rate*0.5);
-            else if(!TAKUMI.includes(s.name)) s.amount=fc.regular*rate;
-            s.totalT=fc.regular;
+
+    // 2. schedule_backup.json - 정규/특강 분리된 원본 데이터로 시수/수강료 계산
+    const br = await fetch(`${FB_URL}/schedule_backup.json`);
+    if(br.ok){
+      const backup = await br.json();
+      if(backup && typeof backup==='object'){
+        const RATE_MAP = {
+          '박선영': {type:'fix'}, '박하영': {type:'fix'},
+          '박민지': {type:'remain'}, '김나현': {type:'discount50'}
+        };
+        const TAKUMI = ['나은솔','김건휘','김예진','최다윤','신유나','최현우','김윤재','김가람','이지아','명지민'];
+
+        ['jul','aug'].forEach(mon=>{
+          const mNum = mon==='jul'?7:8;
+          if(!db[mon]) return;
+          db[mon].forEach(s=>{
+            const rSpec = RATE_MAP[s.name];
+            // 고정/잔여 학생은 건드리지 않음
+            if(rSpec && (rSpec.type==='fix' || rSpec.type==='remain')) return;
+            // 취미반은 고정
+            if(TAKUMI.includes(s.name)) return;
+
+            // schedule_backup에서 해당 학생 데이터 찾기
+            // 키 형식: "반_이름_월" (예: "입시반_김나연_7")
+            const key = `${s.cls}_${s.name}_${mNum}`;
+            const sdata = backup[key];
+            if(!sdata) return;
+
+            const regT = (sdata.lessons||[]).length;
+            const spT  = (sdata.special||[]).length;
+            const absT = (sdata.excluded||[]).length; // 결석 (정규에서 제외된 날)
+            const rate = s.cls==='예비반' ? 30000 : 31250;
+
+            if(rSpec && rSpec.type==='discount50'){
+              // 재수생: 정규 50% + 특강 정가
+              s.amount = Math.round(regT * rate * 0.5) + spT * rate;
+              s.totalT = regT + spT;
+            } else {
+              // 일반: (정규 + 특강) × 단가
+              s.amount = (regT + spT) * rate;
+              s.totalT = regT + spT;
+            }
+            // days 텍스트 업데이트
+            if(spT > 0) s.days = `정규 ${regT}T / 특강 ${spT}T = 총 ${regT+spT}T`;
+            else s.days = `${regT}T`;
           });
         });
       }
     }
+
     renderAll();
     if(statusEl) statusEl.textContent='';
-  } catch(e){ if(statusEl) statusEl.textContent='연결 실패'; }
+  } catch(e){ if(statusEl) statusEl.textContent='연결 실패'; console.error(e); }
 }
 function getDB(){
   const saved=loadDB();
