@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="출석관리">
@@ -12,7 +12,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0f0f13;--card:#1e1e28;--surf:#252530;--brd:#2e2e3e;--txt:#f0f0f5;--mu:#7878a0;--acc:#6c6cff;--green:#26de81;--red:#ff5c5c;--t1:#ff9f43;--t2:#5cc8ff;--t3:#a29bfe}
-body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh}
+html,body{overscroll-behavior-y:none}body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt)}
 
 /* ── 공통 ── */
 #toast{position:fixed;bottom:max(20px,env(safe-area-inset-bottom,20px));left:50%;transform:translateX(-50%);background:var(--green);color:#0f0f13;font-weight:700;font-size:13px;padding:8px 18px;border-radius:20px;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
@@ -34,7 +34,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 
 /* ── 모바일 ── */
 #main-mob{display:none}
-.mob-sticky{position:sticky;top:0;background:var(--bg);z-index:20}
+.mob-sticky{position:sticky;top:0;background:var(--bg);z-index:20;will-change:transform;transform:translateZ(0)}
 .mob-header{padding:max(20px,env(safe-area-inset-top,20px)) 14px 0}
 .mob-drow{display:flex;align-items:center;margin-bottom:5px}
 .mob-date{display:flex;align-items:baseline;gap:8px;flex:1}
@@ -59,7 +59,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 .time-tab{flex:1;height:38px;border-radius:10px;border:1.5px solid var(--brd);background:var(--surf);color:var(--mu);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .time-tab.on{border-color:transparent;color:#fff}
 /* 컨텐츠 */
-.mob-content{padding:0 10px 40px;display:flex;flex-direction:column;gap:8px}
+.mob-content{padding:0 10px 40px;display:flex;flex-direction:column;gap:8px;overscroll-behavior-y:none}
 
 /* ── PC ── */
 #main-pc{display:none;height:100vh;grid-template-columns:380px 1fr;grid-template-rows:auto 1fr}
