@@ -246,6 +246,14 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
         <input class="abs-input" type="text" inputmode="numeric" id="absIn" value="0" oninput="onAbs()">
         <span class="abs-lbl">T</span>
       </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 14px 12px;">
+        <span style="font-size:12px;color:var(--tx2);">4주 기준으로 계산</span>
+        <label style="position:relative;display:inline-block;width:36px;height:20px;cursor:pointer;">
+          <input type="checkbox" id="use4wk" onchange="onAbs()" style="opacity:0;width:0;height:0;position:absolute;">
+          <span id="toggleTrack" style="position:absolute;inset:0;background:var(--bd2);border-radius:999px;transition:background .2s;"></span>
+          <span id="toggleThumb" style="position:absolute;left:3px;top:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s;"></span>
+        </label>
+      </div>
       <div class="rp-body" style="padding-top:0;">
         <div class="rp-row"><span class="lbl">정규</span><span class="val" id="rpR">-</span></div>
         <div class="rp-row"><span class="lbl">특강</span><span class="val y" id="rpS">-</span></div>
@@ -361,6 +369,9 @@ function pick(cls,name){
   // 저장된 전월결석
   const absEl=document.getElementById('absIn');
   if(absEl) absEl.value=localStorage.getItem('abs_'+cls+'_'+name+'_'+mon)||'0';
+  const cbEl=document.getElementById('use4wk');
+  if(cbEl) cbEl.checked=localStorage.getItem('4wk_'+cls+'_'+name+'_'+mon)==='1';
+  updateToggle();
   // 헤더
   document.getElementById('hName').textContent=name;
   document.getElementById('hCls').textContent=cls;
@@ -398,27 +409,32 @@ function calcFee(){
   const rate=curCls==='예비반'?30000:31250;
   const s=STUDENTS[curCls].find(x=>x.name===curStu);
   const abs=getAbs(),sp=d.special.length;
-  let reg=d.lessons.length;
+  const actualReg=d.lessons.length; // 실제 체크 시수
+  const use4wk=document.getElementById('use4wk')?.checked;
+  let reg=use4wk ? s.days.length*4 : actualReg; // 수강료 계산용
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curStu==='김나현'){
-    const rT=abs===0?s.days.length*4:d.lessons.length;
+    const rT=use4wk?s.days.length*4:actualReg;
     fee=Math.round(rT*rate*0.5)+sp*rate;
   }
   if(curCls==='취미반'){
     const base=s.days.length===1?100000:200000;
     fee=Math.max(0,base-abs*25000)+sp*25000;
-    reg=s.days.length*4;finalT=reg;
+    reg=use4wk?s.days.length*4:actualReg;finalT=reg;
   }
-  return {rate,reg,sp,abs,finalT,fee};
+  return {rate,reg,sp,abs,finalT,fee,actualReg};
 }
 
 function updateStats(){
   const c=calcFee();if(!c) return;
-  document.getElementById('sR').textContent=c.reg+'T';
+  // 상단: 실제 체크 시수
+  document.getElementById('sR').textContent=c.actualReg+'T';
   document.getElementById('sS').textContent=c.sp+'T';
   document.getElementById('sAmt').textContent=fmt(c.fee);
-  document.getElementById('rpR').textContent=c.reg+'T';
+  // 우측 패널: 수강료 계산 기준
+  const use4wk=document.getElementById('use4wk')?.checked;
+  document.getElementById('rpR').textContent=c.reg+'T'+(use4wk?' (4주)':'');
   document.getElementById('rpS').textContent=c.sp+'T';
   document.getElementById('rpA').textContent=c.abs>0?'-'+c.abs+'T':'없음';
   document.getElementById('rpFee').textContent=fmt(c.fee);
@@ -427,7 +443,19 @@ function updateStats(){
 function onAbs(){
   if(!curStu) return;
   localStorage.setItem('abs_'+curCls+'_'+curStu+'_'+mon,getAbs());
+  const cb=document.getElementById('use4wk');
+  if(cb) localStorage.setItem('4wk_'+curCls+'_'+curStu+'_'+mon,cb.checked?'1':'0');
+  updateToggle();
   updateStats();updateFee();
+}
+
+function updateToggle(){
+  const cb=document.getElementById('use4wk');
+  const track=document.getElementById('toggleTrack');
+  const thumb=document.getElementById('toggleThumb');
+  if(!cb||!track||!thumb) return;
+  track.style.background=cb.checked?'var(--blue)':'var(--bd2)';
+  thumb.style.transform=cb.checked?'translateX(16px)':'translateX(0)';
 }
 
 // ── 문자 생성 ──
