@@ -652,7 +652,7 @@ async function syncFB(){
         Object.entries(STUDENTS).forEach(([cls,stus])=>{
           stus.forEach(s=>{
             const d=getData(cls,s.name,month);
-            if(d.excluded.includes(day))return;
+            // excluded는 UI 표시용 — 실제 lessons/special에 있는 것만 Firebase에 저장
             [...d.lessons,...d.special].filter(l=>l.day===day).forEach(l=>{
               const tk=l.tim+'타임';
               if(!sch[ds][tk][cls].includes(s.name))sch[ds][tk][cls].push(s.name);
@@ -663,6 +663,15 @@ async function syncFB(){
 
       // ── 디버그: 7월 4일 데이터 확인 ──
       console.log('[syncFB] 7/4 데이터:', JSON.stringify(sch['2026-07-04']));
+      
+      // ── 디버그: 주요 학생 localStorage 원본 확인 ──
+      ['입시반_박민지_7','입시반_김나연_7','중등반_한지유_7','취미반_나은솔_7'].forEach(k => {
+        const raw = localStorage.getItem('sch_v1');
+        const parsed = raw ? JSON.parse(raw) : {};
+        if(parsed[k]) console.log(`[localStorage] ${k}:`, JSON.stringify(parsed[k]));
+        else console.log(`[localStorage] ${k}: 없음 (미초기화)`);
+      });
+      
       const totalNames = Object.values(sch).reduce((sum, day) =>
         sum + Object.values(day).reduce((s2, tim) =>
           s2 + Object.values(tim).reduce((s3, arr) => s3 + arr.length, 0), 0), 0);
