@@ -292,12 +292,11 @@ let S = {}; // Firebase에서 로드
 
 async function loadTimetable() {
   try {
-    // 월별로 저장된 데이터 합치기
     let data = {};
     const mdata = await fbGet('timetable/2026-07');
+    console.log('[loadTimetable] raw Firebase 응답 키:', mdata ? Object.keys(mdata).slice(0,3) : 'null');
     if(mdata) Object.assign(data, mdata);
     if(data && typeof data === 'object') {
-      // 각 날짜의 타임 구조 검증 및 보정
       const fixed = {};
       Object.entries(data).forEach(([date, dayData]) => {
         fixed[date] = {};
@@ -309,10 +308,15 @@ async function loadTimetable() {
         });
       });
       S = fixed;
-      console.log('시간표 Firebase 로드 완료');
+      // 7/4 데이터 확인
+      console.log('[loadTimetable] S[2026-07-04]:', JSON.stringify(S['2026-07-04']));
+      const total = Object.values(S).reduce((sum, day) =>
+        sum + Object.values(day).reduce((s2, tim) =>
+          s2 + Object.values(tim).reduce((s3, arr) => s3 + arr.length, 0), 0), 0);
+      console.log('[loadTimetable] 완료. 전체 수업:', total, '명/일');
     }
   } catch(e) {
-    console.warn('Firebase 시간표 로드 실패:', e);
+    console.warn('[loadTimetable] 실패:', e);
   }
 }
 

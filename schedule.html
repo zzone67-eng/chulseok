@@ -640,7 +640,6 @@ async function syncFB(){
   btn.textContent='동기화 중...';btn.className='sync-btn ing';
   try{
     for(const month of [7]){
-      // [수정] 모든 학생 데이터를 미리 초기화 — 한 번도 클릭 안 한 학생도 sync에 포함
       Object.entries(STUDENTS).forEach(([cls,stus])=>{
         stus.forEach(s=>getData(cls,s.name,month));
       });
@@ -661,14 +660,25 @@ async function syncFB(){
           });
         });
       }
-      // 31번 개별 요청 대신 월 전체를 한 번에 PUT
+
+      // ── 디버그: 7월 4일 데이터 확인 ──
+      console.log('[syncFB] 7/4 데이터:', JSON.stringify(sch['2026-07-04']));
+      const totalNames = Object.values(sch).reduce((sum, day) =>
+        sum + Object.values(day).reduce((s2, tim) =>
+          s2 + Object.values(tim).reduce((s3, arr) => s3 + arr.length, 0), 0), 0);
+      console.log('[syncFB] 전체 수업 수:', totalNames, '명/일');
+
       const monthKey='timetable/'+YEAR+'-'+String(month).padStart(2,'0');
-      await fetch(DB+'/'+monthKey+'.json',{method:'PUT',body:JSON.stringify(sch),headers:{'Content-Type':'application/json'}});
+      const url=DB+'/'+monthKey+'.json';
+      console.log('[syncFB] PUT URL:', url);
+      const res=await fetch(url,{method:'PUT',body:JSON.stringify(sch),headers:{'Content-Type':'application/json'}});
+      const resText=await res.text();
+      console.log('[syncFB] PUT 응답 status:', res.status, '| body:', resText.slice(0,200));
     }
     await fetch(DB+'/schedule_backup.json',{method:'PUT',body:JSON.stringify(db),headers:{'Content-Type':'application/json'}});
     btn.textContent='✓ 동기화됨';btn.className='sync-btn ok';
     setTimeout(()=>{btn.textContent='Firebase 동기화';btn.className='sync-btn';},3000);
-  }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error(e);}
+  }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error('[syncFB] 에러:', e);}
 }
 
 // ── 초기화 ──
