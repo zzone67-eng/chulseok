@@ -95,17 +95,18 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD 
 .slot.excluded{background:var(--surface);border-color:transparent;color:var(--text3);text-decoration:line-through;opacity:.35;}
 
 /* 하단 패널 */
-.bottom-panel{flex-shrink:0;border-top:1px solid var(--border);}
-.absence-row{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--surface2);flex-wrap:wrap;}
-.ab-lbl{font-size:12px;color:var(--text2);white-space:nowrap;}
+
+
+
 .ab-input{width:56px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--rsm);color:var(--text);font-size:13px;font-weight:600;padding:5px 8px;text-align:center;outline:none;}
 .ab-input:focus{border-color:var(--blue);}
-.ab-fee{font-size:14px;font-weight:700;color:var(--blue);}
-.msg-section{display:flex;flex-direction:column;}
-.msg-hdr{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.05em;padding:8px 14px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-.msg-ta{width:100%;height:130px;background:transparent;border:none;color:var(--text);font-size:12px;font-family:inherit;line-height:1.75;padding:10px 14px;resize:none;outline:none;}
-.msg-ta::placeholder{color:var(--text3);}
-.msg-copy{margin:0 14px 10px;padding:8px;background:var(--blue-mid);border:1px solid var(--blue-border);color:var(--blue);border-radius:var(--rsm);font-size:12px;font-weight:700;cursor:pointer;text-align:center;}
+.ab-input::-webkit-outer-spin-button,.ab-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+
+
+
+
+
+
 
 /* 우측 패널 */
 .right-panel{width:260px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
@@ -214,19 +215,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD 
             <div class="weeks" id="calWeeks"></div>
           </div>
         </div>
-        <div class="bottom-panel">
-          <div class="absence-row">
-            <span class="ab-lbl">전월 결석</span>
-            <input class="ab-input" type="number" id="absInput" min="0" max="30" value="0" oninput="onAbsChange()">
-            <span class="ab-lbl">T &nbsp;→&nbsp; 최종 수강료:</span>
-            <span class="ab-fee" id="finalFee">-</span>
-          </div>
-          <div class="msg-section">
-            <div class="msg-hdr">수강료 안내 문자</div>
-            <textarea class="msg-ta" id="feeMsg" placeholder="학생을 선택하면 자동 생성됩니다..."></textarea>
-            <button class="msg-copy" id="feeCopyBtn" onclick="copyFeeMsg()" style="display:none;">문자 복사</button>
-          </div>
-        </div>
+
       </div>
 
       <!-- 모바일 메모 탭 -->
@@ -239,13 +228,35 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD 
 
     <!-- PC 우측 패널 -->
     <div class="right-panel">
-      <div class="rp-sec">
+      <div class="rp-sec" style="flex-shrink:0;">
+        <div class="rp-title">전월 결석</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;">
+          <input class="ab-input" type="text" inputmode="numeric" id="pcAbsInput" value="0" oninput="onPcAbsChange()" style="-moz-appearance:textfield;">
+          <span style="font-size:12px;color:var(--text2);">T 차감</span>
+        </div>
+        <div style="padding:0 14px 12px;display:flex;flex-direction:column;gap:4px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);">
+            <span>정규</span><span id="rp_regular" style="color:var(--text);">-</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);">
+            <span>특강</span><span id="rp_special" style="color:var(--yellow);">-</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);">
+            <span>결석 차감</span><span id="rp_abs" style="color:#E05050;">-</span>
+          </div>
+          <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px;display:flex;justify-content:space-between;font-size:13px;font-weight:700;">
+            <span style="color:var(--text2);">수강료</span><span id="rp_fee" style="color:var(--blue);">-</span>
+          </div>
+        </div>
+      </div>
+      <div class="rp-sec" style="flex:2;">
+        <div class="rp-title">수강료 안내 문자</div>
+        <textarea class="rp-ta" id="pcFeeMsg" placeholder="학생을 선택하면 자동 생성됩니다..."></textarea>
+        <button onclick="copyPcFeeMsg()" id="pcFeeCopyBtn" style="display:none;margin:0 14px 10px;padding:8px;background:var(--blue-mid);border:1px solid var(--blue-border);color:var(--blue);border-radius:var(--rsm);font-size:12px;font-weight:700;cursor:pointer;text-align:center;">문자 복사</button>
+      </div>
+      <div class="rp-sec" style="flex:1;">
         <div class="rp-title">메모</div>
         <textarea class="rp-ta" id="pcMemo" placeholder="수업 메모, 특이사항..."></textarea>
-      </div>
-      <div class="rp-sec">
-        <div class="rp-title">문자 내용</div>
-        <textarea class="rp-ta" id="pcMsg" placeholder="학부모 전달 문자..."></textarea>
       </div>
     </div>
   </div>
@@ -334,8 +345,8 @@ function selectStudent(cls,name){
   document.getElementById('stuCls').textContent=cls;
   // 저장된 전월결석 로드
   const savedAbs=localStorage.getItem('abs_'+cls+'_'+name+'_'+curMonth)||'0';
-  const absEl=document.getElementById('absInput');
-  if(absEl) absEl.value=savedAbs;
+  const pcAbsEl=document.getElementById('pcAbsInput');
+  if(pcAbsEl) pcAbsEl.value=savedAbs;
   // 뷰 전환
   showCalView();
   renderCalendar();updateStats();loadNote();updateFeeSection();renderLists();
@@ -383,6 +394,8 @@ function setMonth(m,el,ctx){
     const savedAbs=localStorage.getItem('abs_'+curClass+'_'+curStudent+'_'+m)||'0';
     const absEl=document.getElementById('absInput');
     if(absEl) absEl.value=savedAbs;
+  const pcAbsEl=document.getElementById('pcAbsInput');
+  if(pcAbsEl) pcAbsEl.value=savedAbs;
     renderCalendar();updateStats();updateFeeSection();
   }
   renderLists();
@@ -398,7 +411,7 @@ function updateStats(){
 }
 
 // ── 수강료 계산 ──
-function getAbsence(){return parseInt(document.getElementById('absInput')?.value||0)||0;}
+function getAbsence(){return parseInt(document.getElementById('pcAbsInput')?.value||0)||0;}
 
 function calcFee(){
   if(!curStudent) return {rate:0,regular:0,special:0,total:0,absence:0,finalT:0,fee:0};
@@ -461,7 +474,38 @@ function updateFeeSection(){
     body='■ '+mon+' 수업 내역\n정규 수업: '+c.regular+'T'+(hasSpecial?'\n방학 특강: '+c.special+'T':'')+(hasAbsence?'\n전월 결석 차감: -'+c.absence+'T':'')+'\n합계: 총 '+c.finalT+'T\n\n■ '+mon+' 수강료\n'+c.rate.toLocaleString()+'원 × '+c.finalT+'T = '+fmtAmt(c.fee);
   }
   ta.value='['+mon+' 수강료 안내 - '+curStudent+' 학생 ('+curClass+')]\n안녕하세요. 화강암플러스미술학원입니다.\n\n'+specialNotice+body+FOOTER;
-  if(copyBtn) copyBtn.style.display='block';
+
+  // PC 우측 패널 동기화
+  const pcFeeMsg=document.getElementById('pcFeeMsg');
+  const pcFeeCopyBtn=document.getElementById('pcFeeCopyBtn');
+  const pcAbsInput=document.getElementById('pcAbsInput');
+  if(pcAbsInput) pcAbsInput.value=getAbsence();
+  if(pcFeeMsg) pcFeeMsg.value=ta?ta.value:'';
+  if(pcFeeCopyBtn) pcFeeCopyBtn.style.display='block';
+  const rR=document.getElementById('rp_regular');
+  const rS=document.getElementById('rp_special');
+  const rA=document.getElementById('rp_abs');
+  const rF=document.getElementById('rp_fee');
+  if(rR) rR.textContent=c.regular+'T';
+  if(rS) rS.textContent=c.special+'T';
+  if(rA) rA.textContent=c.absence>0?'-'+c.absence+'T':'없음';
+  if(rF) rF.textContent=fmtAmt(c.fee);
+}
+
+function onPcAbsChange(){
+  const pcAbs=document.getElementById('pcAbsInput');
+  const mobAbs=document.getElementById('absInput');
+  if(pcAbs&&mobAbs) mobAbs.value=pcAbs.value;
+  onAbsChange();
+}
+
+function copyPcFeeMsg(){
+  const ta=document.getElementById('pcFeeMsg');
+  if(!ta) return;
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    const btn=document.getElementById('pcFeeCopyBtn');
+    btn.textContent='복사됨!';setTimeout(()=>btn.textContent='문자 복사',2000);
+  });
 }
 
 function copyFeeMsg(){
