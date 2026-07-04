@@ -115,6 +115,17 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD 
 
 /* 범례 */
 .legend{display:flex;gap:12px;padding:8px 14px;background:var(--surface);border-top:1px solid var(--border);font-size:11px;color:var(--text2);flex-shrink:0;flex-wrap:wrap;}
+.absence-bar{background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;}
+.absence-lbl{font-size:12px;color:var(--text2);white-space:nowrap;}
+.absence-input{width:60px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-size:13px;font-weight:600;padding:5px 8px;text-align:center;outline:none;}
+.absence-input:focus{border-color:var(--blue);}
+.absence-fee{font-size:13px;font-weight:700;color:var(--blue);margin-left:4px;}
+.msg-area{flex:1;display:flex;flex-direction:column;border-top:1px solid var(--border);}
+.msg-title{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.05em;padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;}
+.msg-ta{flex:1;min-height:120px;width:100%;background:transparent;border:none;color:var(--text);font-size:12px;font-family:inherit;line-height:1.7;padding:10px 14px;resize:none;outline:none;}
+.msg-ta::placeholder{color:var(--text3);}
+.msg-copy{margin:0 14px 10px;padding:8px;background:var(--blue-mid);border:1px solid var(--blue-border);color:var(--blue);border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;text-align:center;}
+.msg-copy:hover{opacity:.85;}
 .leg{display:flex;align-items:center;gap:4px;}
 .leg-box{width:10px;height:10px;border-radius:3px;}
 
@@ -230,6 +241,18 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD 
           <span class="leg"><span class="leg-box" style="background:var(--yellow-dim);border:1px solid var(--yellow-border);"></span>특강</span>
           <span class="leg"><span class="leg-box" style="background:#1A1A1E;border:1px solid var(--border);"></span>제외</span>
           <span style="margin-left:auto;color:var(--text3);font-size:10px;">탭: 토글 | 길게누르기/우클릭: 정규↔특강</span>
+        </div>
+        <div class="absence-bar">
+          <span class="absence-lbl">전월 결석</span>
+          <input class="absence-input" type="number" id="absInput" min="0" max="30" value="0" oninput="onAbsChange()">
+          <span class="absence-lbl">T 차감</span>
+          <span class="absence-lbl" style="margin-left:8px;">최종 수강료:</span>
+          <span class="absence-fee" id="finalFee">-</span>
+        </div>
+        <div class="msg-area">
+          <div class="msg-title">수강료 안내 문자</div>
+          <textarea class="msg-ta" id="feeMsg" placeholder="학생을 선택하면 자동 생성됩니다..."></textarea>
+          <button class="msg-copy" id="feeCopyBtn" onclick="copyFeeMsg()" style="display:none;">문자 복사</button>
         </div>
       </div>
 
@@ -362,7 +385,7 @@ function selectStudent(cls,name){
   if(!isPC()){
     document.querySelectorAll('.mob-tab')[1].click();
   }
-  renderCalendar();updateStats();loadNote();renderLists();
+  renderCalendar();updateStats();loadNote();renderLists();updateFeeSection();
 }
 
 function backToList(){
@@ -381,7 +404,7 @@ function setMonth(m,el,ctx){
     document.querySelectorAll('.month-tab').forEach(b=>b.classList.remove('on'));
   }
   el.classList.add('on');
-  if(curStudent){renderCalendar();updateStats();}
+  if(curStudent){renderCalendar();updateStats();updateFeeSection();}
   renderLists();
 }
 
@@ -476,7 +499,7 @@ function toggleSlot(day,tim,dowName,defCnt){
     d.excluded=d.excluded.filter(x=>x!==day);
     d.lessons.push({day,tim,type:'regular'});
   }
-  save();renderCalendar();updateStats();renderLists();
+  save();renderCalendar();updateStats();renderLists();updateFeeSection();
 }
 
 function toggleSpecial(day,tim){
@@ -495,13 +518,13 @@ function setAllOff(){
   const total=getDays(curMonth),first=getFirst(curMonth);
   d.lessons=[];d.special=[];d.excluded=[];
   for(let day=1;day<=total;day++){const dow=(first+day-1)%7;if(s.days.includes(DAY_NAMES[dow]))d.excluded.push(day);}
-  save();renderCalendar();updateStats();renderLists();
+  save();renderCalendar();updateStats();renderLists();updateFeeSection();
 }
 
 function resetMonth(){
   if(!curStudent||!confirm(`${curStudent} ${curMonth}월 초기화?`)) return;
   delete db[skey(curClass,curStudent,curMonth)];
-  save();renderCalendar();updateStats();renderLists();
+  save();renderCalendar();updateStats();renderLists();updateFeeSection();
 }
 
 // ── 메모/문자 ──
@@ -564,6 +587,145 @@ async function syncToFirebase(){
   }catch(e){
     btn.textContent='실패';btn.className='sync-btn';console.error(e);
   }
+}
+
+// ── 수강료 계산 + 문자 생성 ──
+const BANK='부산은행 101-2092-8547-06 (예금주: 화강암플러스미술학원)';
+const CONTACT='학원: 051-553-3698
+원장: 010-7701-6594 (문자 문의 가능)';
+const FOOTER=`
+
+■ 납부 방법
+${BANK}
+카드결제 시 아이편으로 보내주시면 결제 도와드리겠습니다.
+
+■ 문의
+${CONTACT}
+감사합니다.`;
+
+function getAbsence(){return parseInt(document.getElementById('absInput')?.value||0)||0;}
+
+function calcFee(){
+  if(!curStudent) return {rate:0,regular:0,special:0,total:0,absence:0,finalT:0,fee:0};
+  const d=getData(curClass,curStudent,curMonth);
+  const rate=curClass==='예비반'?30000:31250;
+  const s=STUDENTS[curClass].find(x=>x.name===curStudent);
+  const absence=getAbsence();
+  const special=d.special.length;
+
+  let regular, finalT;
+  if(absence===0){
+    // 전월결석 없으면 4주 기준 (주당 수업횟수 × 4)
+    const weeklyCount=s.days.length;
+    regular=weeklyCount*4;
+    finalT=regular+special;
+  } else {
+    // 전월결석 있으면 실제 체크한 시수 기준
+    regular=d.lessons.length;
+    finalT=Math.max(0,regular+special-absence);
+  }
+
+  const fee=finalT*rate;
+  return {rate,regular,special,total:regular+special,absence,finalT,fee};
+}
+
+function onAbsChange(){
+  if(!curStudent) return;
+  const c=calcFee();
+  const el=document.getElementById('finalFee');
+  if(el) el.textContent=c.fee.toLocaleString('ko-KR')+'원';
+  // 전월결석 저장
+  if(curStudent) localStorage.setItem(`abs_${curClass}_${curStudent}_${curMonth}`, getAbsence());
+  generateFeeMsg();
+}
+
+function generateFeeMsg(){
+  const ta=document.getElementById('feeMsg');
+  const copyBtn=document.getElementById('feeCopyBtn');
+  if(!ta||!curStudent) return;
+  const c=calcFee();
+  const mon=curMonth+'월';
+  const isFixed=curStudent==='박선영'||curStudent==='박하영';
+  const isRemain=curStudent==='박민지';
+  const isDiscount=curStudent==='김나현';
+  const hasSpecial=c.special>0;
+  const hasAbsence=c.absence>0;
+
+  let body='';
+  if(isFixed){
+    body=`■ ${mon} 수강료
+${c.fee.toLocaleString('ko-KR')}원 (고정)`;
+  } else if(isRemain){
+    body=`■ 잔여 타임 안내
+현재 잔여 타임 소진 후 수강료를 별도로 안내드릴 예정입니다.`;
+  } else {
+    body=`■ ${mon} 수업 내역`;
+    body+=`
+정규 수업: ${c.regular}T`;
+    if(hasSpecial) body+=`
+방학 특강: ${c.special}T`;
+    if(hasAbsence) body+=`
+전월 결석 차감: -${c.absence}T`;
+    body+=`
+합계: 총 ${c.finalT}T`;
+    body+=`
+
+■ ${mon} 수강료`;
+    if(isDiscount){
+      const regFee=Math.round(c.regular*c.rate*0.5);
+      const spFee=c.special*c.rate;
+      body+=`
+· 정규: ${c.rate.toLocaleString()}원 × ${c.regular}T = ${(c.regular*c.rate).toLocaleString()}원`;
+      body+=`
+  재수생 50% 할인 → ${regFee.toLocaleString()}원`;
+      if(hasSpecial) body+=`
+· 특강: ${c.rate.toLocaleString()}원 × ${c.special}T = ${spFee.toLocaleString()}원 (할인 없음)`;
+      body+=`
+· 합계: ${c.fee.toLocaleString()}원`;
+    } else {
+      body+=`
+${c.rate.toLocaleString()}원 × ${c.finalT}T = ${c.fee.toLocaleString()}원`;
+    }
+  }
+
+  const hasSpecialNotice=curClass==='중등반'&&hasSpecial;
+  const specialNotice=hasSpecialNotice?`
+★ 방학특강 요일 확정 요청 ★
+현재 특강은 최대 타임 기준으로 안내드리고 있습니다.
+정확한 요일 및 타임 확정 후 수강료가 변동될 수 있으니,
+요일이 확정되는 대로 꼭 학원으로 연락 주시기 바랍니다.
+
+`:'';
+
+  ta.value=`[${mon} 수강료 안내 - ${curStudent} 학생 (${curClass})]
+안녕하세요. 화강암플러스미술학원입니다.
+
+${specialNotice}${body}${FOOTER}`;
+  if(copyBtn) copyBtn.style.display='block';
+}
+
+function copyFeeMsg(){
+  const ta=document.getElementById('feeMsg');
+  if(!ta) return;
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    const btn=document.getElementById('feeCopyBtn');
+    btn.textContent='복사됨!';
+    setTimeout(()=>btn.textContent='문자 복사',2000);
+  });
+}
+
+function updateFeeSection(){
+  if(!curStudent) return;
+  const c=calcFee();
+  const el=document.getElementById('finalFee');
+  const absInput=document.getElementById('absInput');
+  if(el) el.textContent=c.fee.toLocaleString('ko-KR')+'원';
+  // 저장된 전월결석 불러오기
+  if(absInput){
+    const saved=localStorage.getItem(`abs_${curClass}_${curStudent}_${curMonth}`)||'0';
+    absInput.value=saved;
+  }
+  generateFeeMsg();
 }
 
 // ── 초기화 ──
