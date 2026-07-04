@@ -365,7 +365,7 @@ function go(dk){
   if(!att[dk]){const ct=isMob()?'mob-ct':'pc-ct';document.getElementById(ct).innerHTML='<div class="closed-box">불러오는 중…</div>';load(dk);}
   else render();
 }
-function ent(ti,n){return att[cur]?.[ti]?.[n]||{present:false,absent:false,earlyLeave:false,reason:'',contact:false,contact2:false}}
+function ent(ti,n){return att[cur]?.[ti]?.[n]||{present:false,absent:false,earlyLeave:false,reason:'',contact:false,contact2:false,makeup:false}}
 function upd(ti,n,p){
   const e=ent(ti,n),nx={...e,...p};
   if(!att[cur])att[cur]={};if(!att[cur][ti])att[cur][ti]={};
@@ -397,6 +397,7 @@ function saveR(ti,n){
 function editR(ti,n){drafts[ti+':'+n]=ent(ti,n).reason||'';render()}
 function tgC(ti,n){const e=ent(ti,n);upd(ti,n,{contact:!e.contact})}
 function tgC2(ti,n){const e=ent(ti,n);upd(ti,n,{contact2:!e.contact2})}
+function tgMakeup(ti,n){const e=ent(ti,n);upd(ti,n,{makeup:!e.makeup});}
 
 // ── 네비게이션 ────────────────────────────────────────
 function buildNav(){
@@ -566,6 +567,7 @@ function render(){
                 <div class="chk-mini${e.contact2?' on':''}">${e.contact2?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':''}</div>
                 <span class="contact-label" style="color:${e.contact2?'var(--t1)':'var(--mu)'}">학생</span>
               </div>
+              <button class="abtn" onclick="tgMakeup('${ti}','${name}')" style="background:${e.makeup?'#a29bfe':'#2a2a3a'};color:${e.makeup?'#fff':'var(--mu)'};flex-shrink:0">${e.makeup?'보충완료':'보충'}</button>
             </div>`;
           }
         }
@@ -743,7 +745,7 @@ function rAbsences(ym,days){
     TIMES.forEach(ti=>Object.entries(dd[ti]||{}).forEach(([name,e])=>{
       if(!e.absent)return;let cls='기타';
       if(S[dk]&&S[dk][ti])CLS.forEach(c=>{if((S[dk][ti][c]||[]).includes(name))cls=c;});
-      recs.push({dk,d,ti,name,cls,reason:e.reason||'',contact:e.contact,contact2:e.contact2});
+      recs.push({dk,d,ti,name,cls,reason:e.reason||'',contact:e.contact,contact2:e.contact2,makeup:e.makeup||false});
     }));
   }
   if(!recs.length){document.getElementById('admin-ct').innerHTML=`<div class="empty">결석 기록 없음</div><div style="text-align:center"><button class="csv-btn" onclick="dlCSV('${ym}')">CSV 다운로드</button></div>`;return;}
@@ -752,7 +754,7 @@ function rAbsences(ym,days){
   CLS.forEach(cls=>{
     if(!byCls[cls])return;
     h+=`<div class="acard"><div class="acard-hd"><div style="width:8px;height:8px;border-radius:50%;background:${CC[cls]};flex-shrink:0"></div><span style="color:${CC[cls]}">${cls}</span><span style="margin-left:auto;font-size:11px;color:var(--mu)">${byCls[cls].length}건</span></div>`;
-    byCls[cls].forEach(r=>{h+=`<div class="abs-row"><div class="abs-date">${r.d.getMonth()+1}/${r.d.getDate()}(${DW[r.d.getDay()]})<br><span style="color:${TC[r.ti]};font-size:10px">${r.ti}</span></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px"><span class="abs-name">${r.name}</span></div>${r.reason?`<div class="abs-reason">${r.reason}</div>`:''}<div style="font-size:10px;color:var(--t1);margin-top:2px">${r.contact?'학부모연락 ':''} ${r.contact2?'학생연락':''}</div></div></div>`;});
+    byCls[cls].forEach(r=>{h+=`<div class="abs-row"><div class="abs-date">${r.d.getMonth()+1}/${r.d.getDate()}(${DW[r.d.getDay()]})<br><span style="color:${TC[r.ti]};font-size:10px">${r.ti}</span></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px"><span class="abs-name">${r.name}</span></div>${r.reason?`<div class="abs-reason">${r.reason}</div>`:''}<div style="font-size:10px;color:var(--t1);margin-top:2px">${r.contact?'학부모연락 ':''} ${r.contact2?'학생연락 ':''}<span style="color:${r.makeup?'#a29bfe':'#555'};font-weight:${r.makeup?'700':'400'}">${r.makeup?'✓보충완료':'보충대기'}</span></div></div></div>`;});
     h+=`</div>`;
   });
   h+=`<div style="text-align:center"><button class="csv-btn" onclick="dlCSV('${ym}')">CSV 다운로드</button></div>`;
@@ -802,10 +804,10 @@ function rDays(ym,days){
 }
 function dlCSV(ym){
   const days=new Date(parseInt(ym.slice(0,4)),parseInt(ym.slice(5)),0).getDate();
-  const rows=[['날짜','요일','타임','반','이름','학교','결석사유','학부모연락','학생연락']];
+  const rows=[['날짜','요일','타임','반','이름','학교','결석사유','학부모연락','학생연락','보충여부']];
   for(let i=1;i<=days;i++){
     const dk=`${ym}-${String(i).padStart(2,'0')}`,d=new Date(dk+'T12:00:00'),dd=adminData[dk]||{};
-    TIMES.forEach(ti=>{const sc=S[dk];if(!sc)return;CLS.forEach(cls=>(sc[ti][cls]||[]).forEach(name=>{const e=(dd[ti]||{})[name]||{};if(e.absent)rows.push([dk,DW[d.getDay()],ti,cls,name,SCHOOL[name]||'',e.reason||'',e.contact?'완료':'',e.contact2?'완료':'']);}));});
+    TIMES.forEach(ti=>{const sc=S[dk];if(!sc)return;CLS.forEach(cls=>(sc[ti][cls]||[]).forEach(name=>{const e=(dd[ti]||{})[name]||{};if(e.absent)rows.push([dk,DW[d.getDay()],ti,cls,name,SCHOOL[name]||'',e.reason||'',e.contact?'완료':'',e.contact2?'완료':'',e.makeup?'완료':'']);}));});
   }
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['﻿'+rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n')],{type:'text/csv;charset=utf-8'}));
