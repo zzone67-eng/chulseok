@@ -346,6 +346,8 @@ function launch(){
 }
 async function load(dk,show=true){
   if(show){const ct=isMob()?'mob-ct':'pc-ct';const el=document.getElementById(ct);if(el)el.innerHTML='<div class="closed-box">불러오는 중…</div>';}
+  // S가 아직 비어있으면 먼저 로드
+  if(Object.keys(S).length===0) await loadTimetable();
   try{const d=await fbGet(`att/${dk}`);att[dk]=d||{};}
   catch(err){if(!att[dk])att[dk]={};console.error('load err:',err);}
   if(dk===cur)render();
