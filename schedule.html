@@ -657,7 +657,13 @@ async function syncFB(){
         });
       }
     });
-    await fetch(DB+'/timetable.json',{method:'PUT',body:JSON.stringify(sch),headers:{'Content-Type':'application/json'}});
+    // 수업 있는 날만 필터링해서 저장 (데이터 크기 줄이기)
+    const filtered = {};
+    Object.entries(sch).forEach(([date, dayData]) => {
+      const hasAny = Object.values(dayData).some(tim => Object.values(tim).some(arr => arr.length > 0));
+      if(hasAny) filtered[date] = dayData;
+    });
+    await fetch(DB+'/timetable.json',{method:'PUT',body:JSON.stringify(filtered),headers:{'Content-Type':'application/json'}});
     btn.textContent='✓ 동기화됨';btn.className='sync-btn ok';
     setTimeout(()=>{btn.textContent='Firebase 동기화';btn.className='sync-btn';},3000);
   }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error(e);}
