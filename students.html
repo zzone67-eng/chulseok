@@ -583,7 +583,7 @@ function mobSaveEdit(id,month){
   s.totalT=parseInt(document.getElementById('ef-total-'+id).value)||0;
   s.amount=parseInt(document.getElementById('ef-amt-'+id).value)||0;
   s.memo=document.getElementById('ef-memo-'+id).value;
-  const rem=document.getElementById('ef-remain-'+id); if(rem) s.remain=parseInt(rem.value)||0;
+  const rem=document.getElementById('ef-remain-'+id); if(rem){ const rv=parseInt(rem.value); s.remain=(isNaN(rv)||rv<0)?null:rv; } else s.remain=null;
   saveDB(db); mobRender(month); mobRenderSummary(month);
   setTimeout(()=>document.getElementById('detail-'+id)?.classList.add('on'),50);
 }
@@ -766,7 +766,7 @@ function pcSaveEdit(){
   s.totalT=parseInt(document.getElementById('ef-total').value)||0;
   s.amount=parseInt(document.getElementById('ef-amt').value)||0;
   s.memo=document.getElementById('ef-memo').value;
-  const rem=document.getElementById('ef-remain'); if(rem)s.remain=parseInt(rem.value)||0;
+  const rem=document.getElementById('ef-remain'); if(rem){ const rv=parseInt(rem.value); s.remain=(isNaN(rv)||rv<0)?null:rv; } else s.remain=null;
   saveDB(db); pcStudent=s; pcEditing=false; pcRenderSidebar(); pcRenderSummary(); pcRenderDetail();
 }
 function pcCopyMsg(){
