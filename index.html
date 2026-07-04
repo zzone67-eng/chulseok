@@ -847,7 +847,7 @@ function rAbsences(ym,days){
   let h='';
   CLS.forEach(cls=>{
     if(!byCls[cls])return;
-    h+=`<div class="acard"><div class="acard-hd"><div style="width:8px;height:8px;border-radius:50%;background:${CC[cls]};flex-shrink:0"></div><span style="color:${CC[cls]}">${cls}</span><span style="margin-left:auto;font-size:11px;color:var(--mu)">${byCls[cls].length}건</span></div>`;
+    h+=`<div class="acard"><div class="acard-hd"><div style="width:8px;height:8px;border-radius:50%;background:${CC[cls]};flex-shrink:0"></div><span style="color:${CC[cls]}">${cls}</span><span style="margin-left:auto;font-size:11px;color:var(--mu)">${byCls[cls].filter(r=>!r.makeup).length}건</span></div>`;
     byCls[cls].forEach(r=>{h+=`<div class="abs-row"><div class="abs-date">${r.d.getMonth()+1}/${r.d.getDate()}(${DW[r.d.getDay()]})<br><span style="color:${TC[r.ti]};font-size:10px">${r.ti}</span></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px"><span class="abs-name">${r.name}</span></div>${r.reason?`<div class="abs-reason">${r.reason}</div>`:''}<div style="font-size:10px;color:var(--t1);margin-top:2px">${r.contact?'학부모연락 ':''} ${r.contact2?'학생연락 ':''}<span style="color:${r.makeup?'#a29bfe':'#555'};font-weight:${r.makeup?'700':'400'}">${r.makeup?'✓보충완료':'보충대기'}</span></div></div></div>`;});
     h+=`</div>`;
   });
@@ -862,7 +862,7 @@ function rStats(ym,days){
     TIMES.forEach(ti=>CLS.forEach(cls=>(sc[ti][cls]||[]).forEach(name=>{
       if(!ss[name])ss[name]={cls,s:0,p:0,a:0,reasons:[]};
       ss[name].s++;const e=(dd[ti]||{})[name]||{};
-      if(e.present)ss[name].p++;if(e.absent){ss[name].a++;if(e.reason)ss[name].reasons.push(`${i}일:${e.reason}`);}
+      if(e.present)ss[name].p++;if(e.absent&&!e.makeup){ss[name].a++;if(e.reason)ss[name].reasons.push(`${i}일:${e.reason}`);}
     })));
   }
   if(!Object.keys(ss).length){document.getElementById('admin-ct').innerHTML='<div class="empty">데이터 없음</div>';return;}
