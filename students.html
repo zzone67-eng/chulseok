@@ -508,17 +508,20 @@ function init(){
     document.body.className='pc';
     document.getElementById('app-mob').style.display='none';
     document.getElementById('app-pc').style.display='flex';
-    pcRenderFilters(); pcRenderSidebar(); pcRenderSummary();
+    pcRenderFilters();
+    // 로딩 표시
+    document.getElementById('studentList').innerHTML='<div style="padding:20px;color:var(--text3);text-align:center;font-size:13px">불러오는 중...</div>';
   } else {
     document.body.className='mob';
     document.getElementById('app-pc').style.display='none';
     document.getElementById('app-mob').style.display='block';
-    mobRender('jul'); mobRenderSummary('jul');
+    document.getElementById('list-jul').innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">불러오는 중...</div>';
     window.addEventListener('scroll',()=>{
       const btn=document.getElementById('topBtn');
       if(btn) btn.classList.toggle('show', window.scrollY>200);
     });
   }
+  // Firebase 먼저 불러온 후 렌더 (syncFromFirebase 안에서 renderAll 호출)
   syncFromFirebase();
 }
 
