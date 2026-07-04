@@ -3,75 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>화강암플러스 수강생 관리</title>
 <style>
 :root {
   --bg:#F5F4F1; --surface:#fff; --border:#E6E4DF;
   --text:#1A1917; --text2:#6B6860; --text3:#9B9890;
   --red:#C0392B; --blue:#2C5F8A; --green:#1A7A45;
-  --yellow:#E8A020; --radius:14px; --radius-sm:8px;
+  --yellow:#E8A020; --purple:#5B3FA0;
+  --radius:14px; --radius-sm:8px; --sidebar:280px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;padding-top:0;margin:0;}
+html,body{margin:0;padding:0;}
 
-/* 헤더 */
-.sticky-wrap{position:sticky;top:0;z-index:200;}
-.hdr{background:var(--red);padding:max(14px,env(safe-area-inset-top,14px)) 14px 8px;}
-.summary{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
-.sum-box{background:rgba(255,255,255,.15);border-radius:7px;padding:5px 8px;}
-.sum-box.full{background:rgba(255,255,255,.1);}
-.sum-lbl{color:rgba(255,255,255,.65);font-size:10px;}
-.sum-val{color:#fff;font-size:13px;font-weight:700;}
-.sum-val.sm{font-size:13px;}
-.sum-cls{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
-.sum-cls-item{white-space:nowrap;font-size:11px;color:rgba(255,255,255,.85);}
-.sum-cls-item span{font-weight:700;font-size:14px;display:block;}
-.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
-.hdr-title{color:#fff;font-size:14px;font-weight:700;}
-.hdr-sub{color:rgba(255,255,255,.6);font-size:11px;}
-.unpaid-badge{background:rgba(255,255,255,.2);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;cursor:pointer;}
-
-/* 탭 */
-.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;overflow-y:hidden;}
-.tabs::-webkit-scrollbar{display:none;}
-.tab{flex:1;min-width:70px;padding:11px 6px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap;}
-.tab.on{color:var(--red);border-bottom-color:var(--red);font-weight:700;}
-
-/* 필터 */
-.filters{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;}
-.filters::-webkit-scrollbar{display:none;}
-.fbtn{padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;}
-.fbtn.on{background:var(--text);color:#fff;border-color:var(--text);}
-
-/* 패널 */
-.panel{display:none;padding:0 14px 20px;}
-.panel.on{display:block;}
-
-/* 섹션 헤더 */
-.sec-hdr{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;padding:14px 0 6px;}
-
-/* 카드 */
-.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:8px;overflow:hidden;}
-.card.paid{border-color:#A8DBC0;}
-.card.unpaid{border-color:#F5C0BB;}
-.card-top{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;}
-.card-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
-.card-check.done{background:var(--green);border-color:var(--green);}
-.card-check.done::after{content:'✓';color:#fff;font-size:12px;font-weight:700;}
-.card-info{flex:1;min-width:0;}
-.card-name{font-size:15px;font-weight:600;}
-.card-cls{font-size:12px;color:var(--text2);margin-top:1px;}
-.card-right{text-align:right;flex-shrink:0;}
-.card-amt{font-size:15px;font-weight:700;color:var(--blue);}
-.card-amt.zero{color:var(--text3);}
-.card-t{font-size:11px;color:var(--text2);margin-top:1px;}
-
-/* 태그 */
-.tags{display:flex;flex-wrap:wrap;gap:4px;padding:0 14px 10px;}
+/* ── 공통 ── */
 .tag{font-size:10px;padding:2px 7px;border-radius:999px;font-weight:500;}
 .tag-re{background:#FCECEA;color:#8B2020;}
 .tag-dis{background:#E6F4EE;color:#1A5C3A;}
@@ -80,738 +25,757 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD 
 .tag-fix{background:#F0EEFA;color:#3A2080;}
 .tag-pause{background:#F5F0E8;color:#7A6A40;}
 .tag-new{background:#FFF8E6;color:#7A5A00;}
-
-/* 상세 */
-.detail{display:none;border-top:1px solid var(--border);padding:12px 14px;}
-.detail.on{display:block;}
-.d-row{display:flex;justify-content:space-between;align-items:flex-start;padding:4px 0;font-size:13px;border-bottom:1px dashed var(--border);}
-.d-row:last-of-type{border-bottom:none;}
-.d-lbl{color:var(--text2);flex-shrink:0;margin-right:8px;}
-.d-val{font-weight:500;text-align:right;word-break:break-all;}
-.d-dates{font-size:11px;color:var(--text2);line-height:1.7;margin-top:6px;background:var(--bg);padding:8px 10px;border-radius:var(--radius-sm);}
-
-/* 편집 버튼 */
-.edit-btn{display:inline-flex;align-items:center;gap:4px;margin-top:10px;padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);font-size:12px;color:var(--text2);cursor:pointer;}
-.save-btn{display:inline-flex;align-items:center;gap:4px;margin-top:10px;margin-left:6px;padding:7px 14px;border:none;border-radius:var(--radius-sm);background:var(--blue);font-size:12px;color:#fff;cursor:pointer;}
-
-/* 편집 폼 */
-.edit-form{margin-top:10px;display:none;}
-.edit-form.on{display:block;}
-.ef-label{font-size:11px;color:var(--text2);margin-bottom:4px;font-weight:600;}
-.ef-input{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;font-family:inherit;margin-bottom:10px;background:var(--bg);}
-.ef-input:focus{outline:none;border-color:var(--blue);}
-textarea.ef-input{resize:vertical;min-height:70px;}
-
-/* 미납 모달 */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;}
+.tag-special{background:#F0EEFA;color:#3A2080;}
+.remain-badge{display:inline-block;background:#FEF3E2;color:#7A4A00;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600;margin-top:2px;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;}
 .overlay.on{display:flex;}
-.modal{background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px 40px;width:100%;max-height:80vh;overflow-y:auto;}
-.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
-.modal-title{font-size:16px;font-weight:700;}
-.modal-close{font-size:22px;color:var(--text2);cursor:pointer;padding:0 4px;}
-.unpaid-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
-.unpaid-item:last-child{border-bottom:none;}
-.unpaid-name{font-size:14px;font-weight:600;}
-.unpaid-cls{font-size:12px;color:var(--text2);}
-.unpaid-amt{font-size:14px;font-weight:700;color:var(--red);}
-.unpaid-total{display:flex;justify-content:space-between;padding:12px 0 0;margin-top:4px;}
-.unpaid-total-lbl{font-size:13px;font-weight:600;color:var(--text2);}
-.unpaid-total-amt{font-size:16px;font-weight:700;color:var(--red);}
 
-/* 잔여타임 뱃지 */
-.remain-badge{display:inline-block;background:#FEF3E2;color:#7A4A00;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600;margin-top:4px;}
+/* ════════════════════════
+   모바일 레이아웃 (< 900px)
+   ════════════════════════ */
+#app-mob{display:block;}
+#app-pc{display:none;}
 
+body.mob{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;}
 
-.ai-loading{text-align:center;padding:16px;color:var(--text2);font-size:13px;display:none;}
-.ai-loading.on{display:block;}
-.ai-month-sel{display:flex;gap:8px;margin-bottom:12px;}
-.ai-month-btn{flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);font-size:13px;cursor:pointer;font-weight:500;color:var(--text2);}
-.ai-month-btn.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+/* 모바일 헤더 */
+.mob .sticky-wrap{position:sticky;top:0;z-index:200;}
+.mob .hdr{background:var(--red);padding:max(14px,env(safe-area-inset-top,14px)) 14px 8px;}
+.mob .hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.mob .hdr-title{color:#fff;font-size:14px;font-weight:700;}
+.mob .hdr-sub{color:rgba(255,255,255,.6);font-size:11px;}
+.mob .unpaid-badge{background:rgba(255,255,255,.2);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;cursor:pointer;}
+.mob .summary{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
+.mob .sum-box{background:rgba(255,255,255,.15);border-radius:7px;padding:5px 8px;}
+.mob .sum-box.full{background:rgba(255,255,255,.1);}
+.mob .sum-lbl{color:rgba(255,255,255,.65);font-size:10px;}
+.mob .sum-val{color:#fff;font-size:13px;font-weight:700;}
+.mob .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;}
+.mob .tabs::-webkit-scrollbar{display:none;}
+.mob .tab{flex:1;min-width:70px;padding:11px 6px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);border-bottom:2.5px solid transparent;cursor:pointer;}
+.mob .tab.on{color:var(--red);border-bottom-color:var(--red);font-weight:700;}
+.mob .filters{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;}
+.mob .filters::-webkit-scrollbar{display:none;}
+.mob .fbtn{padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;}
+.mob .fbtn.on{background:var(--text);color:#fff;border-color:var(--text);}
+.mob .panel{display:none;padding:0 14px 20px;}
+.mob .panel.on{display:block;}
+.mob .sec-hdr{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.07em;padding:14px 0 6px;}
+.mob .card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:8px;overflow:hidden;}
+.mob .card.paid{border-color:#A8DBC0;}
+.mob .card.unpaid{border-color:#F5C0BB;}
+.mob .card-top{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;}
+.mob .card-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
+.mob .card-check.done{background:var(--green);border-color:var(--green);}
+.mob .card-check.done::after{content:'✓';color:#fff;font-size:12px;font-weight:700;}
+.mob .card-info{flex:1;min-width:0;}
+.mob .card-name{font-size:15px;font-weight:600;}
+.mob .card-cls{font-size:12px;color:var(--text2);margin-top:1px;}
+.mob .card-right{text-align:right;flex-shrink:0;}
+.mob .card-amt{font-size:15px;font-weight:700;color:var(--blue);}
+.mob .card-amt.zero{color:var(--text3);}
+.mob .card-t{font-size:11px;color:var(--text2);margin-top:1px;}
+.mob .tags{display:flex;flex-wrap:wrap;gap:4px;padding:0 14px 10px;}
+.mob .detail{display:none;border-top:1px solid var(--border);padding:12px 14px;}
+.mob .detail.on{display:block;}
+.mob .d-row{display:flex;justify-content:space-between;align-items:flex-start;padding:4px 0;font-size:13px;border-bottom:1px dashed var(--border);}
+.mob .d-row:last-of-type{border-bottom:none;}
+.mob .d-lbl{color:var(--text2);flex-shrink:0;margin-right:8px;}
+.mob .d-val{font-weight:500;text-align:right;word-break:break-all;}
+.mob .d-dates{font-size:11px;color:var(--text2);line-height:1.7;margin-top:6px;background:var(--bg);padding:8px 10px;border-radius:var(--radius-sm);}
+.mob .edit-btn{display:inline-flex;align-items:center;gap:4px;margin-top:10px;padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);font-size:12px;color:var(--text2);cursor:pointer;}
+.mob .save-btn{display:inline-flex;align-items:center;gap:4px;margin-top:10px;margin-left:6px;padding:7px 14px;border:none;border-radius:var(--radius-sm);background:var(--blue);font-size:12px;color:#fff;cursor:pointer;}
+.mob .edit-form{margin-top:10px;display:none;}
+.mob .edit-form.on{display:block;}
+.mob .ef-label{font-size:11px;color:var(--text2);margin-bottom:4px;font-weight:600;}
+.mob .ef-input{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;font-family:inherit;margin-bottom:10px;background:var(--bg);}
+.mob .ef-input:focus{outline:none;border-color:var(--blue);}
+textarea.mob .ef-input{resize:vertical;min-height:70px;}
+.mob .search-wrap{padding:8px 14px 2px;position:sticky;top:52px;z-index:198;background:var(--bg);}
+.mob .search-input{width:100%;padding:9px 14px;border:1px solid var(--border);border-radius:999px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;}
+.mob .search-input:focus{border-color:var(--blue);}
+.mob .search-wrap-inner{position:relative;}
+.mob .search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:18px;cursor:pointer;display:none;}
+.mob .top-btn{position:fixed;bottom:24px;right:16px;width:44px;height:44px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:20px;cursor:pointer;z-index:299;box-shadow:0 4px 14px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;}
+.mob .top-btn.show{display:flex;}
+/* 모바일 미납 모달 */
+.mob .overlay{align-items:flex-end;}
+.mob .modal{background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px 40px;width:100%;max-height:80vh;overflow-y:auto;}
+.mob .modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.mob .modal-title{font-size:16px;font-weight:700;}
+.mob .modal-close{font-size:22px;color:var(--text2);cursor:pointer;padding:0 4px;}
+.mob .unpaid-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+.mob .unpaid-item:last-child{border-bottom:none;}
+.mob .unpaid-name{font-size:14px;font-weight:600;}
+.mob .unpaid-cls{font-size:12px;color:var(--text2);}
+.mob .unpaid-amt{font-size:14px;font-weight:700;color:var(--red);}
+.mob .unpaid-total{display:flex;justify-content:space-between;padding:12px 0 0;margin-top:4px;}
 
-/* 검색 */
-.search-wrap{padding:8px 14px 2px;position:sticky;top:52px;z-index:198;background:var(--bg);}
-.search-input{width:100%;padding:9px 14px 9px 14px;border:1px solid var(--border);border-radius:999px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;}
-.search-input:focus{border-color:var(--blue);}
-.search-wrap-inner{position:relative;}
-
-.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:18px;cursor:pointer;display:none;}
-
-/* 탑 버튼 */
-.top-btn{position:fixed;bottom:24px;right:16px;width:44px;height:44px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:20px;cursor:pointer;z-index:299;box-shadow:0 4px 14px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;transition:opacity .2s;}
-.top-btn.show{display:flex;}
+/* ════════════════════════
+   PC 레이아웃 (≥ 900px)
+   ════════════════════════ */
+body.pc{font-family:-apple-system,'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--text);}
+.pc .topbar{background:var(--red);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pc .topbar-title{color:#fff;font-size:17px;font-weight:700;}
+.pc .topbar-right{display:flex;align-items:center;gap:10px;position:relative;}
+.pc .s-toggle-btn{background:none;border:none;color:rgba(255,255,255,.75);font-size:20px;cursor:pointer;padding:0 4px;flex-shrink:0;line-height:1;}
+.pc .s-cls-panel{display:flex;align-items:center;gap:0;overflow:hidden;max-width:0;opacity:0;transition:max-width .35s ease,opacity .25s ease;position:absolute;right:28px;top:50%;transform:translateY(-50%);background:var(--red);z-index:1;white-space:nowrap;}
+.pc .s-cls-panel.open{max-width:500px;opacity:1;}
+.pc .s-cls-item{display:flex;flex-direction:column;align-items:flex-end;padding:0 10px;border-right:1px solid rgba(255,255,255,.15);flex-shrink:0;}
+.pc .s-cls-item:last-child{border-right:none;padding-right:0;}
+.pc .s-cls-name{font-size:10px;color:rgba(255,255,255,.55);margin-bottom:1px;}
+.pc .s-cls-amt{font-size:12px;font-weight:700;color:#fff;}
+.pc .s-vdiv{width:1px;height:28px;background:rgba(255,255,255,.2);flex-shrink:0;}
+.pc .s-main-item{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;}
+.pc .s-lbl{font-size:10px;color:rgba(255,255,255,.55);margin-bottom:1px;}
+.pc .s-val{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;}
+.pc .s-val.remain{color:#FFB3AE;}
+.pc .unpaid-btn{background:rgba(0,0,0,.2);color:#fff;border:1px solid rgba(255,255,255,.15);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;}
+.pc .main{display:flex;flex:1;overflow:hidden;}
+.pc .sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.pc .sidebar-month{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);}
+.pc .sm-btn{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);border:1px solid var(--border);background:transparent;cursor:pointer;border-radius:8px;}
+.pc .sm-btn.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
+.pc .sidebar-search{padding:12px 12px 8px;}
+.pc .search-input{width:100%;padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:var(--bg);outline:none;}
+.pc .search-input:focus{border-color:var(--blue);}
+.pc .class-filters{display:flex;flex-wrap:wrap;gap:4px;padding:0 12px 8px;}
+.pc .cf-btn{padding:3px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:11px;color:var(--text2);cursor:pointer;}
+.pc .cf-btn.on{background:var(--text);color:#fff;border-color:var(--text);}
+.pc .student-list{flex:1;overflow-y:auto;padding:4px 8px 12px;}
+.pc .sec-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;padding:10px 6px 4px;text-transform:uppercase;}
+.pc .s-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--radius-sm);cursor:pointer;margin-bottom:2px;}
+.pc .s-item:hover{background:var(--bg);}
+.pc .s-item.active{background:#EBF1F8;}
+.pc .s-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s;}
+.pc .s-check.done{background:var(--green);border-color:var(--green);}
+.pc .s-info{flex:1;min-width:0;}
+.pc .s-name{font-size:13px;font-weight:600;}
+.pc .s-cls{font-size:11px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pc .s-amt{font-size:12px;font-weight:700;color:var(--blue);white-space:nowrap;flex-shrink:0;}
+.pc .s-amt.zero{color:var(--text3);}
+.pc .content{flex:1;overflow-y:auto;padding:24px;}
+.pc .no-select{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:15px;}
+.pc .detail-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px;}
+.pc .dcard{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px;margin-bottom:16px;}
+.pc .dcard-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em;}
+.pc .drow{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--bg);}
+.pc .drow:last-child{border-bottom:none;}
+.pc .dlbl{font-size:13px;color:var(--text2);flex-shrink:0;margin-right:12px;}
+.pc .dval{font-size:13px;font-weight:500;text-align:right;word-break:break-word;}
+.pc .dval.amount{color:var(--blue);font-size:16px;font-weight:700;}
+.pc .dval.red{color:var(--red);}
+.pc .dval.green{color:var(--green);}
+.pc .paid-toggle{display:flex;align-items:center;gap:8px;margin-top:12px;}
+.pc .paid-toggle-btn{padding:7px 20px;border-radius:999px;border:none;font-size:13px;font-weight:600;cursor:pointer;}
+.pc .paid-toggle-btn.unpaid{background:#FCECEA;color:var(--red);}
+.pc .paid-toggle-btn.paid{background:#E6F4EE;color:var(--green);}
+.pc .edit-inline{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.pc .ei-row{display:flex;gap:8px;align-items:center;}
+.pc .ei-label{font-size:12px;color:var(--text2);width:80px;flex-shrink:0;}
+.pc .ei-input,.pc .ei-textarea{flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:var(--bg);outline:none;}
+.pc .ei-textarea{resize:vertical;min-height:60px;}
+.pc .ei-input:focus,.pc .ei-textarea:focus{border-color:var(--blue);}
+.pc .btn-row{display:flex;gap:8px;margin-top:8px;}
+.pc .btn{padding:7px 16px;border-radius:var(--radius-sm);border:none;font-size:13px;font-weight:600;cursor:pointer;}
+.pc .btn-blue{background:var(--blue);color:#fff;}
+.pc .btn-gray{background:var(--border);color:var(--text);}
+.pc .msg-panel{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);display:flex;flex-direction:column;}
+.pc .msg-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 16px;gap:4px;flex-wrap:wrap;}
+.pc .msg-tab{padding:10px 12px;font-size:12px;font-weight:500;color:var(--text2);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;}
+.pc .msg-tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:700;}
+.pc .msg-body{flex:1;padding:16px;overflow-y:auto;min-height:300px;}
+.pc .msg-text{font-size:13px;line-height:1.85;white-space:pre-wrap;color:var(--text);background:var(--bg);padding:14px;border-radius:var(--radius-sm);}
+.pc .msg-copy-btn{margin:12px 16px 16px;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;}
+.pc .msg-empty{color:var(--text3);font-size:13px;text-align:center;padding:40px 16px;}
+/* PC 미납 모달 */
+.pc .overlay{align-items:center;}
+.pc .modal{background:var(--surface);border-radius:var(--radius);padding:24px;width:400px;max-height:80vh;overflow-y:auto;}
+.pc .modal-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+.pc .modal-close{font-size:20px;cursor:pointer;color:var(--text2);}
+.pc .unpaid-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.pc .unpaid-row:last-child{border-bottom:none;}
+.pc .unpaid-name{font-size:14px;font-weight:600;}
+.pc .unpaid-cls{font-size:12px;color:var(--text2);}
+.pc .unpaid-amt{font-size:14px;font-weight:700;color:var(--red);}
+.pc .unpaid-total-row{display:flex;justify-content:space-between;padding:14px 0 0;margin-top:8px;border-top:2px solid var(--border);}
 </style>
 </head>
 <body>
 
+<!-- ── 모바일 앱 ── -->
+<div id="app-mob">
 <div class="sticky-wrap">
-<div class="hdr" id="mainHdr">
-  <div class="hdr-top">
-    <div>
-      <div class="hdr-title">화강암플러스 수강생 관리</div>
-      <div class="hdr-sub" id="hdrSub">2026년 7월</div>
+  <div class="hdr" id="mainHdr">
+    <div class="hdr-top">
+      <div>
+        <div class="hdr-title">화강암플러스 수강생 관리</div>
+        <div class="hdr-sub" id="hdrSub">2026년 7월</div>
+      </div>
+      <span id="fb-status" style="font-size:10px;color:rgba(255,255,255,.7);margin-right:8px"></span>
+      <div class="unpaid-badge" onclick="openUnpaid()">미납 확인</div>
     </div>
-    <span id="fb-status" style="font-size:10px;color:rgba(255,255,255,.7);margin-right:8px"></span><div class="unpaid-badge" onclick="openUnpaid()">미납 확인</div>
+    <div class="summary" id="summaryBox" style="min-height:20px;color:white;font-size:12px">로딩중...</div>
   </div>
-  <div class="summary" id="summaryBox" style="min-height:20px;color:white;font-size:12px">로딩중...</div>
+  <div class="tabs">
+    <div class="tab on" onclick="mobSwitchTab('jul',this)">7월</div>
+    <div class="tab" onclick="mobSwitchTab('aug',this)">8월(예정)</div>
+  </div>
 </div>
-
-<div class="tabs">
-  <div class="tab on" onclick="switchTab('jul',this)">7월</div>
-  <div class="tab" onclick="switchTab('aug',this)">8월(예정)</div>
-</div>
-</div><!-- /sticky-wrap -->
-
 <div class="search-wrap">
   <div class="search-wrap-inner">
-    
-    <input class="search-input" id="searchInput" type="text" placeholder="이름 검색..." oninput="onSearch(this.value)">
-    <span class="search-clear" id="searchClear" onclick="clearSearch()">×</span>
+    <input class="search-input" id="mobSearchInput" type="text" placeholder="이름 검색..." oninput="mobOnSearch(this.value)">
+    <span class="search-clear" id="searchClear" onclick="mobClearSearch()">×</span>
   </div>
 </div>
-
-<button class="top-btn" id="topBtn" onclick="scrollToTop()">↑</button>
-
-
-
+<button class="top-btn" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <div class="panel on" id="panel-jul">
   <div class="filters">
-    <button class="fbtn on" onclick="filterCls('jul','all',this)">전체</button>
-    <button class="fbtn" onclick="filterCls('jul','입시반',this)">입시반</button>
-    <button class="fbtn" onclick="filterCls('jul','예비반',this)">예비반</button>
-    <button class="fbtn" onclick="filterCls('jul','중등반',this)">중등반</button>
-    <button class="fbtn" onclick="filterCls('jul','취미반',this)">취미반</button>
-    <button class="fbtn" onclick="filterCls('jul','미납',this)">미납</button>
+    <button class="fbtn on" onclick="mobFilterCls('jul','all',this)">전체</button>
+    <button class="fbtn" onclick="mobFilterCls('jul','입시반',this)">입시반</button>
+    <button class="fbtn" onclick="mobFilterCls('jul','예비반',this)">예비반</button>
+    <button class="fbtn" onclick="mobFilterCls('jul','중등반',this)">중등반</button>
+    <button class="fbtn" onclick="mobFilterCls('jul','취미반',this)">취미반</button>
+    <button class="fbtn" onclick="mobFilterCls('jul','미납',this)">미납</button>
   </div>
   <div id="list-jul"></div>
 </div>
-
 <div class="panel" id="panel-aug">
   <div class="filters">
-    <button class="fbtn on" onclick="filterCls('aug','all',this)">전체</button>
-    <button class="fbtn" onclick="filterCls('aug','입시반',this)">입시반</button>
-    <button class="fbtn" onclick="filterCls('aug','예비반',this)">예비반</button>
-    <button class="fbtn" onclick="filterCls('aug','중등반',this)">중등반</button>
-    <button class="fbtn" onclick="filterCls('aug','취미반',this)">취미반</button>
-    
+    <button class="fbtn on" onclick="mobFilterCls('aug','all',this)">전체</button>
+    <button class="fbtn" onclick="mobFilterCls('aug','입시반',this)">입시반</button>
+    <button class="fbtn" onclick="mobFilterCls('aug','예비반',this)">예비반</button>
+    <button class="fbtn" onclick="mobFilterCls('aug','중등반',this)">중등반</button>
+    <button class="fbtn" onclick="mobFilterCls('aug','취미반',this)">취미반</button>
   </div>
   <div id="list-aug"></div>
 </div>
-
-<!-- 미납 모달 -->
-<div class="overlay" id="unpaidOverlay" onclick="closeUnpaid(event)">
+<!-- 모바일 미납 모달 -->
+<div class="overlay" id="mobUnpaidOverlay" onclick="if(event.target===this)closeMobUnpaid()">
   <div class="modal">
     <div class="modal-hdr">
       <div class="modal-title">미납 현황</div>
-      <div class="modal-close" onclick="closeUnpaid()">×</div>
+      <span class="modal-close" onclick="closeMobUnpaid()">×</span>
     </div>
-    <div id="unpaidList"></div>
+    <div id="mobUnpaidList"></div>
     <div class="unpaid-total">
-      <div class="unpaid-total-lbl">총 미납액</div>
-      <div class="unpaid-total-amt" id="unpaidTotal"></div>
+      <span style="font-weight:600;">총 미납액</span>
+      <span style="font-size:16px;font-weight:700;color:var(--red)" id="mobUnpaidTotal"></span>
     </div>
   </div>
 </div>
+</div><!-- /app-mob -->
+
+<!-- ── PC 앱 ── -->
+<div id="app-pc">
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-title">화강암플러스미술학원</div>
+  </div>
+  <div class="topbar-right">
+    <div style="display:flex;align-items:center;gap:14px;" id="summaryRow1"></div>
+    <button class="unpaid-btn" onclick="openUnpaid()">미납 확인</button>
+  </div>
+</div>
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-month">
+      <button class="sm-btn on" onclick="pcSwitchMonth('jul',this)">7월</button>
+      <button class="sm-btn" onclick="pcSwitchMonth('aug',this)">8월(예정)</button>
+    </div>
+    <div class="sidebar-search">
+      <input class="search-input" id="pcSearchInput" placeholder="이름 검색..." oninput="pcOnSearch(this.value)">
+    </div>
+    <div class="class-filters" id="classFilters"></div>
+    <div class="student-list" id="studentList"></div>
+  </div>
+  <div class="content" id="mainContent">
+    <div class="no-select">← 학생을 선택하세요</div>
+  </div>
+</div>
+<!-- PC 미납 모달 -->
+<div class="overlay" id="pcUnpaidOverlay" onclick="if(event.target===this)closePcUnpaid()">
+  <div class="modal">
+    <div class="modal-title">미납 현황 <span class="modal-close" onclick="closePcUnpaid()">×</span></div>
+    <div id="pcUnpaidList"></div>
+    <div class="unpaid-total-row">
+      <span style="font-weight:600;">총 미납액</span>
+      <span style="font-size:16px;font-weight:700;color:var(--red)" id="pcUnpaidTotal"></span>
+    </div>
+  </div>
+</div>
+</div><!-- /app-pc -->
 
 <script>
-// ── 스토리지 키 ──
-const STORAGE_KEY = 'hwagangam_v2';
+// ══════════════════════════════════
+// 공통 데이터 & Firebase
+// ══════════════════════════════════
+const FB_URL = 'https://hwa1-c1ad9-default-rtdb.firebaseio.com';
+const BANK = '부산은행 101-2092-8547-06 (예금주: 화강암플러스미술학원)';
+const CONTACT = '학원: 051-553-3698\n원장: 010-7701-6594 (문자 문의 가능)';
+const FOOTER = `\n■ 납부 방법\n${BANK}\n카드결제 시 아이편으로 보내주시면 결제 도와드리겠습니다.\n\n■ 문의\n${CONTACT}\n감사합니다.`;
 
-// ── 초기 데이터 ──
 const initData = {
   jul: [
-    // 입시반
     { id:'jul_박선영', name:'박선영', cls:'입시반', tags:['fix:월고정'],
       schedule:'수,목,금,토1,토2 주5회 (3수)', days:'', absence:0, totalT:0,
-      amount:312500, fixed:true, paid:false,
-      memo:'3수생 고정 312,500원/월', remain:null },
+      amount:312500, fixed:true, paid:false, memo:'3수생 고정 312,500원/월', remain:null },
     { id:'jul_박민지', name:'박민지', cls:'입시반', tags:['pause:수능까지휴식'],
-      schedule:'수,목,금,토1,토2 주5회', days:'', absence:0, totalT:0,
-      amount:0, fixed:false, paid:true,
-      memo:'수능까지 수강 없음. 잔여타임만 기록.', remain:13 },
+      schedule:'수,목,금,토1,토2 주5회', days:'', absence:0, totalT:0, regularT:12, specialT:14,
+      amount:0, fixed:false, paid:true, memo:'수능까지 수강 없음. 잔여타임만 기록.', remain:13 },
     { id:'jul_김나연', name:'김나연', cls:'입시반', tags:['re:전월결석1'],
-      schedule:'수,목,금,토1,토2 주5회', days:'정규 12T / 특강 14T', absence:1, totalT:26,
-      amount:812500, fixed:false, paid:false,
-      memo:'22/23결제 (전월결석 1T 차감)', remain:null },
+      schedule:'수,목,금,토1,토2 주5회', days:'정규 12T / 특강 14T', absence:1, totalT:26, regularT:12, specialT:14,
+      amount:812500, fixed:false, paid:false, memo:'22/23결제 (전월결석 1T 차감)', remain:null },
     { id:'jul_김나현', name:'김나현', cls:'입시반', tags:['dis:재수50%할인'],
-      schedule:'수,목,금,토2 주4회', days:'정규 12T / 특강 14T', absence:0, totalT:26,
-      amount:625000, fixed:false, paid:false,
-      memo:'정규 50%할인+특강 정가 합산', remain:null },
-    // 예비반
+      schedule:'수,목,금,토2 주4회', days:'정규 12T(50%할인) / 특강 14T', absence:0, totalT:26, regularT:12, specialT:14,
+      amount:625000, fixed:false, paid:false, memo:'정규 50%할인+특강 정가 합산', remain:null },
     { id:'jul_박하영', name:'박하영', cls:'예비반', tags:['fix:월고정'],
       schedule:'수,목,금 주3회', days:'', absence:0, totalT:0,
-      amount:250000, fixed:true, paid:false,
-      memo:'고1 고정 250,000원/월', remain:null },
+      amount:250000, fixed:true, paid:false, memo:'고1 고정 250,000원/월', remain:null },
     { id:'jul_김도훈', name:'김도훈', cls:'예비반', tags:[],
       schedule:'토1,토2,일 주3회', days:'12T (4주기준)', absence:0, totalT:12,
-      amount:360000, fixed:false, paid:false,
-      memo:'', remain:null },
-    // 중등반
+      amount:360000, fixed:false, paid:false, memo:'', remain:null },
     { id:'jul_안시연', name:'안시연', cls:'중등반', tags:['re:전월결석5'],
       schedule:'토1,토2,일1,일2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 12T / 특강 10T', absence:9, totalT:13,
-      amount:406250, fixed:false, paid:false,
-      memo:'특강 최대 10T 기준. 요일확정 후 변동가능.', remain:null },
+      days:'정규 12T / 특강 10T', absence:9, totalT:13, regularT:12, specialT:10,
+      amount:406250, fixed:false, paid:false, memo:'특강 최대 10T 기준. 요일확정 후 변동가능.',
+      schoolInfo:{ name:'혜화여중', exam:'6/29(월) ~ 7/1(수)', vacStart:'7/22(수)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
     { id:'jul_한지유', name:'한지유', cls:'중등반', tags:[],
-      schedule:'토,일 주2회\n특강: 선택타임',
-      days:'정규 6T / 특강 10T', absence:0, totalT:16,
-      amount:500000, fixed:false, paid:false,
-      memo:'특강 최대 10T 기준. 요일확정 후 변동가능.', remain:null },
+      schedule:'토,일 주2회\n특강: 선택타임', days:'정규 6T / 특강 10T', absence:0, totalT:16, regularT:6, specialT:10,
+      amount:500000, fixed:false, paid:false, memo:'특강 최대 10T 기준.',
+      schoolInfo:{ name:'초연중', exam:'6/24(수) ~ 6/26(금)', vacStart:'7/21(화)', vacEnd:'8/17(월) 추정', openDay:'8/18(화) 추정' } },
     { id:'jul_조제우', name:'조제우', cls:'중등반', tags:[],
-      schedule:'수,금,토 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 8T / 특강 8T', absence:0, totalT:16,
-      amount:500000, fixed:false, paid:false,
-      memo:'', remain:null },
+      schedule:'수,금,토 주3회\n특강: 선택타임', days:'정규 8T / 특강 8T', absence:0, totalT:16, regularT:8, specialT:8,
+      amount:500000, fixed:false, paid:false, memo:'',
+      schoolInfo:{ name:'초읍중', exam:'7/1(수) ~ 7/3(금)', vacStart:'7/24(목)', vacEnd:'8/13(목)', openDay:'8/14(금)' } },
     { id:'jul_전서빈', name:'전서빈', cls:'중등반', tags:['re:전월결석6'],
-      schedule:'목,토1,토2 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 10T / 특강 10T', absence:6, totalT:14,
-      amount:437500, fixed:false, paid:false,
-      memo:'7/2까지 시험기간 포함 정산', remain:null },
+      schedule:'목,토1,토2 주3회\n특강: 선택타임', days:'정규 10T / 특강 10T', absence:6, totalT:14, regularT:10, specialT:10,
+      amount:437500, fixed:false, paid:false, memo:'7/2까지 시험기간 포함 정산',
+      schoolInfo:{ name:'연일중', exam:'7/1(수) ~ 7/3(금)', vacStart:'7/22(수)', vacEnd:'8/23(일)', openDay:'8/24(월)' } },
     { id:'jul_권해원', name:'권해원', cls:'중등반', tags:['re:전월결석10'],
-      schedule:'목,토1,토2 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 10T / 특강 10T', absence:10, totalT:10,
-      amount:312500, fixed:false, paid:false,
-      memo:'', remain:null },
+      schedule:'목,토1,토2 주3회\n특강: 선택타임', days:'정규 10T / 특강 10T', absence:10, totalT:10, regularT:10, specialT:10,
+      amount:312500, fixed:false, paid:false, memo:'',
+      schoolInfo:{ name:'부산예술중', exam:'6/25(목) ~ 6/29(월)', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
     { id:'jul_김현준', name:'김현준', cls:'중등반', tags:['re:전월결석4'],
-      schedule:'수,토,일 주3회',
-      days:'정규 9T / 특강 3T',
-      absence:4, totalT:8,
-      amount:250000, fixed:false, paid:false,
-      memo:'6/28까지 포함 정산', remain:null },
+      schedule:'수,토,일 주3회', days:'정규 9T / 특강 3T', absence:4, totalT:8,
+      amount:250000, fixed:false, paid:false, memo:'6/28까지 포함 정산',
+      schoolInfo:{ name:'부곡중', exam:'6/29(월) ~ 7/1(수)', vacStart:'7/17(금)', vacEnd:'8/16(일)', openDay:'8/17(월)' } },
     { id:'jul_최주연', name:'최주연', cls:'중등반', tags:['re:전월결석10'],
-      schedule:'토1,토2,일 주3회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 9T / 특강 10T', absence:10, totalT:9,
-      amount:281250, fixed:false, paid:false,
-      memo:'7/28까지 정산', remain:null },
-    // 취미반
-    { id:'jul_나은솔', name:'나은솔', cls:'취미반', tags:['re:전월결석1'],
-      schedule:'토1 주1회', days:'', absence:1, totalT:3,
-      amount:75000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_김건휘', name:'김건휘', cls:'취미반', tags:['re:전월결석1'],
-      schedule:'일1 주1회', days:'', absence:1, totalT:3,
-      amount:75000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_김예진', name:'김예진', cls:'취미반', tags:['re:전월결석1'],
-      schedule:'목,토 주2회', days:'', absence:1, totalT:7,
-      amount:175000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_최다윤', name:'최다윤', cls:'취미반', tags:['re:전월결석2'],
-      schedule:'일1 주1회', days:'', absence:2, totalT:2,
-      amount:50000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_신유나', name:'신유나', cls:'취미반', tags:['new:복귀'],
-      schedule:'토1 주1회', days:'', absence:0, totalT:4,
-      amount:100000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_최현우', name:'최현우', cls:'취미반', tags:['bo:보강예정'],
-      schedule:'토2 주1회', days:'', absence:1, totalT:4,
-      amount:100000, fixed:false, paid:false, memo:'전월결석1회 보강예정', remain:null },
-    { id:'jul_김윤재', name:'김윤재', cls:'취미반', tags:[],
-      schedule:'토1,일2 주2회', days:'', absence:0, totalT:8,
-      amount:200000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_이지아', name:'이지아', cls:'취미반', tags:['new:수업시작'],
-      schedule:'토1 주1회', days:'수업시작 5/20', absence:0, totalT:4,
-      amount:50000, fixed:false, paid:false, memo:'전달 정상결제분 50,000원 차감', remain:null },
-    { id:'jul_명지민', name:'명지민', cls:'취미반', tags:[],
-      schedule:'토2 주1회', days:'', absence:0, totalT:4,
-      amount:100000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_김가람', name:'김가람', cls:'취미반', tags:['new:신규'],
-      schedule:'토2,일2 주2회', days:'', absence:0, totalT:8,
-      amount:200000, fixed:false, paid:false, memo:'', remain:null },
+      schedule:'토1,토2,일 주3회\n특강: 선택타임', days:'정규 9T / 특강 10T', absence:10, totalT:9, regularT:9, specialT:10,
+      amount:281250, fixed:false, paid:false, memo:'7/28까지 정산',
+      schoolInfo:{ name:'온천중', exam:'7/1(수) ~ 7/3(금)', vacStart:'7/22(수)', vacEnd:'8/18(화)', openDay:'8/19(수)' } },
+    { id:'jul_나은솔', name:'나은솔', cls:'취미반', tags:['re:전월결석1'], schedule:'토1 주1회', days:'', absence:1, totalT:3, amount:75000, fixed:false, paid:false, memo:'', remain:null },
+    { id:'jul_김건휘', name:'김건휘', cls:'취미반', tags:['re:전월결석1'], schedule:'일1 주1회', days:'', absence:1, totalT:3, amount:75000, fixed:false, paid:false, memo:'', remain:null },
+    { id:'jul_김예진', name:'김예진', cls:'취미반', tags:['re:전월결석1'], schedule:'목,토 주2회', days:'', absence:1, totalT:7, amount:175000, fixed:false, paid:false, memo:'', remain:null },
+    { id:'jul_최다윤', name:'최다윤', cls:'취미반', tags:['re:전월결석2'], schedule:'일1 주1회', days:'', absence:2, totalT:2, amount:50000, fixed:false, paid:false, memo:'', remain:null },
+    { id:'jul_신유나', name:'신유나', cls:'취미반', tags:['new:복귀'], schedule:'토1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'', remain:null },
+    { id:'jul_최현우', name:'최현우', cls:'취미반', tags:['bo:보강예정'], schedule:'토2 주1회', days:'', absence:1, totalT:4, amount:100000, fixed:false, paid:false, memo:'전월결석1회 보강예정', remain:null },
+    { id:'jul_김윤재', name:'김윤재', cls:'취미반', tags:[], schedule:'토1,일2 주2회', days:'', absence:0, totalT:8, amount:200000, fixed:false, paid:false, memo:'', remain:null },
+    { id:'jul_이지아', name:'이지아', cls:'취미반', tags:['new:수업시작'], schedule:'토1 주1회', days:'수업시작 5/20', absence:0, totalT:4, amount:50000, fixed:false, paid:false, memo:'전달 정상결제분 50,000원 차감', remain:null },
+    { id:'jul_명지민', name:'명지민', cls:'취미반', tags:[], schedule:'토2 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'', remain:null },
+    { id:'jul_김가람', name:'김가람', cls:'취미반', tags:['new:신규'], schedule:'토2,일2 주2회', days:'', absence:0, totalT:8, amount:200000, fixed:false, paid:false, memo:'', remain:null },
   ],
   aug: [
-    { id:'aug_박선영', name:'박선영', cls:'입시반', tags:['fix:월고정'],
-      schedule:'수,목,금,토1,토2 주5회 (3수)', days:'', absence:0, totalT:0,
-      amount:312500, fixed:true, paid:false, memo:'3수생 고정 312,500원/월', remain:null },
-    { id:'aug_박민지', name:'박민지', cls:'입시반', tags:['pause:수능까지휴식'],
-      schedule:'수,목,금,토1,토2 주5회', days:'', absence:0, totalT:0,
-      amount:0, fixed:false, paid:true, memo:'수능까지 수강 없음. 잔여타임 기록.', remain:13 },
-    { id:'aug_김나연', name:'김나연', cls:'입시반', tags:['특강'],
-      schedule:'수,목,금,토1,토2 주5회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2',
-      days:'정규 10T / 특강 26T = 총 36T', absence:0, totalT:36,
-      amount:1125000, fixed:false, paid:false, memo:'8월 예상 수강료', remain:null },
-    { id:'aug_김나현', name:'김나현', cls:'입시반', tags:['dis:재수50%','특강'],
-      schedule:'수,목,금,토2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2',
-      days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34,
-      amount:937500, fixed:false, paid:false, memo:'8월 예상. 정규50%+특강정가', remain:null },
-    { id:'aug_박하영', name:'박하영', cls:'예비반', tags:['fix:월고정'],
-      schedule:'수,목,금 주3회', days:'', absence:0, totalT:0,
-      amount:250000, fixed:true, paid:false, memo:'고1 고정 250,000원/월', remain:null },
-    { id:'aug_김도훈', name:'김도훈', cls:'예비반', tags:[],
-      schedule:'토1,토2,일 주3회', days:'예정', absence:0, totalT:0,
-      amount:360000, fixed:false, paid:false, memo:'8월 예상', remain:null },
-    { id:'aug_안시연', name:'안시연', cls:'중등반', tags:['특강'],
-      schedule:'토1,토2,일1,일2 주4회\n특강: 선택타임',
-      days:'정규 12T / 특강 20T = 총 32T', absence:0, totalT:32,
-      amount:1000000, fixed:false, paid:false, memo:'8월 예상', remain:null },
-    { id:'aug_한지유', name:'한지유', cls:'중등반', tags:['특강'],
-      schedule:'토,일 주2회\n특강: 선택타임',
-      days:'정규 6T / 특강 20T = 총 26T', absence:0, totalT:26,
-      amount:812500, fixed:false, paid:false, memo:'8월 예상', remain:null },
-    { id:'aug_조제우', name:'조제우', cls:'중등반', tags:['특강'],
-      schedule:'수,금,토 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 16T = 총 24T', absence:0, totalT:24,
-      amount:750000, fixed:false, paid:false, memo:'8월 예상', remain:null },
-    { id:'aug_전서빈', name:'전서빈', cls:'중등반', tags:['특강'],
-      schedule:'목,토1,토2 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
-      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
-    { id:'aug_권해원', name:'권해원', cls:'중등반', tags:['특강'],
-      schedule:'목,토1,토2 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
-      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
-    { id:'aug_김현준', name:'김현준', cls:'중등반', tags:['특강'],
-      schedule:'수,토,일 주3회\n특강: 선택타임',
-      days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28,
-      amount:875000, fixed:false, paid:false, memo:'8월 예상', remain:null },
-    { id:'aug_최주연', name:'최주연', cls:'중등반', tags:['특강'],
-      schedule:'토1,토2,일 주3회\n특강: 선택타임',
-      days:'정규 9T / 특강 20T = 총 29T', absence:0, totalT:29,
-      amount:906250, fixed:false, paid:false, memo:'8월 예상', remain:null },
-    { id:'aug_나은솔', name:'나은솔', cls:'취미반', tags:[],
-      schedule:'토1 주1회', days:'4주', absence:0, totalT:4,
-      amount:100000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'aug_김건휘', name:'김건휘', cls:'취미반', tags:[],
-      schedule:'일1 주1회', days:'4주', absence:0, totalT:4,
-      amount:100000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'aug_김예진', name:'김예진', cls:'취미반', tags:[],
-      schedule:'목,토 주2회', days:'4주', absence:0, totalT:8,
-      amount:200000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'aug_최다윤', name:'최다윤', cls:'취미반', tags:[],
-      schedule:'일1 주1회', days:'4주', absence:0, totalT:4,
-      amount:100000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'aug_신유나', name:'신유나', cls:'취미반', tags:[],
-      schedule:'토1 주1회', days:'4주', absence:0, totalT:4,
-      amount:100000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'aug_최현우', name:'최현우', cls:'취미반', tags:[],
-      schedule:'토2 주1회', days:'4주', absence:0, totalT:4,
-      amount:100000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'aug_김윤재', name:'김윤재', cls:'취미반', tags:[],
-      schedule:'토1,일2 주2회', days:'4주', absence:0, totalT:8,
-      amount:200000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'aug_이지아', name:'이지아', cls:'취미반', tags:[],
-      schedule:'토1 주1회', days:'4주', absence:0, totalT:4,
-      amount:100000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'aug_명지민', name:'명지민', cls:'취미반', tags:[],
-      schedule:'토2 주1회', days:'4주', absence:0, totalT:4,
-      amount:100000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'aug_김가람', name:'김가람', cls:'취미반', tags:[],
-      schedule:'토2,일2 주2회', days:'4주', absence:0, totalT:8,
-      amount:200000, fixed:false, paid:false, memo:'', remain:null },
+    { id:'aug_박선영', name:'박선영', cls:'입시반', tags:['fix:월고정'], schedule:'수,목,금,토1,토2 주5회 (3수)', days:'', absence:0, totalT:0, amount:312500, fixed:true, paid:false, memo:'3수생 고정 312,500원/월', remain:null },
+    { id:'aug_박민지', name:'박민지', cls:'입시반', tags:['pause:수능까지휴식'], schedule:'수,목,금,토1,토2 주5회', days:'', absence:0, totalT:0, amount:0, fixed:false, paid:true, memo:'수능까지 수강 없음. 잔여타임 기록.', remain:13 },
+    { id:'aug_김나연', name:'김나연', cls:'입시반', tags:['special:특강'], schedule:'수,목,금,토1,토2 주5회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2', days:'정규 10T / 특강 26T = 총 36T', absence:0, totalT:36, regularT:10, specialT:26, amount:1125000, fixed:false, paid:false, memo:'8월 예상' },
+    { id:'aug_김나현', name:'김나현', cls:'입시반', tags:['dis:재수50%','special:특강'], schedule:'수,목,금,토2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2', days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34, regularT:8, specialT:26, amount:937500, fixed:false, paid:false, memo:'8월 예상. 정규50%+특강정가' },
+    { id:'aug_박하영', name:'박하영', cls:'예비반', tags:['fix:월고정'], schedule:'수,목,금 주3회', days:'', absence:0, totalT:0, amount:250000, fixed:true, paid:false, memo:'고1 고정 250,000원/월', remain:null },
+    { id:'aug_김도훈', name:'김도훈', cls:'예비반', tags:[], schedule:'토1,토2,일 주3회', days:'예정', absence:0, totalT:0, amount:360000, fixed:false, paid:false, memo:'8월 예상' },
+    { id:'aug_안시연', name:'안시연', cls:'중등반', tags:['special:특강'], schedule:'토1,토2,일1,일2 주4회\n특강: 선택타임', days:'정규 12T / 특강 20T = 총 32T', absence:0, totalT:32, regularT:12, specialT:20, amount:1000000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'혜화여중', vacStart:'7/22(수)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
+    { id:'aug_한지유', name:'한지유', cls:'중등반', tags:['special:특강'], schedule:'토,일 주2회\n특강: 선택타임', days:'정규 6T / 특강 20T = 총 26T', absence:0, totalT:26, regularT:6, specialT:20, amount:812500, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'초연중', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
+    { id:'aug_조제우', name:'조제우', cls:'중등반', tags:['special:특강'], schedule:'수,금,토 주3회\n특강: 선택타임', days:'정규 8T / 특강 16T = 총 24T', absence:0, totalT:24, regularT:8, specialT:16, amount:750000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'초읍중', vacStart:'7/24(목)', vacEnd:'8/13(목)', openDay:'8/14(금)' } },
+    { id:'aug_전서빈', name:'전서빈', cls:'중등반', tags:['special:특강'], schedule:'목,토1,토2 주3회\n특강: 선택타임', days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28, regularT:8, specialT:20, amount:875000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'연일중', vacStart:'7/22(수)', vacEnd:'8/23(일)', openDay:'8/24(월)' } },
+    { id:'aug_권해원', name:'권해원', cls:'중등반', tags:['special:특강'], schedule:'목,토1,토2 주3회\n특강: 선택타임', days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28, regularT:8, specialT:20, amount:875000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'부산예술중', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
+    { id:'aug_김현준', name:'김현준', cls:'중등반', tags:['special:특강'], schedule:'수,토,일 주3회\n특강: 선택타임', days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28, regularT:8, specialT:20, amount:875000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'부곡중', vacStart:'7/17(금)', vacEnd:'8/16(일)', openDay:'8/17(월)' } },
+    { id:'aug_최주연', name:'최주연', cls:'중등반', tags:['special:특강'], schedule:'토1,토2,일 주3회\n특강: 선택타임', days:'정규 9T / 특강 20T = 총 29T', absence:0, totalT:29, regularT:9, specialT:20, amount:906250, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'온천중', vacStart:'7/22(수)', vacEnd:'8/18(화)', openDay:'8/19(수)' } },
+    { id:'aug_나은솔', name:'나은솔', cls:'취미반', tags:[], schedule:'토1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
+    { id:'aug_김건휘', name:'김건휘', cls:'취미반', tags:[], schedule:'일1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
+    { id:'aug_김예진', name:'김예진', cls:'취미반', tags:[], schedule:'목,토 주2회', days:'', absence:0, totalT:8, amount:200000, fixed:false, paid:false, memo:'' },
+    { id:'aug_최다윤', name:'최다윤', cls:'취미반', tags:[], schedule:'일1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
+    { id:'aug_신유나', name:'신유나', cls:'취미반', tags:[], schedule:'토1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
+    { id:'aug_최현우', name:'최현우', cls:'취미반', tags:[], schedule:'토2 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
+    { id:'aug_김윤재', name:'김윤재', cls:'취미반', tags:[], schedule:'토1,일2 주2회', days:'', absence:0, totalT:8, amount:200000, fixed:false, paid:false, memo:'' },
+    { id:'aug_이지아', name:'이지아', cls:'취미반', tags:[], schedule:'토1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
+    { id:'aug_명지민', name:'명지민', cls:'취미반', tags:[], schedule:'토2 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
+    { id:'aug_김가람', name:'김가람', cls:'취미반', tags:[], schedule:'토2,일2 주2회', days:'', absence:0, totalT:8, amount:200000, fixed:false, paid:false, memo:'' },
   ]
 };
 
 // ── 스토리지 ──
-const FB_URL='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
-function loadDB(){
-  return JSON.parse(JSON.stringify(initData));
-}
+function loadDB(){ return JSON.parse(JSON.stringify(initData)); }
 function saveDB(d){
   const paidMap = {};
-  ['jul','aug'].forEach(m=>{
-    if(d[m]) d[m].forEach(s=>{ paidMap[s.id] = s.paid; });
-  });
+  ['jul','aug'].forEach(m=>{ if(d[m]) d[m].forEach(s=>{ paidMap[s.id]=s.paid; }); });
   fetch(`${FB_URL}/paid.json`,{method:'PUT',body:JSON.stringify(paidMap),headers:{'Content-Type':'application/json'}}).catch(()=>{});
 }
 async function syncFromFirebase(){
   const statusEl = document.getElementById('fb-status');
-  try{
-    // 1. paid.json 로드
+  try {
     const r = await fetch(`${FB_URL}/paid.json`);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const paidMap = await r.json();
-    if(paidMap && typeof paidMap === 'object'){
-      ['jul','aug'].forEach(m=>{
-        if(db[m]) db[m].forEach(s=>{
-          if(paidMap[s.id] !== undefined) s.paid = paidMap[s.id];
-        });
-      });
+    if(paidMap && typeof paidMap==='object'){
+      ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{ if(paidMap[s.id]!==undefined) s.paid=paidMap[s.id]; }); });
     }
-
-    // 2. timetable.json에서 시수 읽어서 수강료 업데이트
     const tr = await fetch(`${FB_URL}/timetable.json`);
     if(tr.ok){
       const timetable = await tr.json();
-      if(timetable && typeof timetable === 'object'){
-        // 학생별 7월/8월 시수 집계
+      if(timetable && typeof timetable==='object'){
         const fees = {};
-        Object.entries(timetable).forEach(([dateStr, dayData])=>{
-          const [y,m,d] = dateStr.split('-').map(Number);
-          const mon = m === 7 ? 'jul' : m === 8 ? 'aug' : null;
-          if(!mon) return;
-          ['1타임','2타임','3타임'].forEach((tim, ti)=>{
-            if(!dayData[tim]) return;
+        Object.entries(timetable).forEach(([dateStr,dayData])=>{
+          const [y,m,d2] = dateStr.split('-').map(Number);
+          const mon = m===7?'jul':m===8?'aug':null; if(!mon) return;
+          ['1타임','2타임','3타임'].forEach(tim=>{ if(!dayData[tim]) return;
             ['입시반','예비반','중등반','취미반'].forEach(cls=>{
-              (dayData[tim][cls]||[]).forEach(name=>{
-                const key = mon+'_'+name;
-                if(!fees[key]) fees[key]={regular:0,special:0};
-                fees[key].regular++;
-              });
+              (dayData[tim][cls]||[]).forEach(name=>{ const k=mon+'_'+name; if(!fees[k])fees[k]={regular:0}; fees[k].regular++; });
             });
           });
         });
-
-        // db 수강료 업데이트
-        const RATE = {
-          '박선영': {type:'fix', amt:312500},
-          '박하영': {type:'fix', amt:250000},
-          '박민지': {type:'remain'},
-          '김나현': {type:'discount50'},
-        };
-        const TAKUMI = ['나은솔','김건휘','김예진','최다윤','신유나','최현우','김윤재','김가람','이지아','명지민'];
-
-        ['jul','aug'].forEach(mon=>{
-          if(!db[mon]) return;
-          db[mon].forEach(s=>{
-            const name = s.name;
-            const key = mon+'_'+name;
-            const fc = fees[key];
-            if(!fc) return;
-
-            const r = RATE[name];
-            if(r && r.type==='fix') return; // 고정 금액은 건드리지 않음
-            if(r && r.type==='remain') return; // 잔여 안내도 건드리지 않음
-
-            const isTakumi = TAKUMI.includes(name);
-            const rate = s.cls==='예비반' ? 30000 : 31250;
-            const totalT = fc.regular;
-
-            if(r && r.type==='discount50'){
-              // 재수생: 정규 50% + 특강 full (timetable에서 구분 어려워 전체 적용)
-              s.amount = Math.round(totalT * rate * 0.5);
-            } else if(isTakumi){
-              // 취미반은 고정 유지
-            } else {
-              s.amount = totalT * rate;
-            }
-            s.totalT = totalT;
+        const RATE={'박선영':{type:'fix'},'박하영':{type:'fix'},'박민지':{type:'remain'},'김나현':{type:'discount50'}};
+        const TAKUMI=['나은솔','김건휘','김예진','최다윤','신유나','최현우','김윤재','김가람','이지아','명지민'];
+        ['jul','aug'].forEach(mon=>{ if(!db[mon]) return;
+          db[mon].forEach(s=>{ const fc=fees[mon+'_'+s.name]; if(!fc) return;
+            const r2=RATE[s.name];
+            if(r2&&(r2.type==='fix'||r2.type==='remain')) return;
+            const rate=s.cls==='예비반'?30000:31250;
+            if(r2&&r2.type==='discount50') s.amount=Math.round(fc.regular*rate*0.5);
+            else if(!TAKUMI.includes(s.name)) s.amount=fc.regular*rate;
+            s.totalT=fc.regular;
           });
         });
       }
     }
-
-    if(typeof render==='function') render();
-    if(typeof renderSidebar==='function') renderSidebar();
-    if(typeof renderSummary==='function') renderSummary();
+    renderAll();
     if(statusEl) statusEl.textContent='';
-  }catch(e){
-    if(statusEl) statusEl.textContent='연결 실패';
-    console.error('Firebase 오류:', e);
-  }
+  } catch(e){ if(statusEl) statusEl.textContent='연결 실패'; }
 }
-function getDB() {
-  try {
-    const saved = loadDB();
-    if (!saved || !saved.jul || !saved.jul.length) {
-      const fresh = JSON.parse(JSON.stringify(initData));
-      saveDB(fresh);
-      return fresh;
-    }
-    // 각 학생에 누락 필드 보완
-    ['jul','aug'].forEach(m => {
-      if (!saved[m]) return;
-      saved[m].forEach(s => {
-        if (!s.tags) s.tags = [];
-        if (s.remain === undefined) s.remain = null;
-        if (s.amount === undefined) s.amount = 0;
-        if (s.paid === undefined) s.paid = false;
-        if (s.fixed === undefined) s.fixed = false;
-        if (s.totalT === undefined) s.totalT = 0;
-      });
-      // initData에서 새 학생 추가
-      initData[m].forEach(init => {
-        if (!saved[m].find(s => s.id === init.id)) saved[m].push(init);
-      });
-    });
-    return saved;
-  } catch(e) {
-    console.error('getDB 오류, initData 사용:', e);
-    const fresh = JSON.parse(JSON.stringify(initData));
-    saveDB(fresh);
-    return fresh;
-  }
+function getDB(){
+  const saved=loadDB();
+  ['jul','aug'].forEach(m=>{
+    initData[m].forEach(init=>{ if(!saved[m].find(s=>s.id===init.id)) saved[m].push(JSON.parse(JSON.stringify(init))); });
+    saved[m].forEach(s=>{ if(!s.tags)s.tags=[]; if(s.remain===undefined)s.remain=null; });
+  });
+  return saved;
 }
-
 let db = getDB();
-let currentFilter = { jul:'all', aug:'all' };
-let searchQuery = '';
-
-// ── 렌더 ──
-function fmt(n) { return n === 0 ? '0원' : n.toLocaleString('ko-KR') + '원'; }
-
-function tagHtml(t) {
-  const [k, ...rest] = t.split(':');
-  const label = rest.join(':');
-  const cls = k === 'fix' ? 'tag-fix' : k === 'pause' ? 'tag-pause' :
-    k === 're' ? 'tag-re' : k === 'dis' ? 'tag-dis' :
-    k === 'bo' ? 'tag-bo' : k === 'new' ? 'tag-new' : 'tag-fix';
+const fmt = n => n===0?'0원':n.toLocaleString('ko-KR')+'원';
+function tagHtml(t){
+  const [k,...rest]=t.split(':'); const label=rest.join(':');
+  const cls=k==='fix'?'tag-fix':k==='pause'?'tag-pause':k==='re'?'tag-re':k==='dis'?'tag-dis':k==='bo'?'tag-bo':k==='new'?'tag-new':k==='special'?'tag-special':'tag-fix';
   return `<span class="tag ${cls}">${label}</span>`;
 }
 
-
-
-function getActiveMonth() {
-  return document.getElementById('panel-aug').classList.contains('on') ? 'aug' : 'jul';
+function renderAll(){
+  if(isPC()){ pcRenderFilters(); pcRenderSidebar(); pcRenderSummary(); }
+  else { mobRender(mobGetActiveMonth()); mobRenderSummary(mobGetActiveMonth()); }
 }
 
-function onSearch(val) {
-  searchQuery = val.trim().toLowerCase();
-  document.getElementById('searchClear').style.display = val ? 'block' : 'none';
-  render(getActiveMonth());
+// ══════════════════════════════════
+// 반응형 분기
+// ══════════════════════════════════
+const isPC = () => window.innerWidth >= 900;
+
+function init(){
+  if(isPC()){
+    document.body.className='pc';
+    document.getElementById('app-mob').style.display='none';
+    document.getElementById('app-pc').style.display='block';
+    pcRenderFilters(); pcRenderSidebar(); pcRenderSummary();
+  } else {
+    document.body.className='mob';
+    document.getElementById('app-pc').style.display='none';
+    document.getElementById('app-mob').style.display='block';
+    mobRender('jul'); mobRenderSummary('jul');
+    window.addEventListener('scroll',()=>{
+      const btn=document.getElementById('topBtn');
+      if(btn) btn.classList.toggle('show', window.scrollY>200);
+    });
+  }
+  syncFromFirebase();
 }
 
-function clearSearch() {
-  document.getElementById('searchInput').value = '';
-  document.getElementById('searchClear').style.display = 'none';
-  searchQuery = '';
-  render(getActiveMonth());
+// ══════════════════════════════════
+// 모바일 로직
+// ══════════════════════════════════
+let mobFilter = {jul:'all', aug:'all'};
+let mobSearchQ = '';
+
+function mobGetActiveMonth(){ return document.getElementById('panel-aug')?.classList.contains('on')?'aug':'jul'; }
+function mobOnSearch(v){ mobSearchQ=v.trim().toLowerCase(); document.getElementById('searchClear').style.display=v?'block':'none'; mobRender(mobGetActiveMonth()); }
+function mobClearSearch(){ document.getElementById('mobSearchInput').value=''; document.getElementById('searchClear').style.display='none'; mobSearchQ=''; mobRender(mobGetActiveMonth()); }
+function mobSwitchTab(month,el){
+  document.querySelectorAll('#app-mob .tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('#app-mob .panel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on'); document.getElementById('panel-'+month).classList.add('on');
+  mobRenderSummary(month);
+  document.getElementById('hdrSub').textContent=month==='jul'?'2026년 7월':'2026년 8월 (예정)';
 }
-
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+function mobFilterCls(month,cls,btn){
+  mobFilter[month]=cls;
+  document.querySelectorAll('#panel-'+month+' .fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); mobRender(month);
 }
-
-window.addEventListener('scroll', () => {
-  const btn = document.getElementById('topBtn');
-  if (window.scrollY > 200) btn.classList.add('show');
-  else btn.classList.remove('show');
-});
-
-function render(month) {
-  if (!db[month]) return; // month 데이터 없으면 skip
-  const filter = currentFilter[month];
-  const list = document.getElementById('list-' + month);
-  if (!list) return;
-  list.innerHTML = '';
-  const items = db[month].filter(s => {
-    if (searchQuery && !s.name.toLowerCase().includes(searchQuery)) return false;
-    if (filter === 'all') return true;
-    if (filter === '미납') {
-      const today = new Date();
-      const cutoff = month === 'jul' ? new Date(2026, 6, 10) : new Date(2026, 7, 10);
-      if (today < cutoff) return false;
-      return !s.paid && s.amount > 0;
-    }
-    return s.cls === filter;
+function mobRender(month){
+  const filter=mobFilter[month];
+  const list=document.getElementById('list-'+month); if(!list) return;
+  list.innerHTML='';
+  const items=db[month].filter(s=>{
+    if(s.amount===0&&s.remain==null&&!s.fixed) return false;
+    if(mobSearchQ&&!s.name.toLowerCase().includes(mobSearchQ)) return false;
+    if(filter==='all') return true;
+    if(filter==='미납'){ const today=new Date(),cut=month==='jul'?new Date(2026,6,10):new Date(2026,7,10); if(today<cut)return false; return !s.paid&&s.amount>0; }
+    return s.cls===filter;
   });
-
-  const groups = {};
-  items.forEach(s => {
-    if (!groups[s.cls]) groups[s.cls] = [];
-    groups[s.cls].push(s);
-  });
-
-  const clsOrder = ['입시반','예비반','중등반','취미반'];
-  clsOrder.forEach(cls => {
-    if (!groups[cls]) return;
-    const hdr = document.createElement('div');
-    hdr.className = 'sec-hdr';
-    hdr.textContent = cls;
-    list.appendChild(hdr);
-    groups[cls].forEach(s => {
-    const card = makeCard(s, month);
-    if (card) list.appendChild(card);
-  });
+  const groups={}; items.forEach(s=>{ if(!groups[s.cls])groups[s.cls]=[]; groups[s.cls].push(s); });
+  ['입시반','예비반','중등반','취미반'].forEach(cls=>{
+    if(!groups[cls]) return;
+    const hdr=document.createElement('div'); hdr.className='sec-hdr'; hdr.textContent=cls; list.appendChild(hdr);
+    groups[cls].forEach(s=>{ const card=mobMakeCard(s,month); if(card)list.appendChild(card); });
   });
 }
-
-function makeCard(s, month) {
-  // 완전히 비어있는 학생만 숨김 (amount=0, remain 없음, 고정요금 아님)
-  if (s.amount === 0 && s.remain == null && !s.fixed) return null;
-  const div = document.createElement('div');
-  div.className = 'card' + (s.paid ? ' paid' : (s.amount > 0 ? ' unpaid' : ''));
-  div.id = 'card-' + s.id;
-
-  const amtDisplay = s.remain != null
-    ? `잔여 ${s.remain}T`
-    : (s.amount === 0 ? '수강없음' : fmt(s.amount));
-
-  const tDisplay = s.remain != null
-    ? '수강 없음'
-    : (s.totalT > 0 ? `총 ${s.totalT}T` : (s.fixed ? '고정요금' : ''));
-
-  const tagsStr = (s.tags||[]).map(t => tagHtml(t)).join('');
-  const remainBadge = (s.remain != null && s.remain !== undefined) ? `<div class="remain-badge">잔여 ${s.remain}T</div>` : '';
-
-  div.innerHTML = `
-    <div class="card-top" onclick="toggleDetail('${s.id}','${month}')">
-      <div class="card-check ${s.paid ? 'done' : ''}" onclick="togglePaid(event,'${s.id}','${month}')"></div>
-      <div class="card-info">
-        <div class="card-name">${s.name}</div>
-        <div class="card-cls">${s.schedule.split('\n')[0]}</div>
-        ${remainBadge}
-      </div>
-      <div class="card-right">
-        <div class="card-amt ${s.amount === 0 && s.remain === null ? 'zero' : ''}">${amtDisplay}</div>
-        <div class="card-t">${tDisplay}</div>
-      </div>
+function mobMakeCard(s,month){
+  if(s.amount===0&&s.remain==null&&!s.fixed) return null;
+  const div=document.createElement('div');
+  div.className='card'+(s.paid?' paid':(s.amount>0?' unpaid':''));
+  const amtD=s.remain!=null?`잔여 ${s.remain}T`:(s.amount===0?'수강없음':fmt(s.amount));
+  const tD=s.remain!=null?'수강 없음':(s.totalT>0?`총 ${s.totalT}T`:(s.fixed?'고정요금':''));
+  const tagsStr=(s.tags||[]).map(t=>tagHtml(t)).join('');
+  const remainB=s.remain!=null?`<div class="remain-badge">잔여 ${s.remain}T</div>`:'';
+  div.innerHTML=`
+    <div class="card-top" onclick="mobToggleDetail('${s.id}')">
+      <div class="card-check ${s.paid?'done':''}" onclick="mobTogglePaid(event,'${s.id}','${month}')"></div>
+      <div class="card-info"><div class="card-name">${s.name}</div><div class="card-cls">${s.schedule.split('\n')[0]}</div>${remainB}</div>
+      <div class="card-right"><div class="card-amt ${s.amount===0&&s.remain===null?'zero':''}">${amtD}</div><div class="card-t">${tD}</div></div>
     </div>
-    ${tagsStr ? `<div class="tags">${tagsStr}</div>` : ''}
+    ${tagsStr?`<div class="tags">${tagsStr}</div>`:''}
     <div class="detail" id="detail-${s.id}">
       <div class="d-row"><span class="d-lbl">수업 요일</span><span class="d-val">${s.schedule.replace(/\n/g,'<br>')}</span></div>
-      ${s.days ? `<div class="d-row"><span class="d-lbl">수업 일자/시수</span><span class="d-val">${s.days.replace(/\n/g,'<br>')}</span></div>` : ''}
-      ${s.absence > 0 ? `<div class="d-row"><span class="d-lbl">결석 차감</span><span class="d-val" style="color:var(--red)">-${s.absence}T</span></div>` : ''}
-      <div class="d-row"><span class="d-lbl">수강료</span><span class="d-val" style="color:var(--blue);font-weight:700;">${s.remain !== null ? '해당없음 (잔여'+s.remain+'T)' : fmt(s.amount)}</span></div>
-      <div class="d-row"><span class="d-lbl">결제여부</span><span class="d-val" style="color:${s.paid?'var(--green)':'var(--red)'}">${s.paid ? '결제완료' : '미납'}</span></div>
-      ${s.memo ? `<div class="d-dates">${s.memo}</div>` : ''}
-      <button class="edit-btn" onclick="openEdit('${s.id}','${month}')">편집</button>
+      ${s.days?`<div class="d-row"><span class="d-lbl">수업 일자/시수</span><span class="d-val">${s.days.replace(/\n/g,'<br>')}</span></div>`:''}
+      ${s.absence>0?`<div class="d-row"><span class="d-lbl">결석 차감</span><span class="d-val" style="color:var(--red)">-${s.absence}T</span></div>`:''}
+      <div class="d-row"><span class="d-lbl">수강료</span><span class="d-val" style="color:var(--blue);font-weight:700">${s.remain!==null?'해당없음 (잔여'+s.remain+'T)':fmt(s.amount)}</span></div>
+      <div class="d-row"><span class="d-lbl">결제여부</span><span class="d-val" style="color:${s.paid?'var(--green)':'var(--red)'}">${s.paid?'결제완료':'미납'}</span></div>
+      ${s.memo?`<div class="d-dates">${s.memo}</div>`:''}
+      <button class="edit-btn" onclick="mobOpenEdit('${s.id}','${month}')">편집</button>
       <div class="edit-form" id="edit-${s.id}">
-        <div class="ef-label">수업 요일/일정</div>
-        <textarea class="ef-input" id="ef-schedule-${s.id}">${s.schedule}</textarea>
-        <div class="ef-label">수업 일자 / 시수 내역</div>
-        <textarea class="ef-input" id="ef-days-${s.id}">${s.days}</textarea>
-        <div class="ef-label">결석 차감 (T)</div>
-        <input class="ef-input" type="number" id="ef-abs-${s.id}" value="${s.absence}">
-        <div class="ef-label">총 시수 (T)</div>
-        <input class="ef-input" type="number" id="ef-total-${s.id}" value="${s.totalT}">
-        <div class="ef-label">수강료 (원)</div>
-        <input class="ef-input" type="number" id="ef-amt-${s.id}" value="${s.amount}">
-        ${s.remain !== null ? `<div class="ef-label">잔여 타임 (T)</div><input class="ef-input" type="number" id="ef-remain-${s.id}" value="${s.remain}">` : ''}
-        <div class="ef-label">메모</div>
-        <textarea class="ef-input" id="ef-memo-${s.id}">${s.memo}</textarea>
-        <button class="save-btn" onclick="saveEdit('${s.id}','${month}')">저장</button>
-        <button class="edit-btn" style="margin-left:0;margin-top:0;" onclick="cancelEdit('${s.id}')">취소</button>
+        <div class="ef-label">수업 요일/일정</div><textarea class="ef-input" id="ef-schedule-${s.id}">${s.schedule}</textarea>
+        <div class="ef-label">수업 일자/시수</div><textarea class="ef-input" id="ef-days-${s.id}">${s.days}</textarea>
+        <div class="ef-label">결석 차감(T)</div><input class="ef-input" type="number" id="ef-abs-${s.id}" value="${s.absence}">
+        <div class="ef-label">총 시수(T)</div><input class="ef-input" type="number" id="ef-total-${s.id}" value="${s.totalT}">
+        <div class="ef-label">수강료(원)</div><input class="ef-input" type="number" id="ef-amt-${s.id}" value="${s.amount}">
+        ${s.remain!==null?`<div class="ef-label">잔여 타임(T)</div><input class="ef-input" type="number" id="ef-remain-${s.id}" value="${s.remain}">`:''}
+        <div class="ef-label">메모</div><textarea class="ef-input" id="ef-memo-${s.id}">${s.memo}</textarea>
+        <button class="save-btn" onclick="mobSaveEdit('${s.id}','${month}')">저장</button>
+        <button class="edit-btn" style="margin-left:0;margin-top:0" onclick="mobCancelEdit('${s.id}')">취소</button>
       </div>
-    </div>
-  `;
+    </div>`;
   return div;
 }
-
-function toggleDetail(id, month) {
-  const det = document.getElementById('detail-' + id);
-  det.classList.toggle('on');
+function mobToggleDetail(id){ document.getElementById('detail-'+id)?.classList.toggle('on'); }
+function mobTogglePaid(e,id,month){ e.stopPropagation(); const s=db[month].find(x=>x.id===id); if(s){s.paid=!s.paid; saveDB(db); mobRender(month); mobRenderSummary(month);} }
+function mobOpenEdit(id,month){ document.getElementById('edit-'+id)?.classList.add('on'); document.getElementById('detail-'+id)?.classList.add('on'); }
+function mobCancelEdit(id){ document.getElementById('edit-'+id)?.classList.remove('on'); }
+function mobSaveEdit(id,month){
+  const s=db[month].find(x=>x.id===id); if(!s) return;
+  s.schedule=document.getElementById('ef-schedule-'+id).value;
+  s.days=document.getElementById('ef-days-'+id).value;
+  s.absence=parseInt(document.getElementById('ef-abs-'+id).value)||0;
+  s.totalT=parseInt(document.getElementById('ef-total-'+id).value)||0;
+  s.amount=parseInt(document.getElementById('ef-amt-'+id).value)||0;
+  s.memo=document.getElementById('ef-memo-'+id).value;
+  const rem=document.getElementById('ef-remain-'+id); if(rem) s.remain=parseInt(rem.value)||0;
+  saveDB(db); mobRender(month); mobRenderSummary(month);
+  setTimeout(()=>document.getElementById('detail-'+id)?.classList.add('on'),50);
 }
-
-function togglePaid(e, id, month) {
-  e.stopPropagation();
-  const s = db[month].find(x => x.id === id);
-  s.paid = !s.paid;
-  saveDB(db);
-  render(month);
-  renderSummary(month);
+function mobRenderSummary(month){
+  const items=initData[month]||[]; if(!items.length) return;
+  const total=items.reduce((a,s)=>a+(s.amount||0),0);
+  const paid=(db[month]||[]).filter(s=>s.paid).reduce((a,s)=>a+(s.amount||0),0);
+  const clsList=['입시반','예비반','중등반','취미반'];
+  const clsSums={}; clsList.forEach(c=>clsSums[c]=0); items.forEach(s=>{ if(clsSums[s.cls]!==undefined) clsSums[s.cls]+=s.amount; });
+  const box=document.getElementById('summaryBox'); if(!box) return;
+  box.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px">
+    <div class="sum-box"><div class="sum-lbl">총 수강료</div><div class="sum-val">${fmt(total)}</div></div>
+    <div class="sum-box"><div class="sum-lbl">결제 완료</div><div class="sum-val">${fmt(paid)}</div></div>
+    <div class="sum-box"><div class="sum-lbl">잔여</div><div class="sum-val" style="color:${(total-paid)>0?'#ffcc88':'#26de81'}">${fmt(total-paid)}</div></div>
+  </div>
+  <div class="sum-box full"><div style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none">
+    ${clsList.map(c=>`<span style="white-space:nowrap;font-size:11px;color:#fff"><span style="opacity:.7">${c}</span> <b>${fmt(clsSums[c])}</b></span>`).join('<span style="color:rgba(255,255,255,.3)">·</span>')}
+  </div></div>`;
 }
-
-function openEdit(id, month) {
-  document.getElementById('edit-' + id).classList.add('on');
-  document.getElementById('detail-' + id).classList.add('on');
-}
-function cancelEdit(id) {
-  document.getElementById('edit-' + id).classList.remove('on');
-}
-
-function saveEdit(id, month) {
-  const s = db[month].find(x => x.id === id);
-  s.schedule = document.getElementById('ef-schedule-' + id).value;
-  s.days = document.getElementById('ef-days-' + id).value;
-  s.absence = parseInt(document.getElementById('ef-abs-' + id).value) || 0;
-  s.totalT = parseInt(document.getElementById('ef-total-' + id).value) || 0;
-  s.amount = parseInt(document.getElementById('ef-amt-' + id).value) || 0;
-  s.memo = document.getElementById('ef-memo-' + id).value;
-  const remEl = document.getElementById('ef-remain-' + id);
-  if (remEl) s.remain = parseInt(remEl.value) || 0;
-  saveDB(db);
-  render(month);
-  renderSummary(month);
-  // 다시 펼치기
-  setTimeout(() => {
-    const det = document.getElementById('detail-' + id);
-    if (det) det.classList.add('on');
-  }, 50);
-}
-
-function filterCls(month, cls, btn) {
-  currentFilter[month] = cls;
-  document.querySelectorAll('#panel-' + month + ' .fbtn').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  render(month);
-}
-
-function switchTab(month, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('panel-' + month).classList.add('on');
-  renderSummary(month);
-  document.getElementById('hdrSub').textContent = month === 'jul' ? '2026년 7월' : '2026년 8월 (예정)';
-}
-
-function renderSummary(month) {
-  const items = initData[month] || [];
-  if (!items.length) return;
-  // 총액은 initData 기준(고정), 결제완료는 db 기준(실시간)
-  const total = items.reduce((a,s) => a + (s.amount||0), 0);
-  const dbItems = (db[month] || []);
-  const paid = dbItems.filter(s => s.paid).reduce((a,s) => a + (s.amount||0), 0);
-  const unpaid = total - paid;
-
-  const clsList = ['입시반','예비반','중등반','취미반'];
-  const clsSums = {};
-  clsList.forEach(c => { clsSums[c] = 0; });
-  items.forEach(s => { if (clsSums[s.cls] !== undefined) clsSums[s.cls] += s.amount; });
-
-  const fmt2 = n => n.toLocaleString('ko-KR') + '원';
-
-  const box = document.getElementById('summaryBox');
-  if(!box){console.error('summaryBox not found');return;}
-  box.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px">
-      <div class="sum-box">
-        <div class="sum-lbl">총 수강료</div>
-        <div class="sum-val">${fmt2(total)}</div>
-      </div>
-      <div class="sum-box">
-        <div class="sum-lbl">결제 완료</div>
-        <div class="sum-val">${fmt2(paid)}</div>
-      </div>
-      <div class="sum-box">
-        <div class="sum-lbl">잔여 수강료</div>
-        <div class="sum-val" style="color:${unpaid>0?'#ffcc88':'#26de81'}">${fmt2(unpaid)}</div>
-      </div>
-    </div>
-    <div class="sum-box full">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none">
-        
-        ${clsList.map(c => `<span style="white-space:nowrap;font-size:11px;color:#fff"><span style="opacity:.7">${c}</span> <b>${fmt2(clsSums[c])}</b></span>`).join('<span style="color:rgba(255,255,255,.3)">·</span>')}
-      </div>
-    </div>
-  `;
-}
-
-function openUnpaid() {
-  const ul = document.getElementById('unpaidList');
-  ul.innerHTML = '';
-  let total = 0;
-  // 미납 기준: 해당 월 10일 이후
-  const today = new Date();
-  const months = [
-    { key:'jul', month:6 },
-    { key:'aug', month:7 }
-  ].filter(m => {
-    const cutoff = new Date(2026, m.month, 10);
-    return today >= cutoff;
-  });
-  months.forEach(({key: month}) => {
-    const label = month === 'jul' ? '7월' : '8월';
-    db[month].filter(s => !s.paid && s.amount > 0).forEach(s => {
-      total += s.amount;
-      ul.innerHTML += `
-        <div class="unpaid-item">
-          <div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--text3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div>
-          <div class="unpaid-amt">${fmt(s.amount)}</div>
-        </div>`;
+function openUnpaid(){
+  const isMobile=!isPC();
+  const ul=document.getElementById(isMobile?'mobUnpaidList':'pcUnpaidList'); ul.innerHTML=''; let total=0;
+  ['jul','aug'].forEach(month=>{
+    const today=new Date(),cut=month==='jul'?new Date(2026,6,10):new Date(2026,7,10); if(today<cut)return;
+    db[month].filter(s=>!s.paid&&s.amount>0).forEach(s=>{
+      total+=s.amount;
+      const label=month==='jul'?'7월':'8월';
+      if(isMobile) ul.innerHTML+=`<div class="unpaid-item"><div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--text3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div><div class="unpaid-amt">${fmt(s.amount)}</div></div>`;
+      else ul.innerHTML+=`<div class="unpaid-row"><div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--text3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div><div class="unpaid-amt">${fmt(s.amount)}</div></div>`;
     });
   });
-  if (ul.innerHTML === '') ul.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">미납 없음</div>';
-  document.getElementById('unpaidTotal').textContent = fmt(total);
-  document.getElementById('unpaidOverlay').classList.add('on');
+  if(!ul.innerHTML) ul.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">미납 없음</div>';
+  document.getElementById(isMobile?'mobUnpaidTotal':'pcUnpaidTotal').textContent=fmt(total);
+  document.getElementById(isMobile?'mobUnpaidOverlay':'pcUnpaidOverlay').classList.add('on');
 }
-function closeUnpaid(e) {
-  if (!e || e.target === document.getElementById('unpaidOverlay')) {
-    document.getElementById('unpaidOverlay').classList.remove('on');
-  }
+function closeMobUnpaid(){ document.getElementById('mobUnpaidOverlay').classList.remove('on'); }
+function closePcUnpaid(){ document.getElementById('pcUnpaidOverlay').classList.remove('on'); }
+
+// ══════════════════════════════════
+// PC 로직
+// ══════════════════════════════════
+let pcMonth='jul', pcFilter='all', pcStudent=null, pcMsgTab=0, pcSearchQ='', pcEditing=false;
+
+function pcSwitchMonth(m,el){
+  pcMonth=m; pcStudent=null;
+  document.querySelectorAll('#app-pc .sm-btn').forEach(t=>t.classList.remove('on')); el.classList.add('on');
+  pcRenderFilters(); pcRenderSidebar(); pcRenderSummary();
+  document.getElementById('mainContent').innerHTML='<div class="no-select">← 학생을 선택하세요</div>';
+}
+function pcOnSearch(v){ pcSearchQ=v.trim(); pcRenderSidebar(); }
+function pcRenderFilters(){
+  const fc=document.getElementById('classFilters'); if(!fc) return; fc.innerHTML='';
+  ['all','입시반','예비반','중등반','취미반','미납'].forEach(f=>{
+    const b=document.createElement('button'); b.className='cf-btn'+(pcFilter===f?' on':'');
+    b.textContent=f==='all'?'전체':f;
+    b.onclick=()=>{ pcFilter=f; pcRenderFilters(); pcRenderSidebar(); }; fc.appendChild(b);
+  });
+}
+function pcRenderSidebar(){
+  const list=document.getElementById('studentList'); if(!list) return; list.innerHTML='';
+  const items=db[pcMonth].filter(s=>{
+    if(s.amount===0&&s.remain==null&&!s.fixed) return false;
+    if(pcSearchQ&&!s.name.includes(pcSearchQ)) return false;
+    if(pcFilter==='all') return true;
+    if(pcFilter==='미납'){ const today=new Date(),cut=pcMonth==='jul'?new Date(2026,6,10):new Date(2026,7,10); if(today<cut)return false; return !s.paid&&s.amount>0; }
+    return s.cls===pcFilter;
+  });
+  const groups={}; ['입시반','예비반','중등반','취미반'].forEach(c=>groups[c]=[]);
+  items.forEach(s=>{ if(groups[s.cls]) groups[s.cls].push(s); });
+  ['입시반','예비반','중등반','취미반'].forEach(cls=>{
+    if(!groups[cls].length) return;
+    const lbl=document.createElement('div'); lbl.className='sec-label'; lbl.textContent=cls; list.appendChild(lbl);
+    groups[cls].forEach(s=>{
+      const div=document.createElement('div'); div.className='s-item'+(pcStudent?.id===s.id?' active':'');
+      const amtTxt=s.remain!=null?`잔여 ${s.remain}T`:(s.amount===0?'-':fmt(s.amount));
+      div.innerHTML=`<div class="s-check ${s.paid?'done':''}" onclick="pcTogglePaid(event,'${s.id}')">${s.paid?'✓':''}</div>
+        <div class="s-info" onclick="pcSelectStudent('${s.id}')"><div class="s-name">${s.name}</div><div class="s-cls">${s.schedule.split('\n')[0]}</div></div>
+        <div class="s-amt ${s.amount===0&&s.remain===null?'zero':''}" onclick="pcSelectStudent('${s.id}')">${amtTxt}</div>`;
+      list.appendChild(div);
+    });
+  });
+}
+function pcRenderSummary(){
+  const items=db[pcMonth]||[]; if(!items.length) return;
+  const total=items.reduce((a,s)=>a+(s.amount||0),0);
+  const paid=items.filter(s=>s.paid).reduce((a,s)=>a+(s.amount||0),0);
+  const clsList=['입시반','예비반','중등반','취미반'];
+  const clsTotal={}; clsList.forEach(c=>clsTotal[c]=0); items.forEach(s=>{ if(clsTotal[s.cls]!==undefined) clsTotal[s.cls]+=(s.amount||0); });
+  const row=document.getElementById('summaryRow1'); if(!row) return;
+  row.innerHTML=`<div style="position:relative;display:flex;align-items:center;">
+    <button class="s-toggle-btn" id="clsToggleBtn" onclick="pcToggleCls()">›</button>
+    <div class="s-cls-panel" id="clsPanel">${clsList.map(c=>`<div class="s-cls-item"><span class="s-cls-name">${c}</span><span class="s-cls-amt">${fmt(clsTotal[c])}</span></div>`).join('')}</div>
+  </div>
+  <div class="s-vdiv"></div>
+  <div class="s-main-item"><span class="s-lbl">총 수강료</span><span class="s-val">${fmt(total)}</span></div>
+  <div class="s-vdiv"></div>
+  <div class="s-main-item"><span class="s-lbl">결제 완료</span><span class="s-val">${fmt(paid)}</span></div>
+  <div class="s-vdiv"></div>
+  <div class="s-main-item"><span class="s-lbl">잔여</span><span class="s-val remain">${fmt(total-paid)}</span></div>`;
+}
+function pcToggleCls(){ const p=document.getElementById('clsPanel'),b=document.getElementById('clsToggleBtn'); if(!p)return; p.classList.toggle('open'); b.textContent=p.classList.contains('open')?'‹':'›'; }
+function pcSelectStudent(id){ const s=db[pcMonth].find(x=>x.id===id); if(!s)return; pcStudent=s; pcMsgTab=0; pcEditing=false; pcRenderSidebar(); pcRenderDetail(); }
+function pcTogglePaid(e,id){ e.stopPropagation(); ['jul','aug'].forEach(m=>{ const s=db[m].find(x=>x.id===id); if(s)s.paid=!s.paid; }); saveDB(db); pcRenderSidebar(); pcRenderSummary(); if(pcStudent?.id===id){pcStudent=db[pcMonth].find(x=>x.id===id);pcRenderDetail();} }
+
+// ── 문자 생성 ──
+function msgFeeNormal(s,month){
+  const mon=month==='jul'?'7월':'8월';
+  if(s.remain!=null) return `[수강 현황 안내 - ${s.name} 학생 (${s.cls})]\n안녕하세요. 화강암플러스미술학원입니다.\n\n■ 잔여 타임\n${s.remain}T 남음\n\n■ 문의\n${CONTACT}\n감사합니다.`;
+  let body=`■ 수업 일정\n${s.schedule}`;
+  if(s.days) body+=`\n\n■ 수업 일자 / 시수\n${s.days}`;
+  if(s.absence>0) body+=`\n\n■ 전월 결석 차감\n-${s.absence}T (-${(s.absence*31250).toLocaleString()}원)`;
+  body+=`\n\n■ ${mon} 수강료\n${s.amount.toLocaleString()}원`;
+  if(s.memo) body+=`\n\n■ 참고\n${s.memo}`;
+  return `[${mon} 수강료 안내 - ${s.name} 학생 (${s.cls})]\n안녕하세요. 화강암플러스미술학원입니다.\n${s.name} 학생의 ${mon} 수강료를 안내드립니다.\n\n${body}${FOOTER}`;
+}
+function getMessages(s,month){
+  const msgs=[{label:`${month==='jul'?'7':'8'}월 수강료`,text:msgFeeNormal(s,month)}];
+  return msgs;
 }
 
-// 로컬(initData) 데이터로 즉시 렌더
-try { render('jul'); } catch(e) { console.error('render jul 오류:', e); }
-try { render('aug'); } catch(e) { console.error('render aug 오류:', e); }
-try { renderSummary('jul'); } catch(e) { console.error('renderSummary 오류:', e); }
-// Firebase 백그라운드 동기화
-try { syncFromFirebase(); } catch(e) {}
+function pcRenderDetail(){
+  const c=document.getElementById('mainContent'); if(!c) return;
+  if(!pcStudent){c.innerHTML='<div class="no-select">← 학생을 선택하세요</div>';return;}
+  const s=pcStudent, msgs=getMessages(s,pcMonth);
+  c.innerHTML=`<div class="detail-wrap">
+    <div class="detail-left">
+      <div class="dcard">
+        <div class="dcard-title">${s.name} · ${s.cls}</div>
+        <div style="margin-bottom:10px">${(s.tags||[]).map(tagHtml).join('')}</div>
+        <div class="drow"><span class="dlbl">수업 요일</span><span class="dval">${s.schedule.replace(/\n/g,'<br>')}</span></div>
+        ${s.days?`<div class="drow"><span class="dlbl">수업일자/시수</span><span class="dval">${s.days.replace(/\n/g,'<br>')}</span></div>`:''}
+        ${s.absence>0?`<div class="drow"><span class="dlbl">결석 차감</span><span class="dval red">-${s.absence}T</span></div>`:''}
+        ${s.totalT>0?`<div class="drow"><span class="dlbl">총 시수</span><span class="dval">${s.totalT}T</span></div>`:''}
+        <div class="drow"><span class="dlbl">수강료</span><span class="dval amount">${s.remain!==null?'해당없음':fmt(s.amount)}</span></div>
+        ${s.remain!==null?`<div class="drow"><span class="dlbl">잔여 타임</span><span class="dval"><span class="remain-badge">${s.remain}T</span></span></div>`:''}
+        <div class="drow"><span class="dlbl">결제 여부</span><span class="dval ${s.paid?'green':'red'}">${s.paid?'결제완료':'미납'}</span></div>
+        ${s.memo?`<div class="drow"><span class="dlbl">메모</span><span class="dval">${s.memo}</span></div>`:''}
+        ${s.schoolInfo&&s.schoolInfo.exam?`<div class="drow"><span class="dlbl">기말고사</span><span class="dval">${s.schoolInfo.exam}</span></div>`:''}
+        ${s.schoolInfo&&s.schoolInfo.vacStart?`<div class="drow"><span class="dlbl">방학일정</span><span class="dval">${s.schoolInfo.vacStart} ~ ${s.schoolInfo.vacEnd}<br>개학: ${s.schoolInfo.openDay}</span></div>`:''}
+        <div class="paid-toggle">
+          <button class="paid-toggle-btn ${s.paid?'paid':'unpaid'}" onclick="pcTogglePaid(event,'${s.id}')">${s.paid?'✓ 결제완료 (클릭시 취소)':'✗ 미납 (클릭시 완료처리)'}</button>
+          <button class="btn btn-gray" onclick="pcToggleEdit()">편집</button>
+        </div>
+        <div id="editForm" style="display:none">
+          <div class="edit-inline">
+            <div class="ei-row"><span class="ei-label">수업 요일</span><textarea class="ei-textarea" id="ef-schedule">${s.schedule}</textarea></div>
+            <div class="ei-row"><span class="ei-label">수업일자/시수</span><textarea class="ei-textarea" id="ef-days">${s.days||''}</textarea></div>
+            <div class="ei-row"><span class="ei-label">결석(T)</span><input class="ei-input" type="number" id="ef-abs" value="${s.absence}"></div>
+            <div class="ei-row"><span class="ei-label">총 시수(T)</span><input class="ei-input" type="number" id="ef-total" value="${s.totalT}"></div>
+            <div class="ei-row"><span class="ei-label">수강료(원)</span><input class="ei-input" type="number" id="ef-amt" value="${s.amount}"></div>
+            ${s.remain!==null?`<div class="ei-row"><span class="ei-label">잔여 타임</span><input class="ei-input" type="number" id="ef-remain" value="${s.remain}"></div>`:''}
+            <div class="ei-row"><span class="ei-label">메모</span><textarea class="ei-textarea" id="ef-memo">${s.memo||''}</textarea></div>
+            <div class="btn-row"><button class="btn btn-blue" onclick="pcSaveEdit()">저장</button><button class="btn btn-gray" onclick="pcToggleEdit()">취소</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-right">
+      <div class="msg-panel">
+        <div class="msg-tabs" id="msgTabs"></div>
+        <div class="msg-body" id="msgBody"></div>
+        <button class="msg-copy-btn" onclick="pcCopyMsg()">문자 복사</button>
+      </div>
+    </div>
+  </div>`;
+  const tabsEl=document.getElementById('msgTabs'),bodyEl=document.getElementById('msgBody');
+  msgs.forEach((m,i)=>{
+    const t=document.createElement('div'); t.className='msg-tab'+(i===pcMsgTab?' on':''); t.textContent=m.label;
+    t.onclick=()=>{ pcMsgTab=i; document.querySelectorAll('.msg-tab').forEach((x,j)=>x.classList.toggle('on',j===i)); bodyEl.innerHTML=`<div class="msg-text">${msgs[i].text.replace(/\n/g,'<br>')}</div>`; };
+    tabsEl.appendChild(t);
+  });
+  if(msgs.length>0) bodyEl.innerHTML=`<div class="msg-text">${msgs[pcMsgTab].text.replace(/\n/g,'<br>')}</div>`;
+}
+function pcToggleEdit(){ pcEditing=!pcEditing; document.getElementById('editForm').style.display=pcEditing?'block':'none'; }
+function pcSaveEdit(){
+  const s=db[pcMonth].find(x=>x.id===pcStudent.id); if(!s) return;
+  s.schedule=document.getElementById('ef-schedule').value;
+  s.days=document.getElementById('ef-days').value;
+  s.absence=parseInt(document.getElementById('ef-abs').value)||0;
+  s.totalT=parseInt(document.getElementById('ef-total').value)||0;
+  s.amount=parseInt(document.getElementById('ef-amt').value)||0;
+  s.memo=document.getElementById('ef-memo').value;
+  const rem=document.getElementById('ef-remain'); if(rem)s.remain=parseInt(rem.value)||0;
+  saveDB(db); pcStudent=s; pcEditing=false; pcRenderSidebar(); pcRenderSummary(); pcRenderDetail();
+}
+function pcCopyMsg(){
+  const msgs=getMessages(pcStudent,pcMonth); if(!msgs[pcMsgTab]) return;
+  navigator.clipboard.writeText(msgs[pcMsgTab].text).then(()=>{ const btn=document.querySelector('.msg-copy-btn'); btn.textContent='복사됨!'; setTimeout(()=>btn.textContent='문자 복사',2000); });
+}
+
+// ── 시작 ──
+init();
 </script>
 </body>
 </html>
