@@ -494,6 +494,7 @@ function scrollToCls(ti,cls){
 
 // ── 렌더 ─────────────────────────────────────────────
 function render(){
+  if(Object.keys(S).length===0){loadTimetable().then(()=>render());return;}
   const sc=S[cur];let tot=0,pres=0,ab=0;
   if(sc)TIMES.forEach(ti=>CLS.forEach(c=>(sc[ti][c]||[]).forEach(n=>{tot++;const e=ent(ti,n);if(e.present)pres++;if(e.absent)ab++;if(e.earlyLeave)ab++;})));
   const early=sc?TIMES.reduce((s,ti)=>s+CLS.reduce((s2,c)=>s2+(sc[ti][c]||[]).filter(n=>ent(ti,n).earlyLeave).length,0),0):0;
