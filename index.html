@@ -366,10 +366,72 @@ function go(dk){
   else render();
 }
 function ent(ti,n){return att[cur]?.[ti]?.[n]||{present:false,absent:false,earlyLeave:false,reason:'',contact:false,contact2:false,makeup:false}}
+// 한 학생 행만 다시 렌더 (스크롤/포커스 유지)
+function renderRow(ti,name){
+  const sc=S[cur];if(!sc)return;
+  const wid='srow_'+ti+'_'+name.replace(/[^가-힣a-z0-9]/gi,'');
+  const wrap=document.getElementById(wid);if(!wrap)return;
+  // 현재 포커스된 엘리먼트가 이 행 안에 있으면 렌더 스킵 (입력중)
+  if(wrap.contains(document.activeElement))return;
+  const e=ent(ti,name),rk=ti+':'+name,hd=drafts[rk]!==undefined;
+  const chk=e.present&&!e.absent;
+  const rid='ri_'+ti+'_'+name.replace(/[^가-힣a-z0-9]/gi,'');
+  let h=`<div class="srow" style="${e.absent?'background:#ff5c5c08':e.earlyLeave?'background:#ff9f4308':e.present?'background:#26de8108':''}">
+    <div class="chk${e.absent?' red':e.earlyLeave?' early':chk?' on':''}" onclick="tgP('${ti}','${name}')">${chk?'<span style="font-size:12px;color:#0f0f13;font-weight:800">✓</span>':e.absent?'<span style="font-size:12px;color:#fff;font-weight:800">✕</span>':e.earlyLeave?'<span style="font-size:12px;color:#fff;font-weight:800">↙</span>':''}</div>
+    <div class="sinfo"><div class="snm${e.absent?' x':''}">${name}</div><div class="ssc">${SCHOOL[name]||''}</div></div>
+    ${PHONE[name]?`<a href="tel:${PHONE[name].replace(/-/g,'')}" style="text-decoration:none;padding:0 4px;flex-shrink:0;display:inline-flex;align-items:center" onclick="event.stopPropagation()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.01 21 3 13.99 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.21 2.2z" fill="#26de81"/></svg></a>`:''}
+    <button class="abtn" onclick="tgE('${ti}','${name}')" style="background:${e.earlyLeave?'#ff9f43':'#2a2a3a'};color:${e.earlyLeave?'#fff':'var(--mu)'}">조퇴</button>
+    <button class="abtn" onclick="tgA('${ti}','${name}')" style="background:${e.absent?'var(--red)':'#2a2a3a'};color:${e.absent?'#fff':'var(--mu)'}">${e.absent?'출석':'결석'}</button>
+  </div>`;
+  if(e.absent){
+    if(hd){
+      h+=`<div class="rrow">
+        <div class="rtags">${TAGS.map(t=>`<span class="rtag" onclick="setTag('${ti}','${name}','${t}')">${t}</span>`).join('')}</div>
+        <div class="rinput-row">
+          <input id="${rid}" class="ri" placeholder="결석 사유..." value="${(drafts[rk]||'').replace(/"/g,'&quot;')}" onkeydown="if(event.key==='Enter')saveR('${ti}','${name}')">
+          <button class="rbtn" onclick="saveR('${ti}','${name}')">저장</button>
+        </div>
+      </div>`;
+    } else {
+      h+=`<div class="absent-info">
+        <span class="absent-reason" onclick="editR('${ti}','${name}')" style="cursor:pointer">결석사유: ${e.reason||'(탭해서 입력)'}</span>
+        <div class="contact-mini" onclick="tgC('${ti}','${name}')">
+          <div class="chk-mini${e.contact?' on':''}" data-contact="${ti}_${name}">${e.contact?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':''}</div>
+          <span class="contact-label" data-contact-lb="${ti}_${name}" style="color:${e.contact?'var(--t1)':'var(--mu)'}">학부모</span>
+        </div>
+        <div class="contact-mini" onclick="tgC2('${ti}','${name}')">
+          <div class="chk-mini${e.contact2?' on':''}" data-contact2="${ti}_${name}">${e.contact2?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':''}</div>
+          <span class="contact-label" data-contact2-lb="${ti}_${name}" style="color:${e.contact2?'var(--t1)':'var(--mu)'}">학생</span>
+        </div>
+        <button class="abtn" data-makeup="${ti}_${name}" onclick="tgMakeup('${ti}','${name}')" style="background:${e.makeup?'#a29bfe':'#2a2a3a'};color:${e.makeup?'#fff':'var(--mu)'};flex-shrink:0">${e.makeup?'보충완료':'보충'}</button>
+      </div>`;
+    }
+  }
+  wrap.innerHTML=h;
+  // 통계 업데이트만
+  updateStat();
+}
+function updateStat(){
+  const sc=S[cur];if(!sc)return;
+  let tot=0,pres=0,ab=0,early=0;
+  TIMES.forEach(ti=>CLS.forEach(c=>(sc[ti][c]||[]).forEach(n=>{tot++;const e=ent(ti,n);if(e.present)pres++;if(e.absent||e.earlyLeave)ab++;if(e.earlyLeave)early++;})));
+  const stat=`출석 <b style="color:var(--green)">${pres}</b> · 조퇴 <b style="color:#ff9f43">${early}</b> · 결석 <b style="color:var(--red)">${ab-early}</b> · 미확인 <b>${tot-pres-ab}</b> / ${tot}명`;
+  ['mob-stats','pc-stats'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=stat;});
+  // 타임 헤더 카운트 업데이트
+  TIMES.forEach(ti=>{
+    const all=sc[ti]?CLS.flatMap(c=>(sc[ti][c]||[]).map(n=>n)):[];
+    const p=all.filter(n=>ent(ti,n).present).length;
+    const a=all.filter(n=>ent(ti,n).absent).length;
+    const el=document.querySelector(`#tblock_${ti} .tcnt`);
+    if(el)el.innerHTML=`출<b style="color:var(--green);margin:0 2px">${p}</b>결<b style="color:var(--red);margin:0 2px">${a}</b>/${all.length}명`;
+  });
+}
 function upd(ti,n,p){
   const e=ent(ti,n),nx={...e,...p};
   if(!att[cur])att[cur]={};if(!att[cur][ti])att[cur][ti]={};
-  att[cur][ti][n]=nx;render();
+  att[cur][ti][n]=nx;
+  // 해당 행만 업데이트 (스크롤/키보드 유지)
+  renderRow(ti,n);
   if(saveTimer)clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>fbSet(`att/${cur}/${ti}`,{[n]:nx}).then(()=>toast('저장됨 ✓')).catch(()=>toast('저장 실패','var(--red)')),500);
 }
@@ -400,12 +462,12 @@ function setTag(ti,n,t){
 function saveR(ti,n){
   const el=document.getElementById('ri_'+ti+'_'+n.replace(/[^가-힣a-z0-9]/gi,''));
   const v=el?el.value:'';delete drafts[ti+':'+n];
-  upd(ti,n,{reason:v});toast('사유 저장됨 ✓');
+  upd(ti,n,{reason:v});
 }
-function editR(ti,n){drafts[ti+':'+n]=ent(ti,n).reason||'';render()}
+function editR(ti,n){drafts[ti+':'+n]=ent(ti,n).reason||'';renderRow(ti,n);}
 function tgC(ti,n){
-  const e=ent(ti,n),v=!e.contact;updSoft(ti,n,{contact:v});
-  // DOM 직접 업데이트
+  const e=ent(ti,n),v=!e.contact;
+  updSoft(ti,n,{contact:v});
   const el=document.querySelector(`[data-contact="${ti}_${n}"]`);
   if(el){el.className='chk-mini'+(v?' on':'');el.innerHTML=v?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':'';}
   const lb=document.querySelector(`[data-contact-lb="${ti}_${n}"]`);
@@ -561,7 +623,7 @@ function render(){
         const e=ent(ti,name),rk=ti+':'+name,hd=drafts[rk]!==undefined;
         const chk=e.present&&!e.absent;
         const rid='ri_'+ti+'_'+name.replace(/[^가-힣a-z0-9]/gi,'');
-        h+=`<div>
+        h+=`<div id="srow_${ti}_${name.replace(/[^가-힣a-z0-9]/gi,'')}">
           <div class="srow" style="${e.absent?'background:#ff5c5c08':e.earlyLeave?'background:#ff9f4308':e.present?'background:#26de8108':''}">
             <div class="chk${e.absent?' red':e.earlyLeave?' early':chk?' on':''}" onclick="tgP('${ti}','${name}')">${chk?'<span style="font-size:12px;color:#0f0f13;font-weight:800">✓</span>':e.absent?'<span style="font-size:12px;color:#fff;font-weight:800">✕</span>':e.earlyLeave?'<span style="font-size:12px;color:#fff;font-weight:800">↙</span>':''}</div>
             <div class="sinfo"><div class="snm${e.absent?' x':''}">${name}</div><div class="ssc">${SCHOOL[name]||''}</div></div>
