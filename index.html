@@ -294,11 +294,22 @@ async function loadTimetable() {
   try {
     const data = await fbGet('timetable');
     if(data && typeof data === 'object') {
-      S = data;
+      // 각 날짜의 타임 구조 검증 및 보정
+      const fixed = {};
+      Object.entries(data).forEach(([date, dayData]) => {
+        fixed[date] = {};
+        ['1타임','2타임','3타임'].forEach(tim => {
+          fixed[date][tim] = {};
+          ['입시반','예비반','중등반','취미반'].forEach(cls => {
+            fixed[date][tim][cls] = (dayData[tim] && dayData[tim][cls]) ? dayData[tim][cls] : [];
+          });
+        });
+      });
+      S = fixed;
       console.log('시간표 Firebase 로드 완료');
     }
   } catch(e) {
-    console.warn('Firebase 시간표 로드 실패, 로컬 데이터 사용');
+    console.warn('Firebase 시간표 로드 실패:', e);
   }
 }
 
