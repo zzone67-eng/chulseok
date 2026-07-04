@@ -328,13 +328,12 @@ function launch(){
   }
   if(isMob()||isTab()) document.getElementById('main-mob').style.display='block';
   else                   document.getElementById('main-pc').style.display='grid';
-  cur=toKey(new Date());buildNav();load(cur);
+  cur=toKey(new Date());loadTimetable().then(()=>{buildNav();load(cur);});
   const sd=document.getElementById('sch-date');if(sd)sd.textContent=SCHEDULE_UPDATED;
   if(pollTimer)clearInterval(pollTimer);
   pollTimer=setInterval(()=>load(cur,false),30000);
 }
 async function load(dk,show=true){
-  await loadTimetable();
   if(show){const ct=isMob()?'mob-ct':'pc-ct';const el=document.getElementById(ct);if(el)el.innerHTML='<div class="closed-box">불러오는 중…</div>';}
   try{const d=await fbGet(`att/${dk}`);att[dk]=d||{};}
   catch(err){if(!att[dk])att[dk]={};console.error('load err:',err);}

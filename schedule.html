@@ -7,267 +7,274 @@
 <title>화강암+ 스케줄</title>
 <style>
 :root{
-  --bg:#111114;--surface:#1C1C20;--surface2:#252529;
-  --border:#2E2E34;--border2:#3A3A42;
-  --text:#E2E0DA;--text2:#8A8880;--text3:#46464E;
+  --bg:#111114;--sf:#1C1C20;--sf2:#252529;
+  --bd:#2E2E34;--bd2:#3A3A42;
+  --tx:#E2E0DA;--tx2:#8A8880;--tx3:#46464E;
   --red:#C0392B;--blue:#4A90D0;--green:#2A9A52;--yellow:#C88010;
-  --blue-dim:#152336;--blue-mid:#1E3A52;--blue-border:#2E5A80;
-  --yellow-dim:#231A08;--yellow-border:#705418;
-  --r:12px;--rsm:8px;--safe:env(safe-area-inset-top);
+  --bdim:#152336;--bmid:#1E3A52;--bbr:#2E5A80;
+  --ydim:#231A08;--ybr:#705418;
+  --r:12px;--rs:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;display:flex;flex-direction:column;}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;display:flex;flex-direction:column;}
 ::-webkit-scrollbar{width:5px;height:5px;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px;}
 
 /* 탑바 */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:calc(12px + var(--safe)) 16px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.tb-bar{width:4px;height:20px;background:var(--red);border-radius:2px;}
+.topbar{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+@supports(padding-top:env(safe-area-inset-top)){.topbar{padding-top:calc(12px + env(safe-area-inset-top));}}
+.tb-accent{width:4px;height:20px;background:var(--red);border-radius:2px;}
 .tb-title{font-size:16px;font-weight:700;flex:1;}
-.sync-btn{padding:7px 13px;background:var(--surface2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;}
+.sync-btn{padding:7px 13px;background:var(--sf2);color:var(--tx2);border:1px solid var(--bd2);border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
 .sync-btn.ok{color:var(--green);border-color:var(--green);}
-.sync-btn.ing{color:var(--yellow);border-color:var(--yellow-border);}
-
-/* 모바일탭 */
-.mob-tabs{display:none;background:var(--surface);border-bottom:1px solid var(--border);}
-.mob-tab{flex:1;padding:11px 0;text-align:center;font-size:13px;font-weight:600;color:var(--text3);border:none;background:transparent;cursor:pointer;border-bottom:2.5px solid transparent;}
-.mob-tab.on{color:var(--red);border-bottom-color:var(--red);}
+.sync-btn.ing{color:var(--yellow);border-color:var(--ybr);}
 
 /* 레이아웃 */
 .layout{flex:1;display:flex;overflow:hidden;}
 
 /* 사이드바 */
-.sidebar{width:200px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
-.month-tabs{display:flex;border-bottom:1px solid var(--border);}
-.month-tab{flex:1;padding:10px;text-align:center;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;}
-.month-tab.on{background:var(--red);color:#fff;}
-.cls-lbl{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;padding:10px 12px 4px;text-transform:uppercase;}
-.stu-btn{width:100%;text-align:left;padding:9px 12px;background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--text2);display:flex;justify-content:space-between;align-items:center;}
-.stu-btn:hover{background:var(--surface2);}
-.stu-btn.on{background:var(--blue-dim);color:var(--blue);font-weight:700;border-right:3px solid var(--blue);}
-.stu-t{font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-dim);padding:2px 7px;border-radius:999px;}
+.sidebar{width:200px;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;}
+.month-row{display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;}
+.mth-btn{flex:1;padding:10px;text-align:center;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--tx2);cursor:pointer;}
+.mth-btn.on{background:var(--red);color:#fff;}
+.cls-lbl{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.07em;padding:10px 12px 4px;text-transform:uppercase;}
+.sb-list{flex:1;overflow-y:auto;}
+.stu-btn{width:100%;text-align:left;padding:8px 12px;background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--tx2);display:flex;justify-content:space-between;align-items:center;}
+.stu-btn:hover{background:var(--sf2);}
+.stu-btn.on{background:var(--bdim);color:var(--blue);font-weight:700;border-right:3px solid var(--blue);}
+.stu-t{font-size:11px;font-weight:700;color:var(--blue);background:var(--bdim);padding:2px 7px;border-radius:999px;}
 
-/* 메인 */
-.main{flex:1;display:flex;overflow:hidden;}
-
-/* 달력 영역 */
-.cal-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+/* 가운데 */
+.center{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 
 /* 학생 헤더 */
-.stu-hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:11px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
-.stu-back{width:30px;height:30px;border-radius:50%;background:var(--surface2);border:none;color:var(--text2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.stu-info{flex:1;}
-.stu-name{font-size:15px;font-weight:700;}
-.stu-cls{font-size:11px;color:var(--text2);}
+.stu-hdr{background:var(--sf);border-bottom:1px solid var(--bd);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;min-height:52px;}
+.stu-back{width:30px;height:30px;border-radius:50%;background:var(--sf2);border:none;color:var(--tx2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;display:none;}
+.stu-hinfo{flex:1;}
+.stu-hname{font-size:14px;font-weight:700;color:var(--tx);}
+.stu-hcls{font-size:11px;color:var(--tx2);}
 .stu-stats{display:flex;gap:14px;}
 .stat{text-align:right;}
-.stat-l{font-size:9px;color:var(--text3);}
+.stat-l{font-size:9px;color:var(--tx3);}
 .stat-v{font-size:14px;font-weight:700;color:var(--blue);}
 .stat-v.y{color:var(--yellow);}
-.stat-v.sm{font-size:12px;}
+.stat-v.s{font-size:11px;}
 
 /* 액션 */
-.actions{display:flex;gap:8px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
-.act{flex:1;padding:7px;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;border:none;text-align:center;}
-.act.red{background:#2A1210;color:#E05050;border:1px solid #5A2020;}
-.act.dim{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
+.act-row{display:flex;gap:8px;padding:8px 12px;background:var(--sf);border-bottom:1px solid var(--bd);flex-shrink:0;}
+.act-btn{flex:1;padding:7px;border-radius:var(--rs);font-size:11px;font-weight:600;cursor:pointer;border:none;text-align:center;}
+.act-btn.red{background:#2A1210;color:#E05050;border:1px solid #5A2020;}
+.act-btn.dim{background:var(--sf2);color:var(--tx2);border:1px solid var(--bd2);}
 
-/* 달력 스크롤 */
+/* 달력 */
 .cal-scroll{flex:1;overflow-y:auto;}
 .cal-wrap{padding:8px;}
 .dow-row{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px;}
-.dow{text-align:center;font-size:10px;font-weight:700;color:var(--text3);padding:4px 0;}
+.dow{text-align:center;font-size:10px;font-weight:700;color:var(--tx3);padding:4px 0;}
 .dow.sun{color:#E05050;}.dow.sat{color:var(--blue);}
 .weeks{display:flex;flex-direction:column;gap:3px;}
 .week{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.day{background:var(--surface);border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden;}
+.day{background:var(--sf);border-radius:var(--rs);border:1px solid var(--bd);overflow:hidden;}
 .day.empty{background:var(--bg);border-color:transparent;}
-.day-head{display:flex;justify-content:space-between;align-items:center;padding:4px 6px;background:var(--surface2);border-bottom:1px solid var(--border);}
-.day-n{font-size:12px;font-weight:700;color:var(--text2);}
+.day-hd{display:flex;justify-content:space-between;align-items:center;padding:4px 6px;background:var(--sf2);border-bottom:1px solid var(--bd);}
+.day-n{font-size:12px;font-weight:700;color:var(--tx2);}
 .day-n.sun{color:#E05050;}.day-n.sat{color:var(--blue);}
 .day-t{font-size:10px;font-weight:700;color:var(--blue);}
 .day-slots{display:flex;flex-direction:column;gap:2px;padding:3px;}
-.slot{border-radius:4px;border:1px solid transparent;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text3);background:var(--surface);cursor:pointer;padding:4px 0;user-select:none;}
+.slot{border-radius:4px;border:1px solid transparent;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--tx3);background:var(--sf);cursor:pointer;padding:4px 0;user-select:none;}
 .slot:active{opacity:.6;}
-.slot.regular{background:var(--blue-mid);border-color:var(--blue-border);color:var(--blue);}
-.slot.special{background:var(--yellow-dim);border-color:var(--yellow-border);color:var(--yellow);}
-.slot.excluded{background:var(--surface);border-color:transparent;color:var(--text3);text-decoration:line-through;opacity:.35;}
+.slot.on{background:var(--bmid);border-color:var(--bbr);color:var(--blue);}
+.slot.sp{background:var(--ydim);border-color:var(--ybr);color:var(--yellow);}
+.slot.off{opacity:.3;text-decoration:line-through;}
 
-/* 하단 패널 */
-
-
-
-.ab-input{width:56px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--rsm);color:var(--text);font-size:13px;font-weight:600;padding:5px 8px;text-align:center;outline:none;}
-.ab-input:focus{border-color:var(--blue);}
-.ab-input::-webkit-outer-spin-button,.ab-input::-webkit-inner-spin-button{-webkit-appearance:none;}
-
-
-
-
-
-
+/* 범례 */
+.legend{display:flex;gap:10px;padding:7px 12px;background:var(--sf);border-top:1px solid var(--bd);font-size:10px;color:var(--tx2);flex-shrink:0;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:4px;}
+.leg-box{width:10px;height:10px;border-radius:3px;}
 
 /* 우측 패널 */
-.right-panel{width:260px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
-.rp-sec{flex:1;display:flex;flex-direction:column;border-bottom:1px solid var(--border);overflow:hidden;}
-.rp-sec:last-child{border-bottom:none;}
-.rp-title{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.05em;padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;}
-.rp-ta{flex:1;width:100%;background:transparent;border:none;color:var(--text);font-size:12px;font-family:inherit;line-height:1.75;padding:10px 14px;resize:none;outline:none;}
-.rp-ta::placeholder{color:var(--text3);}
+.right{width:280px;background:var(--sf);border-left:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.rp-sec{display:flex;flex-direction:column;border-bottom:1px solid var(--bd);overflow:hidden;}
+.rp-sec.grow2{flex:2;}
+.rp-sec.grow1{flex:1;}
+.rp-sec.fixed{flex-shrink:0;}
+.rp-hdr{font-size:11px;font-weight:700;color:var(--tx2);letter-spacing:.05em;padding:9px 14px;background:var(--sf2);border-bottom:1px solid var(--bd);flex-shrink:0;}
+.rp-body{padding:12px 14px;}
+.rp-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;}
+.rp-row .lbl{color:var(--tx2);}
+.rp-row .val{font-weight:600;color:var(--tx);}
+.rp-row .val.blue{color:var(--blue);}
+.rp-row .val.red{color:#E05050;}
+.rp-row .val.y{color:var(--yellow);}
+.rp-divider{border:none;border-top:1px solid var(--bd);margin:6px 0;}
+.rp-fee{display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding:4px 0;}
+.rp-fee .lbl{color:var(--tx2);}
+.rp-fee .val{color:var(--blue);}
+.abs-row{display:flex;align-items:center;gap:8px;padding:10px 14px;}
+.abs-lbl{font-size:12px;color:var(--tx2);white-space:nowrap;}
+.abs-input{width:52px;background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--rs);color:var(--tx);font-size:14px;font-weight:700;padding:5px 8px;text-align:center;outline:none;-moz-appearance:textfield;}
+.abs-input::-webkit-outer-spin-button,.abs-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.abs-input:focus{border-color:var(--blue);}
+.rp-ta{flex:1;width:100%;background:transparent;border:none;color:var(--tx);font-size:12px;font-family:inherit;line-height:1.75;padding:10px 14px;resize:none;outline:none;}
+.rp-ta::placeholder{color:var(--tx3);}
+.copy-btn{margin:0 14px 10px;padding:8px;background:var(--bmid);border:1px solid var(--bbr);color:var(--blue);border-radius:var(--rs);font-size:12px;font-weight:700;cursor:pointer;text-align:center;flex-shrink:0;}
 
-/* 모바일 뷰 */
-.mob-list{padding:12px;}
-.mob-month-sel{display:flex;gap:8px;margin-bottom:12px;}
-.mob-mbtn{flex:1;padding:9px;text-align:center;border:1px solid var(--border2);border-radius:var(--rsm);font-size:13px;font-weight:600;color:var(--text2);background:transparent;cursor:pointer;}
-.mob-mbtn.on{background:var(--red);color:#fff;border-color:var(--red);}
-.mob-cls{margin-bottom:14px;}
-.mob-cls-t{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:0 2px 6px;}
+/* 모바일 전용 */
+.mob-tabs{display:none;background:var(--sf);border-bottom:1px solid var(--bd);}
+.mob-tab{flex:1;padding:11px 0;text-align:center;font-size:13px;font-weight:600;color:var(--tx3);border:none;background:transparent;cursor:pointer;border-bottom:2.5px solid transparent;}
+.mob-tab.on{color:var(--red);border-bottom-color:var(--red);}
+.mob-list-view{display:none;overflow-y:auto;padding:12px;}
+.mob-month-row{display:flex;gap:8px;margin-bottom:12px;}
+.mob-mth{flex:1;padding:9px;text-align:center;border:1px solid var(--bd2);border-radius:var(--rs);font-size:13px;font-weight:600;color:var(--tx2);background:transparent;cursor:pointer;}
+.mob-mth.on{background:var(--red);color:#fff;border-color:var(--red);}
+.mob-cls-sec{margin-bottom:14px;}
+.mob-cls-t{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;padding:0 2px 6px;}
 .mob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.mob-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 8px;cursor:pointer;text-align:center;}
-.mob-card.on{background:var(--blue-mid);border-color:var(--blue-border);}
+.mob-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:11px 8px;cursor:pointer;text-align:center;}
+.mob-card.on{background:var(--bmid);border-color:var(--bbr);}
 .mob-card-n{font-size:13px;font-weight:600;margin-bottom:4px;}
 .mob-card-t{font-size:12px;font-weight:700;color:var(--blue);}
-
-.mob-note{padding:12px;display:flex;flex-direction:column;gap:10px;}
-.note-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);}
-.note-t{font-size:11px;font-weight:700;color:var(--text2);padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--border);border-radius:var(--r) var(--r) 0 0;}
-.note-ta{width:100%;min-height:120px;background:transparent;border:none;color:var(--text);font-size:13px;font-family:inherit;line-height:1.75;padding:10px 14px;resize:none;outline:none;}
-.note-ta::placeholder{color:var(--text3);}
+.mob-note-view{display:none;overflow-y:auto;padding:12px;flex-direction:column;gap:10px;}
+.note-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);}
+.note-hdr{font-size:11px;font-weight:700;color:var(--tx2);padding:9px 14px;background:var(--sf2);border-bottom:1px solid var(--bd);border-radius:var(--r) var(--r) 0 0;}
+.note-ta{width:100%;min-height:120px;background:transparent;border:none;color:var(--tx);font-size:13px;font-family:inherit;line-height:1.75;padding:10px 14px;resize:none;outline:none;}
+.note-ta::placeholder{color:var(--tx3);}
 
 /* 반응형 */
 @media(min-width:900px){
-  .sidebar{display:flex;}
-  .right-panel{display:flex;}
-  .mob-tabs{display:none !important;}
+  .mob-tabs,.mob-list-view,.mob-note-view{display:none !important;}
+  .sidebar,.right{display:flex;}
+  .center{display:flex;}
+  .stu-back{display:none !important;}
 }
 @media(max-width:899px){
-  .sidebar{display:none;}
-  .right-panel{display:none;}
+  .sidebar,.right{display:none !important;}
   .mob-tabs{display:flex;}
+  .center{display:flex;}
 }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="tb-bar"></div>
+  <div class="tb-accent"></div>
   <div class="tb-title">화강암+ 스케줄</div>
-  <button class="sync-btn" id="syncBtn" onclick="syncToFirebase()">Firebase 동기화</button>
+  <button class="sync-btn" id="syncBtn" onclick="syncFB()">Firebase 동기화</button>
 </div>
 
+<!-- 모바일 탭 -->
 <div class="mob-tabs">
-  <button class="mob-tab on" onclick="mobTab('list',this)">학생</button>
-  <button class="mob-tab" onclick="mobTab('cal',this)">달력</button>
-  <button class="mob-tab" onclick="mobTab('note',this)">메모/문자</button>
+  <button class="mob-tab on" onclick="mobSwitch('list',this)">학생</button>
+  <button class="mob-tab" onclick="mobSwitch('cal',this)">달력</button>
+  <button class="mob-tab" onclick="mobSwitch('note',this)">메모/문자</button>
 </div>
 
 <div class="layout">
+
   <!-- PC 사이드바 -->
   <div class="sidebar">
-    <div class="month-tabs">
-      <button class="month-tab on" id="pcM7" onclick="setMonth(7,this)">7월</button>
-      <button class="month-tab" id="pcM8" onclick="setMonth(8,this)">8월</button>
+    <div class="month-row">
+      <button class="mth-btn on" onclick="setMonth(7,this)">7월</button>
+      <button class="mth-btn" onclick="setMonth(8,this)">8월</button>
     </div>
-    <div id="pcList"></div>
+    <div class="sb-list" id="sbList"></div>
   </div>
 
-  <div class="main">
-    <!-- 달력 영역 -->
-    <div class="cal-area" id="calArea">
+  <!-- 가운데 -->
+  <div class="center">
 
-      <!-- 모바일: 학생 선택 -->
-      <div class="cal-scroll" id="mobListView" style="display:none;">
-        <div class="mob-list">
-          <div class="mob-month-sel">
-            <button class="mob-mbtn on" onclick="setMonth(7,this,'mob')">7월</button>
-            <button class="mob-mbtn" onclick="setMonth(8,this,'mob')">8월</button>
-          </div>
-          <div id="mobList"></div>
-        </div>
+    <!-- 모바일: 학생 선택 -->
+    <div class="mob-list-view" id="mobListView">
+      <div class="mob-month-row">
+        <button class="mob-mth on" onclick="setMonth(7,this,'mob')">7월</button>
+        <button class="mob-mth" onclick="setMonth(8,this,'mob')">8월</button>
       </div>
+      <div id="mobListInner"></div>
+    </div>
 
-      <!-- 달력 뷰 -->
-      <div id="calView" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
-        <div class="stu-hdr">
-          <button class="stu-back" onclick="backToList()">‹</button>
-          <div class="stu-info">
-            <div class="stu-name" id="stuName">-</div>
-            <div class="stu-cls" id="stuCls">-</div>
-          </div>
-          <div class="stu-stats">
-            <div class="stat"><div class="stat-l">정규</div><div class="stat-v" id="sR">0T</div></div>
-            <div class="stat"><div class="stat-l">특강</div><div class="stat-v y" id="sS">0T</div></div>
-            <div class="stat"><div class="stat-l">수강료</div><div class="stat-v sm" id="sAmt">-</div></div>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="act red" onclick="setAllOff()">이번달 전체 휴강</button>
-          <button class="act dim" onclick="resetMonth()">초기화</button>
-        </div>
-        <div class="cal-scroll">
-          <div class="cal-wrap">
-            <div class="dow-row">
-              <div class="dow sun">일</div><div class="dow">월</div><div class="dow">화</div>
-              <div class="dow">수</div><div class="dow">목</div><div class="dow">금</div>
-              <div class="dow sat">토</div>
-            </div>
-            <div class="weeks" id="calWeeks"></div>
-          </div>
-        </div>
-
+    <!-- 달력 뷰 -->
+    <div class="stu-hdr" id="stuHdr">
+      <button class="stu-back" onclick="mobBack()">‹</button>
+      <div class="stu-hinfo">
+        <div class="stu-hname" id="hName">학생을 선택하세요</div>
+        <div class="stu-hcls" id="hCls"></div>
       </div>
-
-      <!-- 모바일 메모 탭 -->
-      <div class="cal-scroll" id="mobNoteView" style="display:none;">
-        <div class="mob-note" id="mobNoteInner">
-          <div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">학생을 먼저 선택하세요</div>
+      <div class="stu-stats" id="stuStats" style="display:none;">
+        <div class="stat"><div class="stat-l">정규</div><div class="stat-v" id="sR">-</div></div>
+        <div class="stat"><div class="stat-l">특강</div><div class="stat-v y" id="sS">-</div></div>
+        <div class="stat"><div class="stat-l">수강료</div><div class="stat-v s" id="sAmt">-</div></div>
+      </div>
+    </div>
+    <div class="act-row" id="actRow" style="display:none;">
+      <button class="act-btn red" onclick="allOff()">이번달 전체 휴강</button>
+      <button class="act-btn dim" onclick="resetMon()">초기화</button>
+    </div>
+    <div class="cal-scroll" id="calScroll">
+      <div class="cal-wrap">
+        <div class="dow-row">
+          <div class="dow sun">일</div><div class="dow">월</div><div class="dow">화</div>
+          <div class="dow">수</div><div class="dow">목</div><div class="dow">금</div>
+          <div class="dow sat">토</div>
         </div>
+        <div class="weeks" id="weeks"></div>
+      </div>
+    </div>
+    <div class="legend">
+      <span class="leg"><span class="leg-box" style="background:var(--bmid);border:1px solid var(--bbr);"></span>정규</span>
+      <span class="leg"><span class="leg-box" style="background:var(--ydim);border:1px solid var(--ybr);"></span>특강</span>
+      <span class="leg"><span class="leg-box" style="background:var(--sf);border:1px solid var(--bd);opacity:.3;"></span>제외</span>
+      <span style="margin-left:auto;color:var(--tx3);font-size:10px;">탭: 토글 | 길게/우클릭: 정규↔특강</span>
+    </div>
+
+    <!-- 모바일: 메모/문자 -->
+    <div class="mob-note-view" id="mobNoteView">
+      <div id="mobNoteInner" style="display:flex;flex-direction:column;gap:10px;padding:12px;">
+        <div style="color:var(--tx3);font-size:13px;text-align:center;padding:20px;">학생을 먼저 선택하세요</div>
       </div>
     </div>
 
-    <!-- PC 우측 패널 -->
-    <div class="right-panel">
-      <div class="rp-sec" style="flex-shrink:0;">
-        <div class="rp-title">전월 결석</div>
-        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;">
-          <input class="ab-input" type="text" inputmode="numeric" id="pcAbsInput" value="0" oninput="onPcAbsChange()" style="-moz-appearance:textfield;">
-          <span style="font-size:12px;color:var(--text2);">T 차감</span>
-        </div>
-        <div style="padding:0 14px 12px;display:flex;flex-direction:column;gap:4px;">
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);">
-            <span>정규</span><span id="rp_regular" style="color:var(--text);">-</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);">
-            <span>특강</span><span id="rp_special" style="color:var(--yellow);">-</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);">
-            <span>결석 차감</span><span id="rp_abs" style="color:#E05050;">-</span>
-          </div>
-          <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px;display:flex;justify-content:space-between;font-size:13px;font-weight:700;">
-            <span style="color:var(--text2);">수강료</span><span id="rp_fee" style="color:var(--blue);">-</span>
-          </div>
-        </div>
+  </div>
+
+  <!-- PC 우측 패널 -->
+  <div class="right">
+    <!-- 전월결석 + 수강료 -->
+    <div class="rp-sec fixed">
+      <div class="rp-hdr">전월 결석 / 수강료</div>
+      <div class="abs-row">
+        <span class="abs-lbl">전월 결석</span>
+        <input class="abs-input" type="text" inputmode="numeric" id="absIn" value="0" oninput="onAbs()">
+        <span class="abs-lbl">T</span>
       </div>
-      <div class="rp-sec" style="flex:2;">
-        <div class="rp-title">수강료 안내 문자</div>
-        <textarea class="rp-ta" id="pcFeeMsg" placeholder="학생을 선택하면 자동 생성됩니다..."></textarea>
-        <button onclick="copyPcFeeMsg()" id="pcFeeCopyBtn" style="display:none;margin:0 14px 10px;padding:8px;background:var(--blue-mid);border:1px solid var(--blue-border);color:var(--blue);border-radius:var(--rsm);font-size:12px;font-weight:700;cursor:pointer;text-align:center;">문자 복사</button>
+      <div class="rp-body" style="padding-top:0;">
+        <div class="rp-row"><span class="lbl">정규</span><span class="val" id="rpR">-</span></div>
+        <div class="rp-row"><span class="lbl">특강</span><span class="val y" id="rpS">-</span></div>
+        <div class="rp-row"><span class="lbl">결석 차감</span><span class="val red" id="rpA">-</span></div>
+        <hr class="rp-divider">
+        <div class="rp-fee"><span class="lbl">수강료</span><span class="val" id="rpFee">-</span></div>
       </div>
-      <div class="rp-sec" style="flex:1;">
-        <div class="rp-title">메모</div>
-        <textarea class="rp-ta" id="pcMemo" placeholder="수업 메모, 특이사항..."></textarea>
-      </div>
+    </div>
+    <!-- 수강료 문자 -->
+    <div class="rp-sec grow2" style="display:flex;flex-direction:column;">
+      <div class="rp-hdr">수강료 안내 문자</div>
+      <textarea class="rp-ta" id="feeMsg" placeholder="학생을 선택하면 자동 생성됩니다..."></textarea>
+      <button class="copy-btn" id="feeCopyBtn" style="display:none;" onclick="copyMsg('feeMsg','feeCopyBtn')">문자 복사</button>
+    </div>
+    <!-- 메모 -->
+    <div class="rp-sec grow1" style="display:flex;flex-direction:column;">
+      <div class="rp-hdr">메모</div>
+      <textarea class="rp-ta" id="memoMsg" placeholder="수업 메모, 특이사항..."></textarea>
     </div>
   </div>
+
 </div>
 
 <script>
 const DB='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
 const YEAR=2026;
 const BANK='부산은행 101-2092-8547-06 (예금주: 화강암플러스미술학원)';
-const CONTACT='학원: 051-553-3698\n원장: 010-7701-6594 (문자 문의 가능)';
-const FOOTER='\n\n■ 납부 방법\n'+BANK+'\n카드결제 시 아이편으로 보내주시면 결제 도와드리겠습니다.\n\n■ 문의\n'+CONTACT+'\n감사합니다.';
+const CONT='학원: 051-553-3698\n원장: 010-7701-6594 (문자 문의 가능)';
+const FOOT='\n\n■ 납부 방법\n'+BANK+'\n카드결제 시 아이편으로 보내주시면 결제 도와드리겠습니다.\n\n■ 문의\n'+CONT+'\n감사합니다.';
 
 const STUDENTS={
   '입시반':[{name:'박민지',days:['수','목','금','토']},{name:'김나연',days:['수','목','금','토','토']},{name:'박선영',days:['수','목','금','토','토']},{name:'김나현',days:['수','목','금','토']}],
@@ -275,402 +282,365 @@ const STUDENTS={
   '중등반':[{name:'안시연',days:['토','토','일','일']},{name:'한지유',days:['토','일']},{name:'조제우',days:['수','금','토']},{name:'전서빈',days:['목','토','토']},{name:'권해원',days:['목','토','토']},{name:'김현준',days:['수','토','일']},{name:'최주연',days:['토','토','일']}],
   '취미반':[{name:'나은솔',days:['토']},{name:'김건휘',days:['일']},{name:'김예진',days:['목','토']},{name:'최다윤',days:['일']},{name:'신유나',days:['토']},{name:'최현우',days:['토']},{name:'김윤재',days:['토','일']},{name:'김가람',days:['토','일']},{name:'이지아',days:['토']},{name:'명지민',days:['토']}]
 };
-const DAY_NAMES=['일','월','화','수','목','금','토'];
-let db=JSON.parse(localStorage.getItem('schedule_v2')||'{}');
-let curMonth=7,curStudent=null,curClass=null;
-let pressTimer=null,_lock=false;
 
-function getDays(m){return new Date(YEAR,m,0).getDate();}
-function getFirst(m){return new Date(YEAR,m-1,1).getDay();}
-function skey(c,n,m){return c+'_'+n+'_'+m;}
-function save(){localStorage.setItem('schedule_v2',JSON.stringify(db));}
-function fmtAmt(n){return n.toLocaleString('ko-KR')+'원';}
+const DAYS_DESC={
+  '박민지':'수,목,금,토 주 4회','김나연':'수,목,금,토1,토2 주 5회','박선영':'수,목,금,토1,토2 주 5회','김나현':'수,목,금,토 주 4회',
+  '김도훈':'토1,토2,일 주 3회','박하영':'수,목,금 주 3회',
+  '안시연':'토1,토2,일1,일2 주 4회','한지유':'토,일 주 2회','조제우':'수,금,토 주 3회','전서빈':'목,토1,토2 주 3회','권해원':'목,토1,토2 주 3회','김현준':'수,토,일 주 3회','최주연':'토1,토2,일 주 3회',
+  '나은솔':'토(오전) 주 1회','김건휘':'일(오전) 주 1회','김예진':'목,토 주 2회','최다윤':'일(오전) 주 1회','신유나':'토(오전) 주 1회','최현우':'토(오후) 주 1회','김윤재':'토(오전),일(오후) 주 2회','김가람':'토(오후),일(오후) 주 2회','이지아':'토(오전) 주 1회','명지민':'토(오후) 주 1회'
+};
+
+const DAY=['일','월','화','수','목','금','토'];
+let db=JSON.parse(localStorage.getItem('sch_v1')||'{}');
+let mon=7,curCls=null,curStu=null,ptimer=null,lock=false;
+
 const isPC=()=>window.innerWidth>=900;
+const getDays=m=>new Date(YEAR,m,0).getDate();
+const getFirst=m=>new Date(YEAR,m-1,1).getDay();
+const sk=(c,n,m)=>c+'_'+n+'_'+m;
+const save=()=>localStorage.setItem('sch_v1',JSON.stringify(db));
+const fmt=n=>n.toLocaleString('ko-KR')+'원';
 
 function getData(cls,name,month){
-  const key=skey(cls,name,month);
-  if(!db[key]){
+  const k=sk(cls,name,month);
+  if(!db[k]){
     const s=STUDENTS[cls].find(x=>x.name===name);
-    const total=getDays(month),first=getFirst(month),lessons=[];
-    for(let d=1;d<=total;d++){
-      const dow=(first+d-1)%7,cnt=s.days.filter(x=>x===DAY_NAMES[dow]).length;
-      for(let t=1;t<=cnt;t++) lessons.push({day:d,tim:t,type:'regular'});
+    const tot=getDays(month),fst=getFirst(month),ls=[];
+    for(let d=1;d<=tot;d++){
+      const dw=(fst+d-1)%7,cnt=s.days.filter(x=>x===DAY[dw]).length;
+      for(let t=1;t<=cnt;t++) ls.push({day:d,tim:t,type:'regular'});
     }
-    db[key]={lessons,special:[],excluded:[]};save();
+    db[k]={lessons:ls,special:[],excluded:[]};save();
   }
-  return db[key];
+  return db[k];
 }
 
-// ── 사이드바 ──
-function renderLists(){
-  ['pcList','mobList'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.innerHTML='';
-    const isMob=id==='mobList';
-    Object.entries(STUDENTS).forEach(([cls,students])=>{
-      if(isMob){
-        const sec=document.createElement('div');sec.className='mob-cls';
-        sec.innerHTML='<div class="mob-cls-t">'+cls+'</div>';
-        const grid=document.createElement('div');grid.className='mob-grid';
-        students.forEach(s=>{
-          const d=getData(cls,s.name,curMonth),t=d.lessons.length+d.special.length;
-          const card=document.createElement('div');
-          card.className='mob-card'+(curStudent===s.name&&curClass===cls?' on':'');
-          card.innerHTML='<div class="mob-card-n">'+s.name+'</div><div class="mob-card-t">'+t+'T</div>';
-          card.onclick=()=>selectStudent(cls,s.name);
-          grid.appendChild(card);
-        });
-        sec.appendChild(grid);el.appendChild(sec);
-      } else {
-        const lbl=document.createElement('div');lbl.className='cls-lbl';lbl.textContent=cls;el.appendChild(lbl);
-        students.forEach(s=>{
-          const d=getData(cls,s.name,curMonth),t=d.lessons.length+d.special.length;
-          const btn=document.createElement('button');
-          btn.className='stu-btn'+(curStudent===s.name&&curClass===cls?' on':'');
-          btn.innerHTML='<span>'+s.name+'</span><span class="stu-t">'+t+'T</span>';
-          btn.onclick=()=>selectStudent(cls,s.name);
-          el.appendChild(btn);
-        });
-      }
+// ── 사이드바 렌더 ──
+function renderSB(){
+  const el=document.getElementById('sbList');
+  if(!el) return;
+  el.innerHTML='';
+  Object.entries(STUDENTS).forEach(([cls,stus])=>{
+    const lbl=document.createElement('div');lbl.className='cls-lbl';lbl.textContent=cls;el.appendChild(lbl);
+    stus.forEach(s=>{
+      const d=getData(cls,s.name,mon),t=d.lessons.length+d.special.length;
+      const btn=document.createElement('button');
+      btn.className='stu-btn'+(curCls===cls&&curStu===s.name?' on':'');
+      btn.innerHTML='<span>'+s.name+'</span><span class="stu-t">'+t+'T</span>';
+      btn.onclick=()=>pick(cls,s.name);
+      el.appendChild(btn);
     });
   });
 }
 
-// ── 학생 선택 ──
-function selectStudent(cls,name){
-  saveNote();
-  curClass=cls;curStudent=name;
-  document.getElementById('stuName').textContent=name;
-  document.getElementById('stuCls').textContent=cls;
-  // 저장된 전월결석 로드
-  const savedAbs=localStorage.getItem('abs_'+cls+'_'+name+'_'+curMonth)||'0';
-  const pcAbsEl=document.getElementById('pcAbsInput');
-  if(pcAbsEl) pcAbsEl.value=savedAbs;
-  // 뷰 전환
-  showCalView();
-  renderCalendar();updateStats();loadNote();updateFeeSection();renderLists();
+// 모바일 학생 목록
+function renderMobList(){
+  const el=document.getElementById('mobListInner');
+  if(!el) return;
+  el.innerHTML='';
+  Object.entries(STUDENTS).forEach(([cls,stus])=>{
+    const sec=document.createElement('div');sec.className='mob-cls-sec';
+    sec.innerHTML='<div class="mob-cls-t">'+cls+'</div>';
+    const grid=document.createElement('div');grid.className='mob-grid';
+    stus.forEach(s=>{
+      const d=getData(cls,s.name,mon),t=d.lessons.length+d.special.length;
+      const card=document.createElement('div');
+      card.className='mob-card'+(curCls===cls&&curStu===s.name?' on':'');
+      card.innerHTML='<div class="mob-card-n">'+s.name+'</div><div class="mob-card-t">'+t+'T</div>';
+      card.onclick=()=>pick(cls,s.name);
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);el.appendChild(sec);
+  });
 }
 
-function showCalView(){
-  const cv=document.getElementById('calView');
-  cv.style.display='flex';
+// ── 학생 선택 ──
+function pick(cls,name){
+  saveNote();
+  curCls=cls;curStu=name;
+  // 저장된 전월결석
+  const absEl=document.getElementById('absIn');
+  if(absEl) absEl.value=localStorage.getItem('abs_'+cls+'_'+name+'_'+mon)||'0';
+  // 헤더
+  document.getElementById('hName').textContent=name;
+  document.getElementById('hCls').textContent=cls;
+  document.getElementById('stuStats').style.display='flex';
+  document.getElementById('actRow').style.display='flex';
+  // 모바일: 달력 탭으로
   if(!isPC()){
     document.getElementById('mobListView').style.display='none';
     document.getElementById('mobNoteView').style.display='none';
-    // 탭 업데이트
     document.querySelectorAll('.mob-tab').forEach((b,i)=>b.classList.toggle('on',i===1));
   }
-}
-
-function backToList(){
-  saveNote();
-  document.getElementById('calView').style.display='none';
-  document.getElementById('mobListView').style.display='';
-  renderLists();
-}
-
-// ── 모바일 탭 ──
-function mobTab(tab,el){
-  document.querySelectorAll('.mob-tab').forEach(b=>b.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('mobListView').style.display=tab==='list'?'':'none';
-  document.getElementById('calView').style.display=tab==='cal'&&curStudent?'flex':'none';
-  document.getElementById('mobNoteView').style.display=tab==='note'?'':'none';
-  if(tab==='note') renderMobNote();
-  if(tab==='cal'&&!curStudent){ mobTab('list',document.querySelectorAll('.mob-tab')[0]); }
+  renderCal();updateStats();updateFee();loadNote();renderSB();renderMobList();
 }
 
 // ── 월 변경 ──
 function setMonth(m,el,ctx){
-  saveNote();curMonth=m;
-  if(ctx==='mob'){
-    document.querySelectorAll('.mob-mbtn').forEach(b=>b.classList.remove('on'));
-  } else {
-    document.querySelectorAll('.month-tab').forEach(b=>b.classList.remove('on'));
-  }
+  saveNote();mon=m;
+  if(ctx==='mob') document.querySelectorAll('.mob-mth').forEach(b=>b.classList.remove('on'));
+  else document.querySelectorAll('.mth-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
-  if(curStudent){
-    const savedAbs=localStorage.getItem('abs_'+curClass+'_'+curStudent+'_'+m)||'0';
-    const absEl=document.getElementById('absInput');
-    if(absEl) absEl.value=savedAbs;
-  const pcAbsEl=document.getElementById('pcAbsInput');
-  if(pcAbsEl) pcAbsEl.value=savedAbs;
-    renderCalendar();updateStats();updateFeeSection();
+  if(curStu){
+    const absEl=document.getElementById('absIn');
+    if(absEl) absEl.value=localStorage.getItem('abs_'+curCls+'_'+curStu+'_'+m)||'0';
+    renderCal();updateStats();updateFee();
   }
-  renderLists();
+  renderSB();renderMobList();
 }
 
 // ── 통계 ──
-function updateStats(){
-  if(!curStudent) return;
-  const c=calcFee();
-  document.getElementById('sR').textContent=c.regular+'T';
-  document.getElementById('sS').textContent=c.special+'T';
-  document.getElementById('sAmt').textContent=fmtAmt(c.fee);
-}
-
-// ── 수강료 계산 ──
-function getAbsence(){return parseInt(document.getElementById('pcAbsInput')?.value||0)||0;}
+function getAbs(){return parseInt(document.getElementById('absIn')?.value||0)||0;}
 
 function calcFee(){
-  if(!curStudent) return {rate:0,regular:0,special:0,total:0,absence:0,finalT:0,fee:0};
-  const d=getData(curClass,curStudent,curMonth);
-  const rate=curClass==='예비반'?30000:31250;
-  const s=STUDENTS[curClass].find(x=>x.name===curStudent);
-  const absence=getAbsence();
-  const special=d.special.length;
-  let regular,finalT;
-  if(absence===0){
-    regular=s.days.length*4;
-    finalT=regular+special;
-  } else {
-    regular=d.lessons.length;
-    finalT=Math.max(0,regular+special-absence);
-  }
-  // 재수생 할인
+  if(!curStu) return null;
+  const d=getData(curCls,curStu,mon);
+  const rate=curCls==='예비반'?30000:31250;
+  const s=STUDENTS[curCls].find(x=>x.name===curStu);
+  const abs=getAbs(),sp=d.special.length;
+  let reg,finalT;
+  if(abs===0){reg=s.days.length*4;finalT=reg+sp;}
+  else{reg=d.lessons.length;finalT=Math.max(0,reg+sp-abs);}
   let fee=finalT*rate;
-  if(curStudent==='김나현'){
-    const regFee=Math.round((absence===0?s.days.length*4:d.lessons.length)*rate*0.5);
-    fee=regFee+special*rate;
+  if(curStu==='김나현'){
+    const rT=abs===0?s.days.length*4:d.lessons.length;
+    fee=Math.round(rT*rate*0.5)+sp*rate;
   }
-  return {rate,regular,special,total:regular+special,absence,finalT,fee};
+  if(curCls==='취미반'){
+    const base=s.days.length===1?100000:200000;
+    fee=Math.max(0,base-abs*25000)+sp*25000;
+    reg=s.days.length*4;finalT=reg;
+  }
+  return {rate,reg,sp,abs,finalT,fee};
 }
 
-function onAbsChange(){
-  if(!curStudent) return;
-  localStorage.setItem('abs_'+curClass+'_'+curStudent+'_'+curMonth, getAbsence());
-  updateStats();updateFeeSection();
+function updateStats(){
+  const c=calcFee();if(!c) return;
+  document.getElementById('sR').textContent=c.reg+'T';
+  document.getElementById('sS').textContent=c.sp+'T';
+  document.getElementById('sAmt').textContent=fmt(c.fee);
+  document.getElementById('rpR').textContent=c.reg+'T';
+  document.getElementById('rpS').textContent=c.sp+'T';
+  document.getElementById('rpA').textContent=c.abs>0?'-'+c.abs+'T':'없음';
+  document.getElementById('rpFee').textContent=fmt(c.fee);
+}
+
+function onAbs(){
+  if(!curStu) return;
+  localStorage.setItem('abs_'+curCls+'_'+curStu+'_'+mon,getAbs());
+  updateStats();updateFee();
 }
 
 // ── 문자 생성 ──
-function updateFeeSection(){
-  if(!curStudent) return;
-  const c=calcFee();
-  const feeEl=document.getElementById('finalFee');
-  if(feeEl) feeEl.textContent=fmtAmt(c.fee);
-  const ta=document.getElementById('feeMsg');
-  const copyBtn=document.getElementById('feeCopyBtn');
-  if(!ta) return;
-  const mon=curMonth+'월';
-  const isFixed=curStudent==='박선영'||curStudent==='박하영';
-  const isRemain=curStudent==='박민지';
-  const isDiscount=curStudent==='김나현';
-  const hasSpecial=c.special>0;
-  const hasAbsence=c.absence>0;
-  const specialNotice=(curClass==='중등반'&&hasSpecial)?'★ 방학특강 요일 확정 요청 ★\n현재 특강은 최대 타임 기준으로 안내드리고 있습니다.\n정확한 요일 및 타임 확정 후 수강료가 변동될 수 있으니,\n요일이 확정되는 대로 꼭 학원으로 연락 주시기 바랍니다.\n\n':'';
+function genMsg(c){
+  const m=mon+'월',dd=DAYS_DESC[curStu]||'',hasA=c.abs>0,hasSp=c.sp>0;
+  const spN=curCls==='중등반'&&hasSp?'★ 방학특강 요일 확정 요청 ★\n현재 특강은 최대 타임 기준으로 안내드리고 있습니다.\n정확한 요일 및 타임 확정 후 수강료가 변동될 수 있으니,\n요일이 확정되는 대로 꼭 학원으로 연락 주시기 바랍니다.\n\n':'';
   let body='';
-  if(isFixed){
-    body='■ '+mon+' 수강료\n'+fmtAmt(c.fee)+' (고정)';
-  } else if(isRemain){
-    body='■ 잔여 타임 안내\n잔여 타임 소진 후 별도 안내 예정입니다.';
-  } else if(isDiscount){
-    const regT=c.absence===0?STUDENTS[curClass].find(x=>x.name===curStudent).days.length*4:getData(curClass,curStudent,curMonth).lessons.length;
-    const regFull=regT*c.rate;
-    const regDisc=Math.round(regFull*0.5);
-    const spFee=c.special*c.rate;
-    body='■ '+mon+' 수업 내역\n정규 수업: '+regT+'T\n'+(hasSpecial?'방학 특강: '+c.special+'T\n':'')+(hasAbsence?'전월 결석 차감: -'+c.absence+'T\n':'')+'합계: 총 '+c.finalT+'T\n\n■ '+mon+' 수강료\n· 정규: '+c.rate.toLocaleString()+'원 × '+regT+'T = '+regFull.toLocaleString()+'원\n  재수생 50% 할인 → '+regDisc.toLocaleString()+'원'+(hasSpecial?'\n· 특강: '+c.rate.toLocaleString()+'원 × '+c.special+'T = '+spFee.toLocaleString()+'원 (할인 없음)':'')+'\n· 합계: '+fmtAmt(c.fee);
+  if(curStu==='박선영'||curStu==='박하영'){
+    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료\n'+fmt(c.fee)+' (고정)';
+  } else if(curStu==='박민지'){
+    body='■ 잔여 타임 안내\n잔여 타임 소진 후 별도 안내 예정입니다.\n\n최근 출결이 나아지고 있습니다. 꾸준한 출석 부탁드립니다.';
+  } else if(curCls==='취미반'){
+    const s=STUDENTS[curCls].find(x=>x.name===curStu);
+    const base=s.days.length===1?100000:200000;
+    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료'+(hasA?'\n기본: '+fmt(base)+'\n전월 결석 차감: -'+c.abs+'회 (-'+fmt(c.abs*25000)+')\n합계: ':'\n')+fmt(c.fee);
+  } else if(curStu==='김나현'){
+    const s=STUDENTS[curCls].find(x=>x.name===curStu);
+    const rT=c.abs===0?s.days.length*4:getData(curCls,curStu,mon).lessons.length;
+    const rFull=rT*c.rate,rDisc=Math.round(rFull*0.5),spFee=c.sp*c.rate;
+    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n정규 수업: '+rT+'T'+(hasSp?'\n방학 특강: '+c.sp+'T':'')+(hasA?'\n전월 결석 차감: -'+c.abs+'T':'')+'\n합계: 총 '+c.finalT+'T\n\n■ '+m+' 수강료\n· 정규: '+c.rate.toLocaleString()+'원 × '+rT+'T = '+rFull.toLocaleString()+'원\n  재수생 50% 할인 → '+rDisc.toLocaleString()+'원'+(hasSp?'\n· 특강: '+c.rate.toLocaleString()+'원 × '+c.sp+'T = '+spFee.toLocaleString()+'원 (할인 없음)':'')+'\n· 합계: '+fmt(c.fee);
   } else {
-    body='■ '+mon+' 수업 내역\n정규 수업: '+c.regular+'T'+(hasSpecial?'\n방학 특강: '+c.special+'T':'')+(hasAbsence?'\n전월 결석 차감: -'+c.absence+'T':'')+'\n합계: 총 '+c.finalT+'T\n\n■ '+mon+' 수강료\n'+c.rate.toLocaleString()+'원 × '+c.finalT+'T = '+fmtAmt(c.fee);
+    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n정규 수업: '+c.reg+'T'+(hasSp?'\n방학 특강: '+c.sp+'T':'')+(hasA?'\n전월 결석 차감: -'+c.abs+'T':'')+'\n합계: 총 '+c.finalT+'T\n\n■ '+m+' 수강료\n'+c.rate.toLocaleString()+'원 × '+c.finalT+'T = '+fmt(c.fee);
   }
-  ta.value='['+mon+' 수강료 안내 - '+curStudent+' 학생 ('+curClass+')]\n안녕하세요. 화강암플러스미술학원입니다.\n\n'+specialNotice+body+FOOTER;
-
-  // PC 우측 패널 동기화
-  const pcFeeMsg=document.getElementById('pcFeeMsg');
-  const pcFeeCopyBtn=document.getElementById('pcFeeCopyBtn');
-  const pcAbsInput=document.getElementById('pcAbsInput');
-  if(pcAbsInput) pcAbsInput.value=getAbsence();
-  if(pcFeeMsg) pcFeeMsg.value=ta?ta.value:'';
-  if(pcFeeCopyBtn) pcFeeCopyBtn.style.display='block';
-  const rR=document.getElementById('rp_regular');
-  const rS=document.getElementById('rp_special');
-  const rA=document.getElementById('rp_abs');
-  const rF=document.getElementById('rp_fee');
-  if(rR) rR.textContent=c.regular+'T';
-  if(rS) rS.textContent=c.special+'T';
-  if(rA) rA.textContent=c.absence>0?'-'+c.absence+'T':'없음';
-  if(rF) rF.textContent=fmtAmt(c.fee);
+  return '['+m+' 수강료 안내 - '+curStu+' 학생 ('+curCls+')]\n안녕하세요. 화강암플러스미술학원입니다.\n\n'+spN+body+FOOT;
 }
 
-function onPcAbsChange(){
-  const pcAbs=document.getElementById('pcAbsInput');
-  const mobAbs=document.getElementById('absInput');
-  if(pcAbs&&mobAbs) mobAbs.value=pcAbs.value;
-  onAbsChange();
-}
-
-function copyPcFeeMsg(){
-  const ta=document.getElementById('pcFeeMsg');
-  if(!ta) return;
-  navigator.clipboard.writeText(ta.value).then(()=>{
-    const btn=document.getElementById('pcFeeCopyBtn');
-    btn.textContent='복사됨!';setTimeout(()=>btn.textContent='문자 복사',2000);
-  });
-}
-
-function copyFeeMsg(){
+function updateFee(){
+  const c=calcFee();if(!c) return;
   const ta=document.getElementById('feeMsg');
+  const btn=document.getElementById('feeCopyBtn');
+  if(ta) ta.value=genMsg(c);
+  if(btn) btn.style.display='block';
+}
+
+function copyMsg(taId,btnId){
+  const ta=document.getElementById(taId);
   if(!ta) return;
   navigator.clipboard.writeText(ta.value).then(()=>{
-    const btn=document.getElementById('feeCopyBtn');
-    btn.textContent='복사됨!';setTimeout(()=>btn.textContent='문자 복사',2000);
+    const b=document.getElementById(btnId);
+    if(b){b.textContent='복사됨!';setTimeout(()=>b.textContent='문자 복사',2000);}
   });
 }
 
 // ── 달력 ──
-function renderCalendar(){
-  const container=document.getElementById('calWeeks');
-  container.innerHTML='';
-  if(!curStudent) return;
-  const d=getData(curClass,curStudent,curMonth);
-  const s=STUDENTS[curClass].find(x=>x.name===curStudent);
-  const total=getDays(curMonth),first=getFirst(curMonth);
+function renderCal(){
+  const cont=document.getElementById('weeks');
+  cont.innerHTML='';
+  if(!curStu) return;
+  const d=getData(curCls,curStu,mon);
+  const s=STUDENTS[curCls].find(x=>x.name===curStu);
+  const tot=getDays(mon),fst=getFirst(mon);
   const cells=[];
-  for(let i=0;i<first;i++) cells.push(null);
-  for(let day=1;day<=total;day++) cells.push(day);
-  while(cells.length%7!==0) cells.push(null);
+  for(let i=0;i<fst;i++) cells.push(null);
+  for(let day=1;day<=tot;day++) cells.push(day);
+  while(cells.length%7) cells.push(null);
   for(let w=0;w<cells.length/7;w++){
     const row=document.createElement('div');row.className='week';
     for(let i=0;i<7;i++){
       const day=cells[w*7+i],card=document.createElement('div');
       if(!day){card.className='day empty';row.appendChild(card);continue;}
       card.className='day';
-      const dow=i,dowName=DAY_NAMES[dow];
-      const defCnt=s.days.filter(x=>x===dowName).length;
-      const isExcl=d.excluded.includes(day);
+      const dw=i,dn=DAY[dw],def=s.days.filter(x=>x===dn).length;
+      const excl=d.excluded.includes(day);
       const rl=d.lessons.filter(l=>l.day===day),sp=d.special.filter(l=>l.day===day);
-      const tot=rl.length+sp.length;
-      const head=document.createElement('div');head.className='day-head';
-      head.innerHTML='<span class="day-n'+(dow===0?' sun':dow===6?' sat':'')+'">'+day+'</span>'+(tot>0?'<span class="day-t">'+tot+'T</span>':'');
-      card.appendChild(head);
-      const slots=document.createElement('div');slots.className='day-slots';
-      for(let tim=1;tim<=3;tim++){
+      const tot2=rl.length+sp.length;
+      const hd=document.createElement('div');hd.className='day-hd';
+      hd.innerHTML='<span class="day-n'+(dw===0?' sun':dw===6?' sat':'')+'">'+day+'</span>'+(tot2>0?'<span class="day-t">'+tot2+'T</span>':'');
+      card.appendChild(hd);
+      const sl=document.createElement('div');sl.className='day-slots';
+      for(let t=1;t<=3;t++){
         const slot=document.createElement('div');
-        const hasR=rl.some(l=>l.tim===tim),hasS=sp.some(l=>l.tim===tim),isDef=tim<=defCnt;
-        if(isExcl&&isDef&&!hasR&&!hasS) slot.className='slot excluded';
-        else if(hasR) slot.className='slot regular';
-        else if(hasS) slot.className='slot special';
-        else slot.className='slot';
-        slot.textContent=tim+'T';
-        slot.dataset.day=day;slot.dataset.tim=tim;slot.dataset.dow=dowName;slot.dataset.def=defCnt;
-        slots.appendChild(slot);
+        const hR=rl.some(l=>l.tim===t),hS=sp.some(l=>l.tim===t),isDef=t<=def;
+        slot.className='slot'+(hR?' on':hS?' sp':excl&&isDef?' off':'');
+        slot.textContent=t+'T';
+        slot.dataset.d=day;slot.dataset.t=t;slot.dataset.dn=dn;slot.dataset.def=def;
+        sl.appendChild(slot);
       }
-      card.appendChild(slots);row.appendChild(card);
+      card.appendChild(sl);row.appendChild(card);
     }
-    container.appendChild(row);
+    cont.appendChild(row);
   }
-  container.onclick=e=>{
-    const slot=e.target.closest('.slot');
-    if(!slot) return;
-    if(_lock) return;_lock=true;setTimeout(()=>_lock=false,250);
-    toggleSlot(+slot.dataset.day,+slot.dataset.tim,slot.dataset.dow,+slot.dataset.def);
+  cont.onclick=e=>{
+    const sl=e.target.closest('.slot');if(!sl)return;
+    if(lock)return;lock=true;setTimeout(()=>lock=false,250);
+    toggleSlot(+sl.dataset.d,+sl.dataset.t,sl.dataset.dn,+sl.dataset.def);
   };
-  container.oncontextmenu=e=>{e.preventDefault();const slot=e.target.closest('.slot');if(slot)toggleSpecial(+slot.dataset.day,+slot.dataset.tim);};
-  container.addEventListener('touchstart',e=>{const slot=e.target.closest('.slot');if(!slot)return;pressTimer=setTimeout(()=>toggleSpecial(+slot.dataset.day,+slot.dataset.tim),600);},{passive:true});
-  container.addEventListener('touchend',()=>clearTimeout(pressTimer),{passive:true});
-  container.addEventListener('touchmove',()=>clearTimeout(pressTimer),{passive:true});
+  cont.oncontextmenu=e=>{
+    e.preventDefault();const sl=e.target.closest('.slot');
+    if(sl)toggleSp(+sl.dataset.d,+sl.dataset.t);
+  };
+  cont.addEventListener('touchstart',e=>{
+    const sl=e.target.closest('.slot');if(!sl)return;
+    ptimer=setTimeout(()=>toggleSp(+sl.dataset.d,+sl.dataset.t),600);
+  },{passive:true});
+  cont.addEventListener('touchend',()=>clearTimeout(ptimer),{passive:true});
+  cont.addEventListener('touchmove',()=>clearTimeout(ptimer),{passive:true});
 }
 
-function toggleSlot(day,tim,dowName,defCnt){
-  const d=getData(curClass,curStudent,curMonth);
-  const hasR=d.lessons.some(l=>l.day===day&&l.tim===tim);
-  const hasS=d.special.some(l=>l.day===day&&l.tim===tim);
-  const isDef=tim<=defCnt;
-  if(hasR){d.lessons=d.lessons.filter(l=>!(l.day===day&&l.tim===tim));if(isDef&&!d.excluded.includes(day))d.excluded.push(day);}
-  else if(hasS){d.special=d.special.filter(l=>!(l.day===day&&l.tim===tim));}
+function toggleSlot(day,tim,dn,def){
+  const d=getData(curCls,curStu,mon);
+  const hR=d.lessons.some(l=>l.day===day&&l.tim===tim);
+  const hS=d.special.some(l=>l.day===day&&l.tim===tim);
+  const isDef=tim<=def;
+  if(hR){d.lessons=d.lessons.filter(l=>!(l.day===day&&l.tim===tim));if(isDef&&!d.excluded.includes(day))d.excluded.push(day);}
+  else if(hS){d.special=d.special.filter(l=>!(l.day===day&&l.tim===tim));}
   else{d.excluded=d.excluded.filter(x=>x!==day);d.lessons.push({day,tim,type:'regular'});}
-  save();renderCalendar();updateStats();updateFeeSection();renderLists();
+  save();renderCal();updateStats();updateFee();renderSB();renderMobList();
 }
 
-function toggleSpecial(day,tim){
-  const d=getData(curClass,curStudent,curMonth);
-  const hasR=d.lessons.some(l=>l.day===day&&l.tim===tim);
-  const hasS=d.special.some(l=>l.day===day&&l.tim===tim);
-  if(hasR){d.lessons=d.lessons.filter(l=>!(l.day===day&&l.tim===tim));d.special.push({day,tim,type:'special'});}
-  else if(hasS){d.special=d.special.filter(l=>!(l.day===day&&l.tim===tim));d.lessons.push({day,tim,type:'regular'});}
-  save();renderCalendar();updateStats();updateFeeSection();
+function toggleSp(day,tim){
+  const d=getData(curCls,curStu,mon);
+  const hR=d.lessons.some(l=>l.day===day&&l.tim===tim);
+  const hS=d.special.some(l=>l.day===day&&l.tim===tim);
+  if(hR){d.lessons=d.lessons.filter(l=>!(l.day===day&&l.tim===tim));d.special.push({day,tim,type:'special'});}
+  else if(hS){d.special=d.special.filter(l=>!(l.day===day&&l.tim===tim));d.lessons.push({day,tim,type:'regular'});}
+  save();renderCal();updateStats();updateFee();
 }
 
-function setAllOff(){
-  if(!curStudent||!confirm(curStudent+' '+curMonth+'월 전체 휴강?'))return;
-  const d=getData(curClass,curStudent,curMonth);
-  const s=STUDENTS[curClass].find(x=>x.name===curStudent);
-  const total=getDays(curMonth),first=getFirst(curMonth);
+function allOff(){
+  if(!curStu||!confirm(curStu+' '+mon+'월 전체 휴강?'))return;
+  const d=getData(curCls,curStu,mon),s=STUDENTS[curCls].find(x=>x.name===curStu);
+  const tot=getDays(mon),fst=getFirst(mon);
   d.lessons=[];d.special=[];d.excluded=[];
-  for(let day=1;day<=total;day++){const dow=(first+day-1)%7;if(s.days.includes(DAY_NAMES[dow]))d.excluded.push(day);}
-  save();renderCalendar();updateStats();updateFeeSection();renderLists();
+  for(let day=1;day<=tot;day++){const dw=(fst+day-1)%7;if(s.days.includes(DAY[dw]))d.excluded.push(day);}
+  save();renderCal();updateStats();updateFee();renderSB();renderMobList();
 }
 
-function resetMonth(){
-  if(!curStudent||!confirm(curStudent+' '+curMonth+'월 초기화?'))return;
-  delete db[skey(curClass,curStudent,curMonth)];
-  save();renderCalendar();updateStats();updateFeeSection();renderLists();
+function resetMon(){
+  if(!curStu||!confirm(curStu+' '+mon+'월 초기화?'))return;
+  delete db[sk(curCls,curStu,mon)];
+  save();renderCal();updateStats();updateFee();renderSB();renderMobList();
 }
 
 // ── 메모 ──
-function nkey(f){return 'note_'+curClass+'_'+curStudent+'_'+curMonth+'_'+f;}
+function nk(f){return 'note_'+curCls+'_'+curStu+'_'+mon+'_'+f;}
 function saveNote(){
-  if(!curStudent) return;
-  ['memo','msg'].forEach(f=>{
-    const pc=document.getElementById('pc'+f.charAt(0).toUpperCase()+f.slice(1));
-    const mob=document.getElementById('mob_'+f);
-    if(pc) localStorage.setItem(nkey(f),pc.value);
-    else if(mob) localStorage.setItem(nkey(f),mob.value);
-  });
+  if(!curStu)return;
+  const fee=document.getElementById('feeMsg'),memo=document.getElementById('memoMsg');
+  if(fee) localStorage.setItem(nk('fee'),fee.value);
+  if(memo) localStorage.setItem(nk('memo'),memo.value);
 }
 function loadNote(){
-  if(!curStudent) return;
-  ['memo','msg'].forEach(f=>{
-    const v=localStorage.getItem(nkey(f))||'';
-    const pc=document.getElementById('pc'+f.charAt(0).toUpperCase()+f.slice(1));
-    const mob=document.getElementById('mob_'+f);
-    if(pc){pc.value=v;pc.oninput=saveNote;}
-    if(mob){mob.value=v;mob.oninput=saveNote;}
-  });
+  if(!curStu)return;
+  const fee=document.getElementById('feeMsg'),memo=document.getElementById('memoMsg');
+  if(memo){memo.value=localStorage.getItem(nk('memo'))||'';memo.oninput=saveNote;}
 }
+
+// 모바일 메모 탭
 function renderMobNote(){
   const inner=document.getElementById('mobNoteInner');
-  if(!curStudent){inner.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">학생을 먼저 선택하세요</div>';return;}
-  inner.innerHTML='<div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px;">'+curStudent+' · '+curMonth+'월</div><div class="note-card"><div class="note-t">메모</div><textarea class="note-ta" id="mob_memo" placeholder="수업 메모, 특이사항..."></textarea></div><div class="note-card"><div class="note-t">문자 내용</div><textarea class="note-ta" id="mob_msg" placeholder="학부모 전달 문자..."></textarea></div>';
-  loadNote();
+  if(!curStu){inner.innerHTML='<div style="color:var(--tx3);font-size:13px;text-align:center;padding:20px;">학생을 먼저 선택하세요</div>';return;}
+  inner.innerHTML='<div class="note-card"><div class="note-hdr">수강료 문자</div><textarea class="note-ta" id="mobFeeMsg" placeholder="자동 생성됩니다..."></textarea><button onclick="copyMsg(\'mobFeeMsg\',\'mobCopyBtn\')" id="mobCopyBtn" style="margin:0 14px 10px;padding:8px;background:var(--bmid);border:1px solid var(--bbr);color:var(--blue);border-radius:var(--rs);font-size:12px;font-weight:700;cursor:pointer;text-align:center;">문자 복사</button></div><div class="note-card"><div class="note-hdr">메모</div><textarea class="note-ta" id="mobMemo" placeholder="수업 메모..."></textarea></div>';
+  // 내용 채우기
+  const c=calcFee();
+  const mobFee=document.getElementById('mobFeeMsg');
+  const mobMemo=document.getElementById('mobMemo');
+  if(mobFee&&c) mobFee.value=genMsg(c);
+  if(mobMemo){mobMemo.value=localStorage.getItem(nk('memo'))||'';mobMemo.oninput=()=>localStorage.setItem(nk('memo'),mobMemo.value);}
+}
+
+// ── 모바일 탭 ──
+function mobSwitch(tab,el){
+  document.querySelectorAll('.mob-tab').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('mobListView').style.display=tab==='list'?'block':'none';
+  const calEls=['stuHdr','actRow','calScroll'].map(id=>document.getElementById(id));
+  calEls.forEach(e=>{if(e)e.style.display=tab==='cal'?'':'none';});
+  document.getElementById('legend')?.remove();
+  document.getElementById('mobNoteView').style.display=tab==='note'?'flex':'none';
+  if(tab==='note') renderMobNote();
+  if(tab==='cal'&&!curStu){mobSwitch('list',document.querySelectorAll('.mob-tab')[0]);}
+}
+
+function mobBack(){
+  mobSwitch('list',document.querySelectorAll('.mob-tab')[0]);
 }
 
 // ── Firebase ──
-async function syncToFirebase(){
+async function syncFB(){
   const btn=document.getElementById('syncBtn');
   btn.textContent='동기화 중...';btn.className='sync-btn ing';
   try{
-    const schedule={};
+    const sch={};
     [7,8].forEach(month=>{
-      const total=getDays(month),first=getFirst(month);
-      for(let day=1;day<=total;day++){
+      const tot=getDays(month),fst=getFirst(month);
+      for(let day=1;day<=tot;day++){
         const ds=YEAR+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0');
-        schedule[ds]={'1타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]},'2타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]},'3타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]}};
-        Object.entries(STUDENTS).forEach(([cls,students])=>{
-          students.forEach(s=>{
+        sch[ds]={'1타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]},'2타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]},'3타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]}};
+        Object.entries(STUDENTS).forEach(([cls,stus])=>{
+          stus.forEach(s=>{
             const d=getData(cls,s.name,month);
-            if(d.excluded.includes(day)) return;
+            if(d.excluded.includes(day))return;
             [...d.lessons,...d.special].filter(l=>l.day===day).forEach(l=>{
               const tk=l.tim+'타임';
-              if(!schedule[ds][tk][cls].includes(s.name)) schedule[ds][tk][cls].push(s.name);
+              if(!sch[ds][tk][cls].includes(s.name))sch[ds][tk][cls].push(s.name);
             });
           });
         });
       }
     });
-    await fetch(DB+'/timetable.json',{method:'PUT',body:JSON.stringify(schedule),headers:{'Content-Type':'application/json'}});
+    await fetch(DB+'/timetable.json',{method:'PUT',body:JSON.stringify(sch),headers:{'Content-Type':'application/json'}});
     btn.textContent='✓ 동기화됨';btn.className='sync-btn ok';
     setTimeout(()=>{btn.textContent='Firebase 동기화';btn.className='sync-btn';},3000);
   }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error(e);}
 }
 
 // ── 초기화 ──
-renderLists();
-if(isPC()){
-  document.getElementById('calView').style.display='flex';
-  document.getElementById('mobListView').style.display='none';
-} else {
-  document.getElementById('mobListView').style.display='';
+renderSB();
+renderMobList();
+// 모바일이면 학생목록 뷰 표시
+if(!isPC()){
+  document.getElementById('mobListView').style.display='block';
 }
 </script>
 </body>
