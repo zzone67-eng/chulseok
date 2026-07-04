@@ -373,6 +373,14 @@ function upd(ti,n,p){
   if(saveTimer)clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>fbSet(`att/${cur}/${ti}`,{[n]:nx}).then(()=>toast('저장됨 ✓')).catch(()=>toast('저장 실패','var(--red)')),500);
 }
+// 키보드 유지용: render() 없이 저장만 (contact, makeup 토글용)
+function updSoft(ti,n,p){
+  const e=ent(ti,n),nx={...e,...p};
+  if(!att[cur])att[cur]={};if(!att[cur][ti])att[cur][ti]={};
+  att[cur][ti][n]=nx;
+  if(saveTimer)clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>fbSet(`att/${cur}/${ti}`,{[n]:nx}).then(()=>toast('저장됨 ✓')).catch(()=>toast('저장 실패','var(--red)')),500);
+}
 function tgP(ti,n){const e=ent(ti,n);if(!e.absent)upd(ti,n,{present:!e.present})}
 function tgE(ti,n){
   const e=ent(ti,n);
@@ -395,9 +403,26 @@ function saveR(ti,n){
   upd(ti,n,{reason:v});toast('사유 저장됨 ✓');
 }
 function editR(ti,n){drafts[ti+':'+n]=ent(ti,n).reason||'';render()}
-function tgC(ti,n){const e=ent(ti,n);upd(ti,n,{contact:!e.contact})}
-function tgC2(ti,n){const e=ent(ti,n);upd(ti,n,{contact2:!e.contact2})}
-function tgMakeup(ti,n){const e=ent(ti,n);upd(ti,n,{makeup:!e.makeup});}
+function tgC(ti,n){
+  const e=ent(ti,n),v=!e.contact;updSoft(ti,n,{contact:v});
+  // DOM 직접 업데이트
+  const el=document.querySelector(`[data-contact="${ti}_${n}"]`);
+  if(el){el.className='chk-mini'+(v?' on':'');el.innerHTML=v?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':'';}
+  const lb=document.querySelector(`[data-contact-lb="${ti}_${n}"]`);
+  if(lb)lb.style.color=v?'var(--t1)':'var(--mu)';
+}
+function tgC2(ti,n){
+  const e=ent(ti,n),v=!e.contact2;updSoft(ti,n,{contact2:v});
+  const el=document.querySelector(`[data-contact2="${ti}_${n}"]`);
+  if(el){el.className='chk-mini'+(v?' on':'');el.innerHTML=v?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':'';}
+  const lb=document.querySelector(`[data-contact2-lb="${ti}_${n}"]`);
+  if(lb)lb.style.color=v?'var(--t1)':'var(--mu)';
+}
+function tgMakeup(ti,n){
+  const e=ent(ti,n),v=!e.makeup;updSoft(ti,n,{makeup:v});
+  const btn=document.querySelector(`[data-makeup="${ti}_${n}"]`);
+  if(btn){btn.style.background=v?'#a29bfe':'#2a2a3a';btn.style.color=v?'#fff':'var(--mu)';btn.textContent=v?'보충완료':'보충';}
+}
 
 // ── 네비게이션 ────────────────────────────────────────
 function buildNav(){
@@ -560,14 +585,14 @@ function render(){
             h+=`<div class="absent-info">
               <span class="absent-reason" onclick="editR('${ti}','${name}')" style="cursor:pointer">결석사유: ${e.reason||'(탭해서 입력)'}</span>
               <div class="contact-mini" onclick="tgC('${ti}','${name}')">
-                <div class="chk-mini${e.contact?' on':''}">${e.contact?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':''}</div>
-                <span class="contact-label" style="color:${e.contact?'var(--t1)':'var(--mu)'}">학부모</span>
+                <div class="chk-mini${e.contact?' on':''}" data-contact="${ti}_${name}">${e.contact?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':''}</div>
+                <span class="contact-label" data-contact-lb="${ti}_${name}" style="color:${e.contact?'var(--t1)':'var(--mu)'}">학부모</span>
               </div>
               <div class="contact-mini" onclick="tgC2('${ti}','${name}')">
-                <div class="chk-mini${e.contact2?' on':''}">${e.contact2?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':''}</div>
-                <span class="contact-label" style="color:${e.contact2?'var(--t1)':'var(--mu)'}">학생</span>
+                <div class="chk-mini${e.contact2?' on':''}" data-contact2="${ti}_${name}">${e.contact2?'<span style="font-size:9px;color:#0f0f13;font-weight:900">✓</span>':''}</div>
+                <span class="contact-label" data-contact2-lb="${ti}_${name}" style="color:${e.contact2?'var(--t1)':'var(--mu)'}">학생</span>
               </div>
-              <button class="abtn" onclick="tgMakeup('${ti}','${name}')" style="background:${e.makeup?'#a29bfe':'#2a2a3a'};color:${e.makeup?'#fff':'var(--mu)'};flex-shrink:0">${e.makeup?'보충완료':'보충'}</button>
+              <button class="abtn" data-makeup="${ti}_${name}" onclick="tgMakeup('${ti}','${name}')" style="background:${e.makeup?'#a29bfe':'#2a2a3a'};color:${e.makeup?'#fff':'var(--mu)'};flex-shrink:0">${e.makeup?'보충완료':'보충'}</button>
             </div>`;
           }
         }
