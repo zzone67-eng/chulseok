@@ -68,8 +68,7 @@ body{
 .item-tim .item-arrow{color:#3a1a22}
 
 /* PC 전용 버튼 - 모바일에서 비활성화 */
-.item-pc{opacity:0.3;cursor:default}
-.item-pc .item-sub::after{content:" (PC 전용)";color:#ff5c5c}
+.item-pc{opacity:1;cursor:pointer}
 
 /* ── PC (900px+) ── */
 @media(min-width:900px){
@@ -97,8 +96,7 @@ body{
   .item-name{font-size:15px}
   .item-sub{font-size:12px}
   /* PC에서는 PC버튼 활성화 */
-  .item-pc{opacity:1;cursor:pointer}
-  .item-pc .item-sub::after{content:""}
+
 }
 </style>
 </head>
@@ -133,17 +131,10 @@ body{
 
   <div class="section-label">수강료 관리</div>
   <div class="menu">
-    <div class="item item-stu item-mob" onclick="nav('https://zzone67-eng.github.io/chulseok/students.html')">
+    <div class="item item-stu" onclick="window.location.href='https://zzone67-eng.github.io/chulseok/students.html'">
       <div class="item-left">
-        <div class="item-name">수강료관리 — 모바일</div>
-        <div class="item-sub">납부현황 · 월별 수강료 · 학생별 관리</div>
-      </div>
-      <div class="item-arrow">→</div>
-    </div>
-    <div class="item item-stu item-pc" onclick="navPC('https://zzone67-eng.github.io/chulseok/students.html')">
-      <div class="item-left">
-        <div class="item-name">수강료관리 — PC</div>
-        <div class="item-sub">전체 현황 · 미납 집계 · 상세 편집</div>
+        <div class="item-name">수강료관리</div>
+        <div class="item-sub">납부현황 · 미납 집계 · 학생별 관리</div>
       </div>
       <div class="item-arrow">→</div>
     </div>
