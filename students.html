@@ -449,23 +449,26 @@ async function syncFromFirebase(){
             const sdata = backup[key];
             if(!sdata) return;
 
-            // schedule_backup의 lessons/special은 이미 결석 제외된 실제 체크 타임
             const regT = (sdata.lessons||[]).length;
             const spT  = (sdata.special||[]).length;
+            // 전월결석은 schedule의 absIn 값 → schedule_backup에 abs 필드로 저장됨
+            const absT = sdata.abs || s.absence || 0;
             const rate = s.cls==='예비반' ? 30000 : 31250;
 
             if(rSpec && rSpec.type==='discount50'){
-              // 재수생: 정규 50% + 특강 정가 (결석은 이미 lessons에서 제외됨)
-              s.amount = Math.round(regT * rate * 0.5) + spT * rate;
-              s.totalT = regT + spT;
+              // 재수생: (정규-결석) 50% + 특강 정가
+              const netReg = Math.max(0, regT - absT);
+              s.amount = Math.round(netReg * rate * 0.5) + spT * rate;
+              s.totalT = netReg + spT;
             } else {
-              // 일반: (정규 + 특강) × 단가
-              s.amount = (regT + spT) * rate;
-              s.totalT = regT + spT;
+              // 일반: (정규 + 특강 - 전월결석) × 단가
+              const netT = Math.max(0, regT + spT - absT);
+              s.amount = netT * rate;
+              s.totalT = netT;
             }
-            // days 텍스트 업데이트
-            if(spT > 0) s.days = `정규 ${regT}T / 특강 ${spT}T = 총 ${s.totalT}T`;
-            else s.days = `${regT}T`;
+            s.absence = absT;
+            if(spT > 0) s.days = `정규 ${regT}T / 특강 ${spT}T${absT>0?' / 전월결석 -'+absT+'T':''} = 총 ${s.totalT}T`;
+            else s.days = `${regT}T${absT>0?' (전월결석 -'+absT+'T)':''}`;
           });
         });
       }
