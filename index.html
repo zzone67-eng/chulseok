@@ -767,7 +767,7 @@ function rAbsCount(){
       if(!counts[name])counts[name]={cls,abs:0,dates:[]};
       counts[name].cls=cls;
       const e=(adminData[dk]||{})[ti]?.[name];
-      if(e&&e.absent){
+      if(e&&e.absent&&!e.makeup){
         counts[name].abs++;
         counts[name].dates.push(`${d.getMonth()+1}/${d.getDate()}(${DW[d.getDay()]})`);
       }
