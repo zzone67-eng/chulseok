@@ -67,9 +67,8 @@ body{
 .item-tim .item-name{color:#dd8899}
 .item-tim .item-arrow{color:#3a1a22}
 
-/* PC 전용 버튼 - 모바일에서 비활성화 */
-.item-pc{opacity:0.3;cursor:default}
-.item-pc .item-sub::after{content:" (PC 전용)";color:#ff5c5c}
+/* PC 전용 버튼 - 모바일에서 숨김 */
+.item-pc{display:none;}
 
 /* ── PC (900px+) ── */
 @media(min-width:900px){
@@ -96,8 +95,9 @@ body{
   .item{padding:18px 22px;border-radius:13px;gap:16px}
   .item-name{font-size:15px}
   .item-sub{font-size:12px}
-  /* PC에서는 PC버튼 활성화 */
-
+  /* PC에서는 PC버튼 보이고 모바일버튼 숨김 */
+  .item-mob{display:none;}
+  .item-pc{display:flex;}
 }
 </style>
 </head>
@@ -116,14 +116,14 @@ body{
   <div class="menu">
     <div class="item item-att item-mob" onclick="nav('https://zzone67-eng.github.io/chulseok/')">
       <div class="item-left">
-        <div class="item-name">출석관리 — 모바일</div>
+        <div class="item-name">출석관리</div>
         <div class="item-sub">출결 체크 · 결석사유 · 실시간 공유</div>
       </div>
       <div class="item-arrow">→</div>
     </div>
     <div class="item item-att item-pc" onclick="navPC('https://zzone67-eng.github.io/chulseok/')">
       <div class="item-left">
-        <div class="item-name">출석관리 — PC</div>
+        <div class="item-name">출석관리</div>
         <div class="item-sub">사이드바 달력 · 타임 그리드 · 관리자</div>
       </div>
       <div class="item-arrow">→</div>
@@ -134,14 +134,14 @@ body{
   <div class="menu">
     <div class="item item-stu item-mob" onclick="nav('https://zzone67-eng.github.io/chulseok/students.html')">
       <div class="item-left">
-        <div class="item-name">수강료관리 — 모바일</div>
+        <div class="item-name">수강료관리</div>
         <div class="item-sub">납부현황 · 월별 수강료 · 학생별 관리</div>
       </div>
       <div class="item-arrow">→</div>
     </div>
     <div class="item item-stu item-pc" onclick="navPC('https://zzone67-eng.github.io/chulseok/students.html')">
       <div class="item-left">
-        <div class="item-name">수강료관리 — PC</div>
+        <div class="item-name">수강료관리</div>
         <div class="item-sub">전체 현황 · 미납 집계 · 상세 편집</div>
       </div>
       <div class="item-arrow">→</div>
@@ -150,10 +150,9 @@ body{
 
   <div class="section-label">시간표 관리</div>
   <div class="menu">
-
     <div class="item item-tim item-pc" onclick="navPC('./schedule.html')">
       <div class="item-left">
-        <div class="item-name">시간표관리 — PC</div>
+        <div class="item-name">시간표관리</div>
         <div class="item-sub">달력형 시간표 · 3타임 관리 · 수강료 자동계산</div>
       </div>
       <div class="item-arrow">→</div>
