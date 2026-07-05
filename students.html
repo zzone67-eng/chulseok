@@ -210,7 +210,7 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
     <div class="hdr-top">
       <div>
         <div class="hdr-title">화강암플러스 수강생 관리</div>
-        <div class="hdr-sub" id="hdrSub">2026년 7월</div>
+        <div class="hdr-sub" id="hdrSub"></div>
       </div>
       <span id="fb-status" style="font-size:10px;color:rgba(255,255,255,.7);margin-right:8px"></span>
       <div class="unpaid-badge" onclick="openUnpaid()">미납 확인</div>
@@ -522,6 +522,8 @@ function init(){
     });
   }
   // Firebase 먼저 불러온 후 렌더 (syncFromFirebase 안에서 renderAll 호출)
+  // 헤더 날짜 동적 설정
+  const now=new Date();const sub=document.getElementById('hdrSub');if(sub)sub.textContent=`${now.getFullYear()}년 ${now.getMonth()+1}월`;
   syncFromFirebase();
 }
 

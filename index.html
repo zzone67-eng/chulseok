@@ -233,7 +233,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
     </div>
   </div>
   <div class="pc-sidebar">
-    <h3>2026년 7월</h3>
+    <h3 id="pc-month-label">로딩 중...</h3>
     <div class="cal-hdr">
       <div class="cal-hd" style="color:#ff6b6b">일</div>
       <div class="cal-hd">월</div><div class="cal-hd">화</div><div class="cal-hd">수</div>
@@ -293,9 +293,18 @@ let S = {}; // Firebase에서 로드
 async function loadTimetable() {
   try {
     let data = {};
-    const mdata = await fbGet('timetable/2026-07');
-    console.log('[loadTimetable] raw Firebase 응답 키:', mdata ? Object.keys(mdata).slice(0,3) : 'null');
-    if(mdata) Object.assign(data, mdata);
+    // 현재 달 + 다음 달 timetable 동적 로드
+    const now=new Date();
+    const months=[[now.getFullYear(),now.getMonth()+1]];
+    // 다음 달도 포함
+    const nm=new Date(now.getFullYear(),now.getMonth()+1,1);
+    months.push([nm.getFullYear(),nm.getMonth()+1]);
+    for(const [y,m] of months){
+      const key=`timetable/${y}-${String(m).padStart(2,'0')}`;
+      const mdata=await fbGet(key);
+      if(mdata) Object.assign(data,mdata);
+    }
+    console.log('[loadTimetable] 로드된 날짜 수:', Object.keys(data).length);
     if(data && typeof data === 'object') {
       const fixed = {};
       Object.entries(data).forEach(([date, dayData]) => {
@@ -309,7 +318,7 @@ async function loadTimetable() {
       });
       S = fixed;
       // 7/4 데이터 확인
-      console.log('[loadTimetable] S[2026-07-04]:', JSON.stringify(S['2026-07-04']));
+      console.log('[loadTimetable] 로드 완료, 총 날짜:', Object.keys(S).length);
       const total = Object.values(S).reduce((sum, day) =>
         sum + Object.values(day).reduce((s2, tim) =>
           s2 + Object.values(tim).reduce((s3, arr) => s3 + arr.length, 0), 0), 0);
@@ -500,6 +509,7 @@ function buildNav(){
   const dm=`${d.getMonth()+1}월 ${d.getDate()}일`,ds=`(${DW[d.getDay()]})`;
   // 날짜 표시
   ['mob-dm','pc-dm'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=dm;});
+  const pml=document.getElementById('pc-month-label');if(pml){const _d=new Date(cur+'T12:00:00');pml.textContent=`${_d.getFullYear()}년 ${_d.getMonth()+1}월`;}
   ['mob-ds','pc-ds'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ds;});
   const btnT=document.getElementById('btn-today');
   if(btnT)btnT.style.display=cur!==tk?'inline-flex':'none';
@@ -509,9 +519,12 @@ function buildNav(){
   buildClsTabs();
 }
 function buildMobNav(tk){
+  const ym=cur.slice(0,7); // "2026-07"
+  const [cy,cm]=ym.split('-').map(Number);
+  const daysInMonth=new Date(cy,cm,0).getDate();
   let h='';
-  for(let i=1;i<=31;i++){
-    const dk=`2026-07-${String(i).padStart(2,'0')}`;
+  for(let i=1;i<=daysInMonth;i++){
+    const dk=`${ym}-${String(i).padStart(2,'0')}`;
     const off=S[dk]===null||S[dk]===undefined;
     h+=`<button class="nb${dk===cur?' act':''}${off?' off':''}" onclick="go('${dk}')"><span class="nn">${i}</span><span class="nw">${DW[new Date(dk+'T12:00:00').getDay()]}</span></button>`;
   }
@@ -519,10 +532,13 @@ function buildMobNav(tk){
   if(nav){nav.innerHTML=h;setTimeout(()=>{const b=nav.querySelector('.act');if(b)b.scrollIntoView({block:'nearest',inline:'center'});},50);}
 }
 function buildPcCal(tk){
-  const fd=new Date('2026-07-01T12:00:00').getDay();
+  const ym=cur.slice(0,7);
+  const [cy,cm]=ym.split('-').map(Number);
+  const daysInMonth=new Date(cy,cm,0).getDate();
+  const fd=new Date(`${ym}-01T12:00:00`).getDay();
   let h='';for(let i=0;i<fd;i++)h+='<div></div>';
-  for(let i=1;i<=31;i++){
-    const dk=`2026-07-${String(i).padStart(2,'0')}`;
+  for(let i=1;i<=daysInMonth;i++){
+    const dk=`${ym}-${String(i).padStart(2,'0')}`;
     const off=S[dk]===null||S[dk]===undefined,act=dk===cur,isT=dk===tk;
     h+=`<button class="cal-day${act?' act':''}${off?' off':''}${isT&&!act?' today-ring':''}" ${off?'disabled':''} onclick="go('${dk}')">${i}</button>`;
   }

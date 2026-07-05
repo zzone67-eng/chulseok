@@ -624,10 +624,10 @@ function mobSwitch(tab,el){
   document.getElementById('mobListView').style.display=tab==='list'?'block':'none';
   const calEls=['stuHdr','actRow','calScroll'].map(id=>document.getElementById(id));
   calEls.forEach(e=>{if(e)e.style.display=tab==='cal'?'':'none';});
-  document.getElementById('legend')?.remove();
+  const leg=document.getElementById('legend');if(leg)leg.style.display=tab==='cal'?'':'none';
   document.getElementById('mobNoteView').style.display=tab==='note'?'flex':'none';
   if(tab==='note') renderMobNote();
-  if(tab==='cal'&&!curStu){mobSwitch('list',document.querySelectorAll('.mob-tab')[0]);}
+  if(tab==='cal'&&!curStu){const listBtn=document.querySelectorAll('.mob-tab')[0];listBtn.classList.add('on');el.classList.remove('on');document.getElementById('mobListView').style.display='block';calEls.forEach(e=>{if(e)e.style.display='none';});return;}
 }
 
 function mobBack(){
@@ -639,7 +639,7 @@ async function syncFB(){
   const btn=document.getElementById('syncBtn');
   btn.textContent='동기화 중...';btn.className='sync-btn ing';
   try{
-    for(const month of [7]){
+    for(const month of [7,8]){
       Object.entries(STUDENTS).forEach(([cls,stus])=>{
         stus.forEach(s=>getData(cls,s.name,month));
       });
@@ -662,7 +662,7 @@ async function syncFB(){
       }
 
       // ── 디버그: 7월 4일 데이터 확인 ──
-      console.log('[syncFB] 7/4 데이터:', JSON.stringify(sch['2026-07-04']));
+      console.log('[syncFB] 동기화 완료 - 월:', month);
       
       // ── 디버그: 주요 학생 localStorage 원본 확인 ──
       ['입시반_박민지_7','입시반_김나연_7','중등반_한지유_7','취미반_나은솔_7'].forEach(k => {
@@ -705,7 +705,7 @@ async function initFromFirebase(){
       // 타임스탬프로 최신 데이터 판단
       const fbTs=backup._updatedAt||0;
       const localTs=parseInt(localStorage.getItem('sch_v1_ts')||'0');
-      if(fbKeys>0&&fbTs>localTs){
+      if(fbKeys>0&&(fbTs>localTs||(localTs===0&&fbKeys>0))){
         const {_updatedAt:_ts,...backupClean}=backup;
         db=backupClean;
         localStorage.setItem('sch_v1',JSON.stringify(db));
