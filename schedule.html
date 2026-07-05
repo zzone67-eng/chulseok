@@ -423,7 +423,10 @@ function pick(cls,name){
   curCls=cls;curStu=name;
   // 저장된 전월결석
   const absEl=document.getElementById('absIn');
-  if(absEl) absEl.value=localStorage.getItem('abs_'+cls+'_'+name+'_'+mon)||'0';
+  const k_abs=cls+'_'+name+'_'+mon;
+  const absFromDB=db[k_abs]?.abs||0;
+  const absFromLocal=localStorage.getItem('abs_'+cls+'_'+name+'_'+mon);
+  if(absEl) absEl.value=absFromLocal!==null?absFromLocal:String(absFromDB);
   const cbEl=document.getElementById('use4wk');
   if(cbEl) cbEl.checked=localStorage.getItem('4wk_'+cls+'_'+name+'_'+mon)==='1';
   updateToggle();
@@ -449,7 +452,10 @@ function setMonth(m,el,ctx){
   el.classList.add('on');
   if(curStu){
     const absEl=document.getElementById('absIn');
-    if(absEl) absEl.value=localStorage.getItem('abs_'+curCls+'_'+curStu+'_'+m)||'0';
+    const k_m=curCls+'_'+curStu+'_'+m;
+    const absDB=db[k_m]?.abs||0;
+    const absLocal=localStorage.getItem('abs_'+curCls+'_'+curStu+'_'+m);
+    if(absEl) absEl.value=absLocal!==null?absLocal:String(absDB);
     renderCal();updateStats();updateFee();
   }
   renderSB();renderMobList();
@@ -497,9 +503,14 @@ function updateStats(){
 
 function onAbs(){
   if(!curStu) return;
-  localStorage.setItem('abs_'+curCls+'_'+curStu+'_'+mon,getAbs());
+  const absVal=getAbs();
+  localStorage.setItem('abs_'+curCls+'_'+curStu+'_'+mon,absVal);
   const cb=document.getElementById('use4wk');
   if(cb) localStorage.setItem('4wk_'+curCls+'_'+curStu+'_'+mon,cb.checked?'1':'0');
+  // db에도 abs 저장 → Firebase 자동동기화
+  const k=curCls+'_'+curStu+'_'+mon;
+  if(db[k]) db[k].abs=absVal;
+  save();
   updateToggle();
   updateStats();updateFee();
 }
