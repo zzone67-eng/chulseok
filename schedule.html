@@ -690,13 +690,30 @@ async function syncFB(){
   }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error('[syncFB] 에러:', e);}
 }
 
-// ── 초기화 ──
-renderSB();
-renderMobList();
-// 모바일이면 학생목록 뷰 표시
-if(!isPC()){
-  document.getElementById('mobListView').style.display='block';
+// ── 초기화: Firebase 백업에서 자동 복원 후 렌더 ──
+async function initFromFirebase(){
+  try{
+    const r=await fetch(DB+'/schedule_backup.json');
+    if(r.ok){
+      const backup=await r.json();
+      if(backup&&typeof backup==='object'&&Object.keys(backup).length>0){
+        // 로컬보다 Firebase가 더 최신인지 확인 (키 수 비교)
+        const localKeys=Object.keys(db).length;
+        const fbKeys=Object.keys(backup).length;
+        if(fbKeys>=localKeys){
+          db=backup;
+          localStorage.setItem('sch_v1',JSON.stringify(db));
+        }
+      }
+    }
+  }catch(e){ console.log('Firebase 복원 실패, 로컬 사용'); }
+  renderSB();
+  renderMobList();
+  if(!isPC()){
+    document.getElementById('mobListView').style.display='block';
+  }
 }
+initFromFirebase();
 </script>
 </body>
 </html>
