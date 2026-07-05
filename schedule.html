@@ -312,7 +312,8 @@ const fmt=n=>n.toLocaleString('ko-KR')+'원';
 function getData(cls,name,month){
   const k=sk(cls,name,month);
   if(!db[k]){
-    const s=STUDENTS[cls].find(x=>x.name===name);
+    const s=STUDENTS[cls]?.find(x=>x.name===name);
+    if(!s){db[k]={lessons:[],special:[],excluded:[]};return db[k];}
     const tot=getDays(month),fst=getFirst(month),ls=[];
     for(let d=1;d<=tot;d++){
       const dw=(fst+d-1)%7,cnt=s.days.filter(x=>x===DAY[dw]).length;
@@ -331,12 +332,14 @@ function renderSB(){
   Object.entries(STUDENTS).forEach(([cls,stus])=>{
     const lbl=document.createElement('div');lbl.className='cls-lbl';lbl.textContent=cls;el.appendChild(lbl);
     stus.forEach(s=>{
+      try{
       const d=getData(cls,s.name,mon),t=d.lessons.length+d.special.length;
       const btn=document.createElement('button');
       btn.className='stu-btn'+(curCls===cls&&curStu===s.name?' on':'');
       btn.innerHTML='<span>'+s.name+'</span><span class="stu-t">'+t+'T</span>';
       btn.onclick=()=>pick(cls,s.name);
       el.appendChild(btn);
+      }catch(e){console.error('renderSB 오류:',cls,s.name,e);}
     });
   });
 }
@@ -694,36 +697,34 @@ async function syncFB(){
   }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error('[syncFB] 에러:', e);}
 }
 
-// ── 초기화: Firebase 백업에서 자동 복원 후 렌더 ──
-async function initFromFirebase(){
+// ── 초기화 ──
+renderSB();
+renderMobList();
+if(!isPC()){
+  document.getElementById('mobListView').style.display='block';
+}
+// 백그라운드로 Firebase 복원 시도 (렌더 후 실행 → 화면에 영향 없음)
+(async()=>{
   try{
     const r=await fetch(DB+'/schedule_backup.json');
-    if(r.ok){
-      const backup=await r.json();
-      if(!backup||typeof backup!=='object'){throw new Error('backup 형식 오류');}
-      const {_updatedAt:_ts,...backupClean}=backup;
-      // 유효성 검사: 학생 키 형식인 항목이 1개 이상 있어야 함
-      const validKeys=Object.keys(backupClean).filter(k=>k.includes('_')&&!k.startsWith('_'));
-      if(validKeys.length===0){throw new Error('유효한 학생 데이터 없음');}
-      const fbTs=_ts||0;
-      const localTs=parseInt(localStorage.getItem('sch_v1_ts')||'0');
-      const localKeys=Object.keys(db).filter(k=>k.includes('_')).length;
-      // Firebase가 더 최신이거나 로컬이 비어있을 때만 복원
-      if(fbTs>localTs||(localKeys===0&&validKeys.length>0)){
-        db=backupClean;
-        localStorage.setItem('sch_v1',JSON.stringify(db));
-        localStorage.setItem('sch_v1_ts',String(fbTs));
-        console.log('Firebase 복원 완료:', validKeys.length,'개 학생 데이터');
-      }
+    if(!r.ok) return;
+    const backup=await r.json();
+    if(!backup||typeof backup!=='object') return;
+    const {_updatedAt:fbTs=0,...backupClean}=backup;
+    const validKeys=Object.keys(backupClean).filter(k=>k.match(/^.+_.+_\d+$/));
+    if(validKeys.length===0){console.log('Firebase: 유효 데이터 없음');return;}
+    const localTs=parseInt(localStorage.getItem('sch_v1_ts')||'0');
+    const localHasData=Object.keys(db).some(k=>k.match(/^.+_.+_\d+$/));
+    if(fbTs>localTs||(fbTs===0&&!localHasData&&validKeys.length>0)){
+      db=backupClean;
+      localStorage.setItem('sch_v1',JSON.stringify(db));
+      localStorage.setItem('sch_v1_ts',String(fbTs||Date.now()));
+      console.log('Firebase 복원:', validKeys.length,'개');
+      try{renderSB(); renderMobList();}catch(e){console.error('렌더 오류:',e);}
+      if(!isPC()) document.getElementById('mobListView').style.display='block';
     }
-  }catch(e){ console.log('Firebase 복원 스킵:', e.message); }
-  renderSB();
-  renderMobList();
-  if(!isPC()){
-    document.getElementById('mobListView').style.display='block';
-  }
-}
-initFromFirebase();
+  }catch(e){console.log('Firebase 복원 실패:', e.message);}
+})();
 </script>
 </body>
 </html>
