@@ -700,21 +700,23 @@ async function initFromFirebase(){
     const r=await fetch(DB+'/schedule_backup.json');
     if(r.ok){
       const backup=await r.json();
-      const localKeys=Object.keys(db).length;
-      const fbKeys=backup&&typeof backup==='object'?Object.keys(backup).length:0;
-      // 타임스탬프로 최신 데이터 판단
-      const fbTs=backup._updatedAt||0;
+      if(!backup||typeof backup!=='object'){throw new Error('backup 형식 오류');}
+      const {_updatedAt:_ts,...backupClean}=backup;
+      // 유효성 검사: 학생 키 형식인 항목이 1개 이상 있어야 함
+      const validKeys=Object.keys(backupClean).filter(k=>k.includes('_')&&!k.startsWith('_'));
+      if(validKeys.length===0){throw new Error('유효한 학생 데이터 없음');}
+      const fbTs=_ts||0;
       const localTs=parseInt(localStorage.getItem('sch_v1_ts')||'0');
-      if(fbKeys>0&&(fbTs>localTs||(localTs===0&&fbKeys>0))){
-        const {_updatedAt:_ts,...backupClean}=backup;
+      const localKeys=Object.keys(db).filter(k=>k.includes('_')).length;
+      // Firebase가 더 최신이거나 로컬이 비어있을 때만 복원
+      if(fbTs>localTs||(localKeys===0&&validKeys.length>0)){
         db=backupClean;
         localStorage.setItem('sch_v1',JSON.stringify(db));
-        // 로컬에도 타임스탬프 별도 저장
         localStorage.setItem('sch_v1_ts',String(fbTs));
-        console.log('Firebase에서 복원:', new Date(fbTs).toLocaleString());
+        console.log('Firebase 복원 완료:', validKeys.length,'개 학생 데이터');
       }
     }
-  }catch(e){ console.log('Firebase 복원 실패, 로컬 사용'); }
+  }catch(e){ console.log('Firebase 복원 스킵:', e.message); }
   renderSB();
   renderMobList();
   if(!isPC()){
