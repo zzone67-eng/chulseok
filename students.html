@@ -412,10 +412,10 @@ function saveDB(d){
 async function syncFromFirebase(){
   const statusEl = document.getElementById('fb-status');
   try {
-    // paid.json + schedule_backup.json 병렬 fetch
+    // paid.json + schedule_backup.json 병렬 fetch (항상 최신)
     const [r, br] = await Promise.all([
-      fetch(`${FB_URL}/paid.json`),
-      fetch(`${FB_URL}/schedule_backup.json`)
+      fetch(`${FB_URL}/paid.json?_=${Date.now()}`),
+      fetch(`${FB_URL}/schedule_backup.json?_=${Date.now()}`)
     ]);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const paidMap = await r.json();
@@ -526,6 +526,8 @@ function init(){
   // 헤더 날짜 동적 설정
   const now=new Date();const sub=document.getElementById('hdrSub');if(sub)sub.textContent=`${now.getFullYear()}년 ${now.getMonth()+1}월`;
   syncFromFirebase();
+  // 30초마다 자동 업데이트 (schedule 변경사항 반영)
+  setInterval(syncFromFirebase, 30000);
 }
 
 // ══════════════════════════════════

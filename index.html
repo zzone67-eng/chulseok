@@ -340,7 +340,7 @@ let adminY=2026,adminM=7,adminTab=0,adminData={};
 function toKey(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 const isMob=()=>window.innerWidth<1100;
 const isTab=()=>window.innerWidth>=600&&window.innerWidth<1100;
-async function fbGet(p){const r=await fetch(`${DB}/${p}.json`);if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
+async function fbGet(p){const r=await fetch(`${DB}/${p}.json?_=${Date.now()}`);if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
 async function fbSet(p,d){await fetch(`${DB}/${p}.json`,{method:'PATCH',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}})}
 
 function toast(m,c='var(--green)'){
