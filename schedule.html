@@ -161,6 +161,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
   <div class="tb-accent"></div>
   <div class="tb-title">화강암+ 스케줄</div>
   <button class="sync-btn" id="syncBtn" onclick="syncFB()">Firebase 동기화</button>
+  <button class="sync-btn" onclick="resetLocal()" style="background:#3a1a1a;color:#ff6b6b;border-color:#ff6b6b;font-size:11px">로컬 초기화</button>
 </div>
 
 <!-- 모바일 탭 -->
@@ -299,7 +300,26 @@ const DAYS_DESC={
 };
 
 const DAY=['일','월','화','수','목','금','토'];
-let db=JSON.parse(localStorage.getItem('sch_v1')||'{}');
+(()=>{
+  try{
+    const raw=localStorage.getItem('sch_v1');
+    if(!raw){window._db={};return;}
+    const parsed=JSON.parse(raw);
+    // 유효성 검사: 값이 {lessons,special,excluded} 형식인지 확인
+    const clean={};
+    Object.entries(parsed).forEach(([k,v])=>{
+      if(v&&typeof v==='object'&&Array.isArray(v.lessons)&&Array.isArray(v.special)&&Array.isArray(v.excluded)){
+        clean[k]=v;
+      }
+    });
+    window._db=clean;
+    if(Object.keys(clean).length!==Object.keys(parsed).length){
+      localStorage.setItem('sch_v1',JSON.stringify(clean));
+      console.log('오염 데이터 정리됨');
+    }
+  }catch(e){window._db={};}
+})();
+let db=window._db;
 let mon=7,curCls=null,curStu=null,ptimer=null,lock=false;
 
 const isPC=()=>window.innerWidth>=900;
@@ -309,6 +329,14 @@ const sk=(c,n,m)=>c+'_'+n+'_'+m;
 const save=()=>localStorage.setItem('sch_v1',JSON.stringify(db));
 const fmt=n=>n.toLocaleString('ko-KR')+'원';
 
+function resetLocal(){
+  if(!confirm('로컬 데이터를 초기화합니다. 체크한 내용이 모두 사라집니다. 계속할까요?')) return;
+  localStorage.removeItem('sch_v1');
+  localStorage.removeItem('sch_v1_ts');
+  db={};
+  renderSB();renderMobList();
+  alert('초기화 완료. 이제 정상적으로 사용하실 수 있습니다.');
+}
 function getData(cls,name,month){
   const k=sk(cls,name,month);
   if(!db[k]||typeof db[k]!=='object'||!Array.isArray(db[k].lessons)){
