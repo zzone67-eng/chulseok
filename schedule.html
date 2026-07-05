@@ -684,8 +684,11 @@ async function syncFB(){
       const resText=await res.text();
       console.log('[syncFB] PUT 응답 status:', res.status, '| body:', resText.slice(0,200));
     }
-    const dbWithTs={...db,_updatedAt:Date.now()};
-    await fetch(DB+'/schedule_backup.json',{method:'PUT',body:JSON.stringify(dbWithTs),headers:{'Content-Type':'application/json'}});
+    // 로컬 db에는 _updatedAt 추가하지 않고, 전송용 객체만 따로 만듦
+    const nowTs=Date.now();
+    localStorage.setItem('sch_v1_ts',String(nowTs));
+    const dbForFB=Object.assign({},db,{_updatedAt:nowTs});
+    await fetch(DB+'/schedule_backup.json',{method:'PUT',body:JSON.stringify(dbForFB),headers:{'Content-Type':'application/json'}});
     btn.textContent='✓ 동기화됨';btn.className='sync-btn ok';
     setTimeout(()=>{btn.textContent='Firebase 동기화';btn.className='sync-btn';},3000);
   }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error('[syncFB] 에러:', e);}
@@ -701,10 +704,13 @@ async function initFromFirebase(){
       const fbKeys=backup&&typeof backup==='object'?Object.keys(backup).length:0;
       // 타임스탬프로 최신 데이터 판단
       const fbTs=backup._updatedAt||0;
-      const localTs=db._updatedAt||0;
+      const localTs=parseInt(localStorage.getItem('sch_v1_ts')||'0');
       if(fbKeys>0&&fbTs>localTs){
-        db=backup;
+        const {_updatedAt:_ts,...backupClean}=backup;
+        db=backupClean;
         localStorage.setItem('sch_v1',JSON.stringify(db));
+        // 로컬에도 타임스탬프 별도 저장
+        localStorage.setItem('sch_v1_ts',String(fbTs));
         console.log('Firebase에서 복원:', new Date(fbTs).toLocaleString());
       }
     }
