@@ -439,21 +439,7 @@ function saveStudents(){
     .catch(e=>console.error('학생 저장 실패:',e));
 }
 
-async function loadStudents(){
-  try{
-    const r=await fetch(DB+'/students_list.json?_='+Date.now());
-    if(!r.ok)return;
-    const data=await r.json();
-    if(!data||typeof data!=='object')return;
-    // STUDENTS 업데이트
-    Object.entries(data).forEach(([cls,stus])=>{
-      if(STUDENTS[cls]&&Array.isArray(stus)){
-        STUDENTS[cls]=stus.filter(s=>s.name&&Array.isArray(s.days));
-      }
-    });
-    console.log('학생 목록 로드 완료');
-  }catch(e){console.log('학생 목록 로드 실패, 기본값 사용');}
-}
+// loadStudents는 아래에 정의됨
 
 // ── 월 버튼 동적 생성 ──
 function buildMonthButtons(){
@@ -515,7 +501,10 @@ async function loadStudents(){
     const data=await r.json();
     if(!data||typeof data!=='object')return;
     Object.entries(data).forEach(([cls,stus])=>{
-      if(STUDENTS[cls]&&Array.isArray(stus))STUDENTS[cls]=stus.filter(s=>s.name&&Array.isArray(s.days));
+      if(Array.isArray(stus)){
+        if(!STUDENTS[cls])STUDENTS[cls]=[];
+        STUDENTS[cls]=stus.filter(s=>s.name&&Array.isArray(s.days));
+      }
     });
     console.log('학생 목록 로드 완료');
   }catch(e){console.log('학생 목록 로드 실패');}

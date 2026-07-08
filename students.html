@@ -412,15 +412,64 @@ function saveDB(d){
 async function syncFromFirebase(){
   const statusEl = document.getElementById('fb-status');
   try {
-    // paid.json + schedule_backup.json 병렬 fetch (항상 최신)
-    const [r, br] = await Promise.all([
+    // paid.json + schedule_backup.json + students_list.json 병렬 fetch
+    const [r, br, sr] = await Promise.all([
       fetch(`${FB_URL}/paid.json?_=${Date.now()}`),
-      fetch(`${FB_URL}/schedule_backup.json?_=${Date.now()}`)
+      fetch(`${FB_URL}/schedule_backup.json?_=${Date.now()}`),
+      fetch(`${FB_URL}/students_list.json?_=${Date.now()}`)
     ]);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const paidMap = await r.json();
     if(paidMap && typeof paidMap==='object'){
       ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{ if(paidMap[s.id]!==undefined) s.paid=paidMap[s.id]; }); });
+    }
+
+    // students_list.json - 신규 학생 db에 동적 추가
+    if(sr&&sr.ok){
+      try{
+        const stuList = await sr.json();
+        if(stuList&&typeof stuList==='object'){
+          const CLS_MAP = {'입시반':'입시반','예비반':'예비반','중등반':'중등반','취미반':'취미반'};
+          Object.entries(stuList).forEach(([cls,stus])=>{
+            if(!Array.isArray(stus))return;
+            ['jul','aug'].forEach(mon=>{
+              if(!db[mon])return;
+              stus.forEach(stu=>{
+                const id=mon+'_'+stu.name;
+                // 이미 initData에 있으면 스킵
+                if(db[mon].find(s=>s.id===id))return;
+                // 신규 학생 추가
+                db[mon].push({
+                  id, name:stu.name, cls,
+                  tags:[], schedule:stu.days.join(','), days:'',
+                  absence:0, totalT:0, amount:0,
+                  fixed:false, paid:false, memo:'', remain:null
+                });
+              });
+            });
+          });
+        }
+      }catch(e){console.log('students_list 로드 실패');}
+    }
+
+    // students_list.json - 신규 학생 db에 동적 추가
+    if(sr&&sr.ok){
+      try{
+        const stuList = await sr.json();
+        if(stuList&&typeof stuList==='object'){
+          ['jul','aug'].forEach(mon=>{
+            if(!db[mon])return;
+            Object.entries(stuList).forEach(([cls,stus])=>{
+              if(!Array.isArray(stus))return;
+              stus.forEach(stu=>{
+                const id=mon+'_'+stu.name;
+                if(db[mon].find(s=>s.id===id))return;
+                db[mon].push({id,name:stu.name,cls,tags:[],schedule:(stu.days||[]).join(','),days:'',absence:0,totalT:0,amount:0,fixed:false,paid:false,memo:'',remain:null});
+              });
+            });
+          });
+        }
+      }catch(e){console.log('students_list 로드 실패');}
     }
 
     // schedule_backup.json - 정규/특강 분리된 원본 데이터로 시수/수강료 계산
