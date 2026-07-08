@@ -471,6 +471,11 @@ function getData(cls,name,month){
     db[k]={lessons:ls,special:[],excluded:[]};
     try{save();}catch(e){}
   }
+  // special/excluded 없을 경우 보완
+  if(db[k]&&!Array.isArray(db[k].special))db[k].special=[];
+  if(db[k]&&!Array.isArray(db[k].excluded))db[k].excluded=[];
+  if(db[k]&&!Array.isArray(db[k].special))db[k].special=[];
+  if(db[k]&&!Array.isArray(db[k].excluded))db[k].excluded=[];
   return db[k]||{lessons:[],special:[],excluded:[]};
 }
 
