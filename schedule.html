@@ -434,26 +434,21 @@ function saveStudents(){
 async function loadStudents(){
   try{
     const r=await fetch(DB+'/students_list.json?_='+Date.now());
-    if(!r.ok)return;
+    if(!r.ok){ console.log('students_list 없음, 기본값 사용'); return; }
     const data=await r.json();
     if(!data||typeof data!=='object')return;
+    // Firebase 데이터로 STUDENTS 완전 교체 (유효한 데이터만)
+    let updated=false;
     Object.entries(data).forEach(([cls,stus])=>{
-      if(Array.isArray(stus)){
-        if(!STUDENTS[cls])STUDENTS[cls]=[];
-        const fbStus=stus.filter(s=>s.name&&Array.isArray(s.days)&&s.days.length>0);
-        if(fbStus.length===0)return; // Firebase 데이터 없으면 기존 유지
-        // 기존 학생 유지하면서 Firebase 신규 학생 추가
-        fbStus.forEach(fs=>{
-          if(!STUDENTS[cls].find(s=>s.name===fs.name)){
-            STUDENTS[cls].push({name:fs.name,days:fs.days});
-          }
-        });
-        // Firebase에서 삭제된 학생 제거
-        STUDENTS[cls]=STUDENTS[cls].filter(s=>fbStus.find(fs=>fs.name===s.name));
+      if(!Array.isArray(stus))return;
+      const valid=stus.filter(s=>s&&s.name&&Array.isArray(s.days)&&s.days.length>0);
+      if(valid.length>0){
+        STUDENTS[cls]=valid.map(s=>({name:s.name,days:s.days}));
+        updated=true;
       }
     });
-    console.log('학생 목록 로드 완료');
-  }catch(e){console.log('학생 목록 로드 실패');}
+    if(updated) console.log('학생 목록 로드 완료:', Object.entries(STUDENTS).map(([c,s])=>c+':'+s.length+'명').join(', '));
+  }catch(e){console.log('학생 목록 로드 실패',e);}
 }
 
 function resetLocal(){
@@ -473,9 +468,10 @@ function getData(cls,name,month){
       const dw=(fst+d-1)%7,cnt=s.days.filter(x=>x===DAY[dw]).length;
       for(let t=1;t<=cnt;t++) ls.push({day:d,tim:t,type:'regular'});
     }
-    db[k]={lessons:ls,special:[],excluded:[]};save();
+    db[k]={lessons:ls,special:[],excluded:[]};
+    try{save();}catch(e){}
   }
-  return db[k];
+  return db[k]||{lessons:[],special:[],excluded:[]};
 }
 
 // ── 사이드바 렌더 ──
