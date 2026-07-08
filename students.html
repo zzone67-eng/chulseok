@@ -414,8 +414,12 @@ function saveEdits(){
   const edits={};
   ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{
     const init=initData[m]?.find(x=>x.id===s.id);
-    if(!init)return;
     const changed={};
+    // initData에 없는 신규 학생은 모든 편집값 저장
+    if(!init){
+      edits[s.id]={amount:s.amount,totalT:s.totalT,days:s.days,schedule:s.schedule,memo:s.memo,absence:s.absence,remain:s.remain};
+      return;
+    }
     if(s.amount!==init.amount)changed.amount=s.amount;
     if(s.totalT!==init.totalT)changed.totalT=s.totalT;
     if(s.days!==init.days)changed.days=s.days;
@@ -425,7 +429,10 @@ function saveEdits(){
     if(s.remain!==init.remain)changed.remain=s.remain;
     if(Object.keys(changed).length>0)edits[s.id]=changed;
   });});
-  fetch(`${FB_URL}/student_edits.json`,{method:'PUT',body:JSON.stringify(edits),headers:{'Content-Type':'application/json'}}).catch(()=>{});
+  console.log('saveEdits 저장:', JSON.stringify(edits));
+  fetch(`${FB_URL}/student_edits.json`,{method:'PUT',body:JSON.stringify(edits),headers:{'Content-Type':'application/json'}})
+    .then(r=>console.log('saveEdits 완료:', r.status))
+    .catch(e=>console.error('saveEdits 실패:', e));
 }
 async function loadEdits(){
   try{
