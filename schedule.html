@@ -271,13 +271,13 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
     <div class="modal-field">
       <div class="modal-label">수업 요일 (중복 선택 가능)</div>
       <div class="day-grid" id="dayGrid">
-        <button class="day-chip" data-day="일">일</button>
-        <button class="day-chip" data-day="월">월</button>
-        <button class="day-chip" data-day="화">화</button>
-        <button class="day-chip" data-day="수">수</button>
-        <button class="day-chip" data-day="목">목</button>
-        <button class="day-chip" data-day="금">금</button>
-        <button class="day-chip" data-day="토">토</button>
+        <button class="day-chip" data-day="일" onclick="toggleDayChip(this)">일</button>
+        <button class="day-chip" data-day="월" onclick="toggleDayChip(this)">월</button>
+        <button class="day-chip" data-day="화" onclick="toggleDayChip(this)">화</button>
+        <button class="day-chip" data-day="수" onclick="toggleDayChip(this)">수</button>
+        <button class="day-chip" data-day="목" onclick="toggleDayChip(this)">목</button>
+        <button class="day-chip" data-day="금" onclick="toggleDayChip(this)">금</button>
+        <button class="day-chip" data-day="토" onclick="toggleDayChip(this)">토</button>
       </div>
     </div>
     <div class="modal-btns">
@@ -490,12 +490,11 @@ function confirmAddStudent(){
   saveStudents();closeAddStudent();renderSB();
   alert(name+' 학생이 추가됐습니다.');
 }
-document.addEventListener('click',e=>{
-  const chip=e.target.closest('.day-chip');if(!chip)return;
+function toggleDayChip(chip){
   const day=chip.dataset.day;
   if(_selectedDays.includes(day)){_selectedDays=_selectedDays.filter(d=>d!==day);chip.classList.remove('on');}
   else{_selectedDays.push(day);chip.classList.add('on');}
-});
+}
 function removeStudent(cls,name){
   if(!confirm(name+' 학생을 제거할까요?\n수업 데이터도 모두 삭제됩니다.'))return;
   STUDENTS[cls]=STUDENTS[cls].filter(s=>s.name!==name);
