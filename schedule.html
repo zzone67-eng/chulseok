@@ -261,8 +261,8 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 </div>
 
 <!-- 학생 추가 모달 -->
-<div class="modal-overlay" id="addStudentModal">
-  <div class="modal-box">
+<div class="modal-overlay" id="addStudentModal" onclick="closeAddStudent()">
+  <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-title" id="addModalTitle">학생 추가</div>
     <div class="modal-field">
       <div class="modal-label">이름</div>
@@ -271,18 +271,18 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
     <div class="modal-field">
       <div class="modal-label">수업 요일 (중복 선택 가능)</div>
       <div class="day-grid" id="dayGrid">
-        <button class="day-chip" data-day="일" onclick="toggleDayChip(this)">일</button>
-        <button class="day-chip" data-day="월" onclick="toggleDayChip(this)">월</button>
-        <button class="day-chip" data-day="화" onclick="toggleDayChip(this)">화</button>
-        <button class="day-chip" data-day="수" onclick="toggleDayChip(this)">수</button>
-        <button class="day-chip" data-day="목" onclick="toggleDayChip(this)">목</button>
-        <button class="day-chip" data-day="금" onclick="toggleDayChip(this)">금</button>
-        <button class="day-chip" data-day="토" onclick="toggleDayChip(this)">토</button>
+        <button type="button" class="day-chip" data-day="일" onclick="toggleDayChip(this)">일</button>
+        <button type="button" class="day-chip" data-day="월" onclick="toggleDayChip(this)">월</button>
+        <button type="button" class="day-chip" data-day="화" onclick="toggleDayChip(this)">화</button>
+        <button type="button" class="day-chip" data-day="수" onclick="toggleDayChip(this)">수</button>
+        <button type="button" class="day-chip" data-day="목" onclick="toggleDayChip(this)">목</button>
+        <button type="button" class="day-chip" data-day="금" onclick="toggleDayChip(this)">금</button>
+        <button type="button" class="day-chip" data-day="토" onclick="toggleDayChip(this)">토</button>
       </div>
     </div>
     <div class="modal-btns">
-      <button class="modal-btn cancel" onclick="closeAddStudent()">취소</button>
-      <button class="modal-btn ok" onclick="confirmAddStudent()">추가</button>
+      <button type="button" class="modal-btn cancel" onclick="closeAddStudent()">취소</button>
+      <button type="button" class="modal-btn ok" onclick="confirmAddStudent()">추가</button>
     </div>
   </div>
 </div>
@@ -562,7 +562,7 @@ function renderSB(){
     });
     // 반별 학생 추가 버튼
     const addBtn=document.createElement('button');
-    addBtn.className='add-stu-btn';
+    addBtn.type='button';addBtn.className='add-stu-btn';
     addBtn.textContent='+ 학생 추가';
     addBtn.onclick=()=>openAddStudent(cls);
     el.appendChild(addBtn);
