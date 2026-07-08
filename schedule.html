@@ -391,55 +391,7 @@ function openAddStudent(cls){
 function closeAddStudent(){
   document.getElementById('addStudentModal').classList.remove('on');
 }
-function confirmAddStudent(){
-  const name=document.getElementById('newStudentName').value.trim();
-  if(!name){alert('이름을 입력하세요.');return;}
-  if(_selectedDays.length===0){alert('수업 요일을 선택하세요.');return;}
-  if(STUDENTS[_addingCls].find(s=>s.name===name)){alert('이미 같은 이름의 학생이 있습니다.');return;}
-  STUDENTS[_addingCls].push({name,days:[..._selectedDays]});
-  // Firebase에 STUDENTS 저장
-  saveStudents();
-  closeAddStudent();
-  renderSB();
-  alert(name+' 학생이 추가됐습니다.');
-}
-document.addEventListener('click',e=>{
-  const chip=e.target.closest('.day-chip');
-  if(!chip)return;
-  const day=chip.dataset.day;
-  if(_selectedDays.includes(day)){
-    _selectedDays=_selectedDays.filter(d=>d!==day);
-    chip.classList.remove('on');
-  } else {
-    _selectedDays.push(day);
-    chip.classList.add('on');
-  }
-});
-
-function removeStudent(cls,name){
-  if(!confirm(`${name} 학생을 제거하시겠습니까?
-해당 학생의 수업 데이터도 모두 삭제됩니다.`))return;
-  STUDENTS[cls]=STUDENTS[cls].filter(s=>s.name!==name);
-  // db에서도 해당 학생 키 제거
-  Object.keys(db).forEach(k=>{if(k.includes('_'+name+'_'))delete db[k];});
-  save();
-  saveStudents();
-  if(curStu===name){curStu=null;curCls=null;renderCal();}
-  renderSB();
-}
-
-function saveStudents(){
-  // STUDENTS를 Firebase에 저장
-  const stuData={};
-  Object.entries(STUDENTS).forEach(([cls,stus])=>{
-    stuData[cls]=stus.map(s=>({name:s.name,days:s.days}));
-  });
-  fetch(DB+'/students_list.json',{method:'PUT',body:JSON.stringify(stuData),headers:{'Content-Type':'application/json'}})
-    .then(()=>console.log('학생 목록 저장됨'))
-    .catch(e=>console.error('학생 저장 실패:',e));
-}
-
-// loadStudents는 아래에 정의됨
+// 학생 관리 함수는 아래에 정의됨
 
 // ── 월 버튼 동적 생성 ──
 function buildMonthButtons(){
