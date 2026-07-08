@@ -363,21 +363,6 @@ const save=()=>{
 const fmt=n=>n.toLocaleString('ko-KR')+'원';
 
 // ── 월 버튼 동적 생성 ──
-function buildMonthButtons(){
-  const row=document.getElementById('monthRow');if(!row)return;
-  row.innerHTML='';
-  const curM=new Date().getMonth()+1;
-  const months=[curM];
-  const nm=curM===12?1:curM+1;months.push(nm);
-  months.forEach((m,i)=>{
-    const btn=document.createElement('button');
-    btn.className='mth-btn'+(mon===m?' on':'');
-    btn.textContent=m+'월';
-    btn.onclick=()=>setMonth(m,btn);
-    row.appendChild(btn);
-  });
-}
-
 // ── 학생 추가/제거 ──
 
 function openAddStudent(cls){
@@ -835,33 +820,37 @@ async function syncFB(){
   }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error('[syncFB] 에러:', e);}
 }
 
-// ── 초기화: 로컬 먼저 렌더 후 Firebase에서 최신 데이터 불러오기 ──
-renderSB();
-if(!isPC()) document.getElementById('mobListView').style.display='block';
-// Firebase에서 최신 데이터 확인 (백그라운드)
+// ── 초기화 ──
+buildMonthButtons();
 (async()=>{
+  // 1. 학생 목록 로드 (Firebase students_list.json)
+  await loadStudents();
+
+  // 2. 수업 데이터 로드 (Firebase schedule_backup.json)
   try{
-    const r=await fetch(DB+'/schedule_backup.json');
-    if(!r.ok) return;
-    const backup=await r.json();
-    if(!backup||typeof backup!=='object') return;
-    const {_updatedAt:fbTs=0,...backupClean}=backup;
-    // 유효한 학생 데이터 검사
-    const validKeys=Object.keys(backupClean).filter(k=>{
-      const v=backupClean[k];
-      return v&&typeof v==='object'&&Array.isArray(v.lessons)&&Array.isArray(v.special);
-    });
-    if(validKeys.length===0) return;
-    const localTs=parseInt(localStorage.getItem('sch_v1_ts')||'0');
-    if(fbTs>localTs){
-      // Firebase가 더 최신 → 로컬 업데이트 후 재렌더
-      db=backupClean;
-      localStorage.setItem('sch_v1',JSON.stringify(db));
-      localStorage.setItem('sch_v1_ts',String(fbTs));
-      console.log('최신 데이터 동기화 완료');
-      renderSB();if(!isPC()) document.getElementById('mobListView').style.display='block';
+    const r=await fetch(DB+'/schedule_backup.json?_='+Date.now());
+    if(r.ok){
+      const backup=await r.json();
+      if(backup&&typeof backup==='object'){
+        const {_updatedAt:fbTs=0,...backupClean}=backup;
+        const validKeys=Object.keys(backupClean).filter(k=>{
+          const v=backupClean[k];
+          return v&&typeof v==='object'&&Array.isArray(v.lessons)&&Array.isArray(v.special);
+        });
+        if(validKeys.length>0){
+          const localTs=parseInt(localStorage.getItem('sch_v1_ts')||'0');
+          if(fbTs>=localTs||Object.keys(db).length===0){
+            db=backupClean;
+            localStorage.setItem('sch_v1',JSON.stringify(db));
+            localStorage.setItem('sch_v1_ts',String(fbTs||Date.now()));
+          }
+        }
+      }
     }
-  }catch(e){console.log('Firebase 동기화 실패:',e.message);}
+  }catch(e){console.log('schedule_backup 로드 실패:',e.message);}
+
+  // 3. 렌더
+  renderSB();
 })();
 </script>
 </body>
