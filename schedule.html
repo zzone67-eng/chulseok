@@ -840,7 +840,7 @@ buildMonthButtons();
         });
         if(validKeys.length>0){
           const localTs=parseInt(localStorage.getItem('sch_v1_ts')||'0');
-          if(fbTs>=localTs||Object.keys(db).length===0){
+          if(fbTs>localTs||Object.keys(db).length===0){
             db=backupClean;
             localStorage.setItem('sch_v1',JSON.stringify(db));
             localStorage.setItem('sch_v1_ts',String(fbTs||Date.now()));

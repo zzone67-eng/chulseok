@@ -487,6 +487,13 @@ async function syncFromFirebase(){
       }catch(e){console.log('students_list 로드 실패',e);}
     }
 
+    // student_edits 먼저 로드 (schedule_backup보다 우선)
+    let _edits={};
+    try{
+      const er=await fetch(`${FB_URL}/student_edits.json?_=${Date.now()}`);
+      if(er.ok){const ed=await er.json();if(ed&&typeof ed==='object')_edits=ed;}
+    }catch(e){}
+
     // schedule_backup.json - 정규/특강 분리된 원본 데이터로 시수/수강료 계산
     if(br.ok){
       const backup = await br.json();
@@ -509,6 +516,13 @@ async function syncFromFirebase(){
 
             // schedule_backup에서 해당 학생 데이터 찾기
             // 키 형식: "반_이름_월" (예: "입시반_김나연_7")
+            // student_edits에 수동 편집값 있으면 자동계산 건너뜀
+            if(_edits[s.id]) return;
+
+            // student_edits에 수동 편집값 있으면 자동계산 건너뜀
+            if(_edits[s.id]) return;
+
+            if(_edits[s.id]) return; // 수동 편집된 학생은 자동계산 건너뜀
             const key = `${s.cls}_${s.name}_${mNum}`;
             const sdata = backup[key];
             if(!sdata) return;
@@ -538,7 +552,17 @@ async function syncFromFirebase(){
       }
     }
 
-    await loadEdits();
+    // student_edits 적용
+    ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{
+      const e=_edits[s.id]; if(!e) return;
+      if(e.amount!==undefined)s.amount=e.amount;
+      if(e.totalT!==undefined)s.totalT=e.totalT;
+      if(e.days!==undefined)s.days=e.days;
+      if(e.schedule!==undefined)s.schedule=e.schedule;
+      if(e.memo!==undefined)s.memo=e.memo;
+      if(e.absence!==undefined)s.absence=e.absence;
+      if(e.remain!==undefined)s.remain=e.remain;
+    });});
     renderAll();
     if(statusEl) statusEl.textContent='';
   } catch(e){ if(statusEl) statusEl.textContent='연결 실패'; console.error(e); }
