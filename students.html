@@ -429,19 +429,17 @@ async function syncFromFirebase(){
       try{
         const stuList = await sr.json();
         if(stuList&&typeof stuList==='object'){
-          const CLS_MAP = {'입시반':'입시반','예비반':'예비반','중등반':'중등반','취미반':'취미반'};
-          Object.entries(stuList).forEach(([cls,stus])=>{
-            if(!Array.isArray(stus))return;
-            ['jul','aug'].forEach(mon=>{
-              if(!db[mon])return;
+          ['jul','aug'].forEach(mon=>{
+            if(!db[mon])return;
+            Object.entries(stuList).forEach(([cls,stus])=>{
+              if(!Array.isArray(stus))return;
               stus.forEach(stu=>{
+                if(!stu.name)return;
                 const id=mon+'_'+stu.name;
-                // 이미 initData에 있으면 스킵
-                if(db[mon].find(s=>s.id===id))return;
-                // 신규 학생 추가
+                if(db[mon].find(s=>s.id===id))return; // 기존 학생 스킵
                 db[mon].push({
                   id, name:stu.name, cls,
-                  tags:[], schedule:stu.days.join(','), days:'',
+                  tags:[], schedule:(stu.days||[]).join(','), days:'',
                   absence:0, totalT:0, amount:0,
                   fixed:false, paid:false, memo:'', remain:null
                 });
@@ -449,27 +447,7 @@ async function syncFromFirebase(){
             });
           });
         }
-      }catch(e){console.log('students_list 로드 실패');}
-    }
-
-    // students_list.json - 신규 학생 db에 동적 추가
-    if(sr&&sr.ok){
-      try{
-        const stuList = await sr.json();
-        if(stuList&&typeof stuList==='object'){
-          ['jul','aug'].forEach(mon=>{
-            if(!db[mon])return;
-            Object.entries(stuList).forEach(([cls,stus])=>{
-              if(!Array.isArray(stus))return;
-              stus.forEach(stu=>{
-                const id=mon+'_'+stu.name;
-                if(db[mon].find(s=>s.id===id))return;
-                db[mon].push({id,name:stu.name,cls,tags:[],schedule:(stu.days||[]).join(','),days:'',absence:0,totalT:0,amount:0,fixed:false,paid:false,memo:'',remain:null});
-              });
-            });
-          });
-        }
-      }catch(e){console.log('students_list 로드 실패');}
+      }catch(e){console.log('students_list 로드 실패',e);}
     }
 
     // schedule_backup.json - 정규/특강 분리된 원본 데이터로 시수/수강료 계산
