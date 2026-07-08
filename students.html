@@ -538,6 +538,7 @@ async function syncFromFirebase(){
       }
     }
 
+    await loadEdits();
     renderAll();
     if(statusEl) statusEl.textContent='';
   } catch(e){ if(statusEl) statusEl.textContent='연결 실패'; console.error(e); }
