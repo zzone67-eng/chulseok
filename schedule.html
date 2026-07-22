@@ -65,6 +65,9 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 .sp-tag-btn:hover{background:var(--sf2);color:var(--tx);}
 .sp-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:var(--bdim);border-radius:999px;font-size:11px;color:var(--blue);cursor:pointer;}
 .sp-tag .sp-del{color:var(--tx3);font-size:10px;}
+.disc-btn{padding:4px 8px;border-radius:6px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:11px;cursor:pointer;font-weight:600;}
+.disc-btn:hover{background:var(--sf2);}
+.disc-btn.on{background:var(--acc);color:#fff;border-color:var(--acc);}
 .sp-tag-btn{padding:4px 10px;border-radius:999px;border:1px dashed var(--bd2);background:transparent;color:var(--tx3);font-size:11px;cursor:pointer;}
 .sp-tag-btn:hover{background:var(--sf2);color:var(--tx);}
 .sp-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:var(--bdim);border-radius:999px;font-size:11px;color:var(--blue);cursor:pointer;}
@@ -283,6 +286,30 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
           </div>
         </div>
       </div>
+      <!-- 할인율 버튼 -->
+      <div style="padding:6px 14px 0;border-top:1px solid var(--bd)">
+        <div style="font-size:11px;color:var(--tx2);font-weight:600;margin-bottom:6px">할인율 적용</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap" id="discountBtns">
+          <button type="button" class="disc-btn" data-rate="10" onclick="applyDiscount(10)">10%</button>
+          <button type="button" class="disc-btn" data-rate="20" onclick="applyDiscount(20)">20%</button>
+          <button type="button" class="disc-btn" data-rate="30" onclick="applyDiscount(30)">30%</button>
+          <button type="button" class="disc-btn" data-rate="40" onclick="applyDiscount(40)">40%</button>
+          <button type="button" class="disc-btn" data-rate="50" onclick="applyDiscount(50)">50%</button>
+          <button type="button" class="disc-btn" data-rate="0" onclick="applyDiscount(0)" style="color:var(--tx3)">초기화</button>
+        </div>
+      </div>
+      <!-- 할인율 버튼 -->
+      <div style="padding:6px 14px 0;border-top:1px solid var(--bd)">
+        <div style="font-size:11px;color:var(--tx2);font-weight:600;margin-bottom:6px">할인율 적용</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap" id="discountBtns">
+          <button type="button" class="disc-btn" data-rate="10" onclick="applyDiscount(10)">10%</button>
+          <button type="button" class="disc-btn" data-rate="20" onclick="applyDiscount(20)">20%</button>
+          <button type="button" class="disc-btn" data-rate="30" onclick="applyDiscount(30)">30%</button>
+          <button type="button" class="disc-btn" data-rate="40" onclick="applyDiscount(40)">40%</button>
+          <button type="button" class="disc-btn" data-rate="50" onclick="applyDiscount(50)">50%</button>
+          <button type="button" class="disc-btn" data-rate="0" onclick="applyDiscount(0)" style="color:var(--tx3)">초기화</button>
+        </div>
+      </div>
       <!-- 특이사항 버튼들 -->
       <div style="padding:8px 14px;border-top:1px solid var(--bd)">
         <div style="font-size:12px;color:var(--tx2);font-weight:600;margin-bottom:6px">특이사항 추가</div>
@@ -470,11 +497,18 @@ async function clearFixedFeeFromFirebase(id){
 }
 function onFixedFee(){
   if(!curStu)return;
-  const v=parseInt(document.getElementById('fixedFeeIn')?.value||'0')||0;
+  const el=document.getElementById('fixedFeeIn');
+  const raw=el?.value??'';
+  if(raw===''){
+    // 빈칸 → 고정수강료 제거, 자동계산으로 복원
+    localStorage.removeItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
+    clearFixedFeeFromFirebase(monToLabel(mon)+'_'+curStu);
+    updateFee();
+    return;
+  }
+  const v=parseInt(raw)||0;
   localStorage.setItem('fixedFee_'+curCls+'_'+curStu+'_'+mon, String(v));
-  const sid=monToLabel(mon)+'_'+curStu;
-  if(v>=0&&document.getElementById('fixedFeeIn')?.value!=='') saveFixedFeeToFirebase(sid, v);
-  else clearFixedFeeFromFirebase(sid);
+  saveFixedFeeToFirebase(monToLabel(mon)+'_'+curStu, v);
   updateFee();
 }
 function clearFixedFee(){
@@ -482,6 +516,9 @@ function clearFixedFee(){
   if(el)el.value='';
   localStorage.removeItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
   clearFixedFeeFromFirebase(monToLabel(mon)+'_'+curStu);
+  // 할인율도 초기화
+  localStorage.removeItem('discount_'+curCls+'_'+curStu+'_'+mon);
+  renderDiscountBtns();
   updateFee();
 }
 function clearAllFixedFees(){
@@ -521,6 +558,107 @@ function renderSpecialTags(){
   ).join('');
 }
 let _editingSpecialIdx=-1;
+// ── 할인율 ──
+function applyDiscount(rate){
+  if(!curStu)return;
+  if(rate===0){
+    // 초기화 - 고정수강료도 제거
+    localStorage.removeItem('discount_'+curCls+'_'+curStu+'_'+mon);
+    localStorage.removeItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
+    clearFixedFeeFromFirebase(monToLabel(mon)+'_'+curStu);
+    const el=document.getElementById('fixedFeeIn');
+    if(el)el.value='';
+    renderDiscountBtns();
+    updateFee();
+    return;
+  }
+  localStorage.setItem('discount_'+curCls+'_'+curStu+'_'+mon, String(rate));
+  // 자동계산 수강료에 할인율 적용
+  const c=calcFeeRaw(); // 고정수강료 미적용 원본 계산
+  if(!c)return;
+  const discounted=Math.round(c.fee*(1-rate/100));
+  localStorage.setItem('fixedFee_'+curCls+'_'+curStu+'_'+mon, String(discounted));
+  const el=document.getElementById('fixedFeeIn');
+  if(el)el.value=String(discounted);
+  saveFixedFeeToFirebase(monToLabel(mon)+'_'+curStu, discounted);
+  renderDiscountBtns();
+  updateFee();
+}
+function renderDiscountBtns(){
+  const cur=parseInt(localStorage.getItem('discount_'+curCls+'_'+curStu+'_'+mon)||'0');
+  document.querySelectorAll('.disc-btn').forEach(b=>{
+    b.classList.toggle('on', parseInt(b.dataset.rate)===cur&&cur>0);
+  });
+}
+function calcFeeRaw(){
+  // 고정수강료/할인율 미적용 순수 계산
+  if(!curStu)return null;
+  const d=getData(curCls,curStu,mon);
+  const rate=curCls==='예비반'?30000:31250;
+  const s=STUDENTS[curCls]?.find(x=>x.name===curStu);
+  if(!s)return null;
+  const abs=getAbs(),sp=d.special.length,actualReg=d.lessons.length;
+  const use4wk=document.getElementById('use4wk')?.checked;
+  let reg=use4wk?s.days.length*4:actualReg;
+  let finalT=Math.max(0,reg+sp-abs);
+  let fee=finalT*rate;
+  if(curStu==='김나현'){fee=Math.round((use4wk?s.days.length*4:actualReg)*rate*0.5)+sp*rate;}
+  if(curCls==='취미반'){
+    const wRate=s.days.length===1?25000:50000;
+    fee=abs===0?(s.days.length===1?100000:200000)+sp*wRate:Math.max(0,actualReg-abs)*wRate+sp*wRate;
+  }
+  return {fee,rate,reg,sp,abs,finalT,actualReg};
+}
+
+// ── 할인율 ──
+function applyDiscount(rate){
+  if(!curStu)return;
+  if(rate===0){
+    localStorage.removeItem('discount_'+curCls+'_'+curStu+'_'+mon);
+    localStorage.removeItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
+    clearFixedFeeFromFirebase(monToLabel(mon)+'_'+curStu);
+    const el=document.getElementById('fixedFeeIn');
+    if(el)el.value='';
+    renderDiscountBtns();
+    updateFee();
+    return;
+  }
+  localStorage.setItem('discount_'+curCls+'_'+curStu+'_'+mon, String(rate));
+  const c=calcFeeRaw();
+  if(!c)return;
+  const discounted=Math.round(c.fee*(1-rate/100));
+  localStorage.setItem('fixedFee_'+curCls+'_'+curStu+'_'+mon, String(discounted));
+  const el=document.getElementById('fixedFeeIn');
+  if(el)el.value=String(discounted);
+  saveFixedFeeToFirebase(monToLabel(mon)+'_'+curStu, discounted);
+  renderDiscountBtns();
+  updateFee();
+}
+function renderDiscountBtns(){
+  if(!curStu){document.querySelectorAll('.disc-btn').forEach(b=>b.classList.remove('on'));return;}
+  const cur=parseInt(localStorage.getItem('discount_'+curCls+'_'+curStu+'_'+mon)||'0');
+  document.querySelectorAll('.disc-btn').forEach(b=>{
+    b.classList.toggle('on',parseInt(b.dataset.rate)===cur&&cur>0);
+  });
+}
+function calcFeeRaw(){
+  if(!curStu)return null;
+  const d=getData(curCls,curStu,mon);
+  const rate=curCls==='예비반'?30000:31250;
+  const s=STUDENTS[curCls]?.find(x=>x.name===curStu);
+  if(!s)return null;
+  const abs=getAbs(),sp=(d.special||[]).length,actualReg=(d.lessons||[]).length;
+  const use4wk=document.getElementById('use4wk')?.checked;
+  let reg=use4wk?s.days.length*4:actualReg;
+  let finalT=Math.max(0,reg+sp-abs),fee=finalT*rate;
+  if(curStu==='김나현'){fee=Math.round(actualReg*rate*0.5)+sp*rate;}
+  if(curCls==='취미반'){
+    const wRate=s.days.length===1?25000:50000;
+    fee=abs===0?(s.days.length===1?100000:200000)+sp*wRate:Math.max(0,actualReg-abs)*wRate+sp*wRate;
+  }
+  return {fee,rate,reg,sp,abs,finalT,actualReg};
+}
+
 function openSpecialModal(idx){
   _editingSpecialIdx=idx!==undefined?idx:-1;
   const sp=_editingSpecialIdx>=0?_specials[_editingSpecialIdx]:{title:'',content:''};
@@ -663,7 +801,7 @@ function pick(cls,name){
   document.getElementById('stuStats').style.display='flex';
   document.getElementById('actRow').style.display='flex';
   // 모바일: 달력 탭으로
-  renderCal();updateStats();loadNote();loadFixedFee();loadSpecials();updateFee();renderSB();}
+  renderCal();updateStats();loadNote();loadFixedFee();loadSpecials();renderDiscountBtns();updateFee();renderSB();}
 
 // ── 월 변경 ──
 function setMonth(m,el,ctx){
