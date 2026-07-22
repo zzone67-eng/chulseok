@@ -556,17 +556,16 @@ function applyDiscount(rate){
   }
   renderDiscountBtns();
   updateFee();
-  // Firebase student_edits에도 할인율 저장 (students.html 연동)
-  const c=calcFeeRaw();
-  if(!c)return;
+  // Firebase student_edits에 할인 적용된 금액 저장
   const sid=monToLabel(mon)+'_'+curStu;
+  const c2=calcFee(); // 할인율 적용된 최종 계산값
+  if(!c2)return;
   if(rate===0){
-    // 고정수강료도 없으면 edits 제거
     const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
     if(!_fv||_fv==='')clearFixedFeeFromFirebase(sid);
+    else saveFixedFeeToFirebase(sid, parseInt(_fv));
   } else {
-    const discounted=Math.round(c.fee*(1-rate/100));
-    saveFixedFeeToFirebase(sid, discounted);
+    saveFixedFeeToFirebase(sid, c2.fee);
   }
 }
 function renderDiscountBtns(){
@@ -787,12 +786,15 @@ function calcFee(){
       reg=actualReg; finalT=netT+sp;
     }
   }
-  // 고정수강료 우선 적용
+  // 1. 할인율 적용 (수강료 계산에 포함)
+  const discountRate=parseInt(localStorage.getItem('discount_'+curCls+'_'+curStu+'_'+mon)||'0');
+  if(discountRate>0) fee=Math.round(fee*(1-discountRate/100));
+  // 2. 고정수강료 (독립 적용 - 할인율 무시)
   const fixedFee=getFixedFee();
   const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
   const fixedFeeSet=_fv!==null&&_fv!==''&&_fv!=='undefined';
   if(fixedFeeSet)fee=fixedFee;
-  return {rate,reg,sp,abs,finalT,fee,actualReg,fixedFee,fixedFeeSet}; // actualReg=실제체크수
+  return {rate,reg,sp,abs,finalT,fee,actualReg,fixedFee,fixedFeeSet,discountRate};
 }
 
 function updateStats(){
