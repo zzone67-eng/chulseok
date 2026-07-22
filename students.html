@@ -494,15 +494,8 @@ async function syncFromFirebase(){
           Object.keys(db).forEach(mon=>{
             if(!db[mon]||!Array.isArray(db[mon]))return;
 
-            // 1. 제거된 학생 삭제
-            db[mon]=db[mon].filter(s=>{
-              // initData에 있으면 무조건 유지
-              if(initData[mon]?.find(x=>x.id===s.id))return true;
-              // students_list에 이름이 있으면 유지
-              if(allFbNames.has(s.name))return true;
-              // 둘 다 없으면 제거
-              return false;
-            });
+            // 1. 제거된 학생 삭제 (students_list가 유일한 기준)
+            db[mon]=db[mon].filter(s=>allFbNames.has(s.name));
 
             // 2. 신규 학생 추가
             Object.entries(stuList).forEach(([cls,stus])=>{

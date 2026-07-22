@@ -453,17 +453,26 @@ function monToLabel(m){
   const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
   return labels[(m-1)%12]||'jul';
 }
-function saveFixedFeeToFirebase(id, amount){
-  // student_edits.json에 고정수강료 저장 (students.html 연동)
-  fetch(DB+'/student_edits/'+encodeURIComponent(id)+'.json',{
-    method:'PUT', body:JSON.stringify({amount}),
-    headers:{'Content-Type':'application/json'}
-  }).catch(()=>{});
+async function saveFixedFeeToFirebase(id, amount){
+  // student_edits.json 전체를 읽어서 해당 항목만 추가/수정 후 저장
+  try{
+    const r=await fetch(DB+'/student_edits.json?_='+Date.now());
+    const edits=(r.ok&&await r.json())||{};
+    if(typeof edits!=='object'||edits===null) return;
+    edits[id]={...edits[id], amount};
+    await fetch(DB+'/student_edits.json',{method:'PUT',body:JSON.stringify(edits),headers:{'Content-Type':'application/json'}});
+    console.log('고정수강료 저장:', id, amount);
+  }catch(e){console.error('고정수강료 저장 실패:',e);}
 }
-function clearFixedFeeFromFirebase(id){
-  fetch(DB+'/student_edits/'+encodeURIComponent(id)+'.json',{
-    method:'DELETE'
-  }).catch(()=>{});
+async function clearFixedFeeFromFirebase(id){
+  try{
+    const r=await fetch(DB+'/student_edits.json?_='+Date.now());
+    const edits=(r.ok&&await r.json())||{};
+    if(typeof edits!=='object'||edits===null) return;
+    delete edits[id];
+    await fetch(DB+'/student_edits.json',{method:'PUT',body:JSON.stringify(edits),headers:{'Content-Type':'application/json'}});
+    console.log('고정수강료 제거:', id);
+  }catch(e){console.error('고정수강료 제거 실패:',e);}
 }
 
 function onFixedFee(){
