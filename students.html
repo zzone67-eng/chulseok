@@ -410,12 +410,23 @@ function saveDB(d){
   fetch(`${FB_URL}/paid.json`,{method:'PUT',body:JSON.stringify(paidMap),headers:{'Content-Type':'application/json'}}).catch(()=>{});
 }
 function saveEdits(){
-  // 편집된 학생 데이터(수강료, 메모, 수업일자 등) Firebase에 저장
+  // schedule_backup 자동계산 제외 대상 (고정/잔여/취미반)
+  const RATE_MAP_FIX=['박선영','박하영','박민지'];
+  const TAKUMI=['나은솔','김건휘','김예진','최다윤','신유나','최현우','김윤재','김가람','이지아','명지민'];
+  const autoCalc=s=>!RATE_MAP_FIX.includes(s.name)&&!TAKUMI.includes(s.name)&&s.name!=='김나현';
+
   const edits={};
   Object.keys(db).forEach(m=>{ if(!db[m]||!Array.isArray(db[m]))return; db[m].forEach(s=>{
-    const init=initData[m]?.find(x=>x.id===s.id);
     const changed={};
-    // initData에 없는 신규 학생은 모든 편집값 저장
+    // 자동계산 대상 학생은 memo만 저장 (수강료/시수는 schedule_backup에서 자동계산)
+    if(autoCalc(s)){
+      if(s.memo)changed.memo=s.memo;
+      if(s.absence!==undefined&&s.absence!==0)changed.absence=s.absence;
+      if(Object.keys(changed).length>0)edits[s.id]=changed;
+      return;
+    }
+    // 고정/잔여/취미반은 모든 편집값 저장
+    const init=initData[m]?.find(x=>x.id===s.id);
     if(!init){
       edits[s.id]={amount:s.amount,totalT:s.totalT,days:s.days,schedule:s.schedule,memo:s.memo,absence:s.absence,remain:s.remain};
       return;
