@@ -444,16 +444,42 @@ const fmt=n=>n.toLocaleString('ko-KR')+'원';
 let _addingCls='', _selectedDays=[];
 
 // ── 고정수강료 ──
+function monToLabel(m){
+  // 월 숫자 → 레이블 (현재 mon 변수는 숫자)
+  const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  return labels[(m-1)%12]||'jul';
+}
+function monToLabel(m){
+  const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  return labels[(m-1)%12]||'jul';
+}
+function saveFixedFeeToFirebase(id, amount){
+  // student_edits.json에 고정수강료 저장 (students.html 연동)
+  fetch(DB+'/student_edits/'+encodeURIComponent(id)+'.json',{
+    method:'PUT', body:JSON.stringify({amount}),
+    headers:{'Content-Type':'application/json'}
+  }).catch(()=>{});
+}
+function clearFixedFeeFromFirebase(id){
+  fetch(DB+'/student_edits/'+encodeURIComponent(id)+'.json',{
+    method:'DELETE'
+  }).catch(()=>{});
+}
+
 function onFixedFee(){
   if(!curStu)return;
   const v=parseInt(document.getElementById('fixedFeeIn')?.value||'0')||0;
   localStorage.setItem('fixedFee_'+curCls+'_'+curStu+'_'+mon, v||'');
+  const sid=monToLabel(mon)+'_'+curStu;
+  if(v>0) saveFixedFeeToFirebase(sid, v);
+  else clearFixedFeeFromFirebase(sid);
   updateFee();
 }
 function clearFixedFee(){
   const el=document.getElementById('fixedFeeIn');
   if(el)el.value='';
   localStorage.removeItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
+  clearFixedFeeFromFirebase(monToLabel(mon)+'_'+curStu);
   updateFee();
 }
 function getFixedFee(){
