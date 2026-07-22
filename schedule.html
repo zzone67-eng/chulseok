@@ -778,6 +778,11 @@ function updateFee(){
   const btn=document.getElementById('feeCopyBtn');
   if(ta) ta.value=genMsg(c);
   if(btn) btn.style.display='block';
+  // 헤더 수강료도 업데이트
+  const sAmt=document.getElementById('sAmt');
+  const rpFee=document.getElementById('rpFee');
+  if(sAmt) sAmt.textContent=fmt(c.fee);
+  if(rpFee) rpFee.textContent=fmt(c.fee);
 }
 
 function copyMsg(taId,btnId){
