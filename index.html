@@ -233,7 +233,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
     </div>
   </div>
   <div class="pc-sidebar">
-    <h3 id="pc-month-label">로딩 중...</h3>
+    <h3>2026년 7월</h3>
     <div class="cal-hdr">
       <div class="cal-hd" style="color:#ff6b6b">일</div>
       <div class="cal-hd">월</div><div class="cal-hd">화</div><div class="cal-hd">수</div>
@@ -272,7 +272,7 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 </div>
 
 <script>
-const SCHOOL={"박민지":"중앙여고졸","김나연":"계성여고3","박선영":"검정고시","김나현":"사대부고졸","김도훈":"내성고1","박하영":"사직고1","안시연":"해화여중3","한지유":"초연중3","조제우":"초읍중3","전서빈":"연일중3","권해원":"부산여중3","김현준":"부곡중3","최주연":"온천중3","나은솔":"사직여중2","김건휘":"여명중2","김예진":"사직여중1","최다윤":"만덕중2","신유나":"사직중2","최현우":"동인고1","김윤재":"여명중1","김가람":"사직여중1","이지아":"거제여중1","명지민":"사직여중1","남지우":"거제여중3"};
+const SCHOOL={"박민지":"중앙여고졸","김나연":"계성여고3","박선영":"검정고시","김나현":"사대부고졸","김도훈":"내성고1","박하영":"사직고1","안시연":"해화여중3","한지유":"초연중3","조제우":"초읍중3","전서빈":"연일중3","권해원":"부산여중3","김현준":"부곡중3","최주연":"온천중3","나은솔":"사직여중2","김건휘":"여명중2","김예진":"사직여중1","최다윤":"만덕중2","신유나":"사직중2","최현우":"동인고1","감윤재":"여명중1","김가람":"사직여중1","이지아":"거제여중1","명지민":"사직여중1"};
 const TIMES=["1타임","2타임","3타임"],TR={"1타임":"10:00~13:30","2타임":"14:00~17:30","3타임":"18:30~22:00"};
 const CLS=["입시반","예비반","중등반","취미반"],CC={"입시반":"#ff7c5c","예비반":"#26de81","중등반":"#45aaf2","취미반":"#ffd32a"};
 const TC={"1타임":"#ff9f43","2타임":"#5cc8ff","3타임":"#a29bfe"},DW=["일","월","화","수","목","금","토"];
@@ -283,7 +283,7 @@ const PHONE={
   "권해원":"010-7887-7547","김현준":"010-6238-6980","최주연":"010-4519-2704",
   "나은솔":"010-7644-2874","김건휘":"010-4241-6027","김예진":"010-3214-6306",
   "최다윤":"010-3469-1228","신유나":"010-4588-9122","최현우":"010-8295-7408",
-  "김윤재":"010-3201-3014","김가람":"010-5604-6864","이지아":"010-8753-1302","남지우":"010-2237-6445",
+  "감윤재":"010-3201-3014","김가람":"010-5604-6864","이지아":"010-8753-1302",
   "명지민":"010-3405-3398","박민지":"010-7205-8450","김나현":"010-5845-1531",
   "박선영":"010-2209-8850","김나연":"010-3771-7981"
 };
@@ -293,18 +293,9 @@ let S = {}; // Firebase에서 로드
 async function loadTimetable() {
   try {
     let data = {};
-    // 현재 달 + 다음 달 timetable 동적 로드
-    const now=new Date();
-    const months=[[now.getFullYear(),now.getMonth()+1]];
-    // 다음 달도 포함
-    const nm=new Date(now.getFullYear(),now.getMonth()+1,1);
-    months.push([nm.getFullYear(),nm.getMonth()+1]);
-    for(const [y,m] of months){
-      const key=`timetable/${y}-${String(m).padStart(2,'0')}`;
-      const mdata=await fbGet(key);
-      if(mdata) Object.assign(data,mdata);
-    }
-    console.log('[loadTimetable] 로드된 날짜 수:', Object.keys(data).length);
+    const mdata = await fbGet('timetable/2026-07');
+    console.log('[loadTimetable] raw Firebase 응답 키:', mdata ? Object.keys(mdata).slice(0,3) : 'null');
+    if(mdata) Object.assign(data, mdata);
     if(data && typeof data === 'object') {
       const fixed = {};
       Object.entries(data).forEach(([date, dayData]) => {
@@ -318,7 +309,7 @@ async function loadTimetable() {
       });
       S = fixed;
       // 7/4 데이터 확인
-      console.log('[loadTimetable] 로드 완료, 총 날짜:', Object.keys(S).length);
+      console.log('[loadTimetable] S[2026-07-04]:', JSON.stringify(S['2026-07-04']));
       const total = Object.values(S).reduce((sum, day) =>
         sum + Object.values(day).reduce((s2, tim) =>
           s2 + Object.values(tim).reduce((s3, arr) => s3 + arr.length, 0), 0), 0);
@@ -340,7 +331,7 @@ let adminY=2026,adminM=7,adminTab=0,adminData={};
 function toKey(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 const isMob=()=>window.innerWidth<1100;
 const isTab=()=>window.innerWidth>=600&&window.innerWidth<1100;
-async function fbGet(p){const r=await fetch(`${DB}/${p}.json?_=${Date.now()}`);if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
+async function fbGet(p){const r=await fetch(`${DB}/${p}.json`);if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
 async function fbSet(p,d){await fetch(`${DB}/${p}.json`,{method:'PATCH',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}})}
 
 function toast(m,c='var(--green)'){
@@ -509,7 +500,6 @@ function buildNav(){
   const dm=`${d.getMonth()+1}월 ${d.getDate()}일`,ds=`(${DW[d.getDay()]})`;
   // 날짜 표시
   ['mob-dm','pc-dm'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=dm;});
-  const pml=document.getElementById('pc-month-label');if(pml){const _d=new Date(cur+'T12:00:00');pml.textContent=`${_d.getFullYear()}년 ${_d.getMonth()+1}월`;}
   ['mob-ds','pc-ds'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ds;});
   const btnT=document.getElementById('btn-today');
   if(btnT)btnT.style.display=cur!==tk?'inline-flex':'none';
@@ -519,12 +509,9 @@ function buildNav(){
   buildClsTabs();
 }
 function buildMobNav(tk){
-  const ym=cur.slice(0,7); // "2026-07"
-  const [cy,cm]=ym.split('-').map(Number);
-  const daysInMonth=new Date(cy,cm,0).getDate();
   let h='';
-  for(let i=1;i<=daysInMonth;i++){
-    const dk=`${ym}-${String(i).padStart(2,'0')}`;
+  for(let i=1;i<=31;i++){
+    const dk=`2026-07-${String(i).padStart(2,'0')}`;
     const off=S[dk]===null||S[dk]===undefined;
     h+=`<button class="nb${dk===cur?' act':''}${off?' off':''}" onclick="go('${dk}')"><span class="nn">${i}</span><span class="nw">${DW[new Date(dk+'T12:00:00').getDay()]}</span></button>`;
   }
@@ -532,13 +519,10 @@ function buildMobNav(tk){
   if(nav){nav.innerHTML=h;setTimeout(()=>{const b=nav.querySelector('.act');if(b)b.scrollIntoView({block:'nearest',inline:'center'});},50);}
 }
 function buildPcCal(tk){
-  const ym=cur.slice(0,7);
-  const [cy,cm]=ym.split('-').map(Number);
-  const daysInMonth=new Date(cy,cm,0).getDate();
-  const fd=new Date(`${ym}-01T12:00:00`).getDay();
+  const fd=new Date('2026-07-01T12:00:00').getDay();
   let h='';for(let i=0;i<fd;i++)h+='<div></div>';
-  for(let i=1;i<=daysInMonth;i++){
-    const dk=`${ym}-${String(i).padStart(2,'0')}`;
+  for(let i=1;i<=31;i++){
+    const dk=`2026-07-${String(i).padStart(2,'0')}`;
     const off=S[dk]===null||S[dk]===undefined,act=dk===cur,isT=dk===tk;
     h+=`<button class="cal-day${act?' act':''}${off?' off':''}${isT&&!act?' today-ring':''}" ${off?'disabled':''} onclick="go('${dk}')">${i}</button>`;
   }
@@ -749,16 +733,30 @@ function rAbsCount(){
   if(!window._absFrom)window._absFrom=defStart;
   if(!window._absTo)window._absTo=defEnd;
 
+  const todayStr=toKey(new Date());
   let h=`<div style="background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:14px;margin-bottom:12px">
-    <div style="font-size:13px;color:var(--mu);margin-bottom:10px">조회 기간 설정</div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <input type="date" id="abs-from" value="${window._absFrom}"
-        style="flex:1;min-width:130px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;color:var(--txt);font-size:13px;padding:7px 10px;font-family:inherit;outline:none">
-      <span style="color:var(--mu);font-size:13px">~</span>
-      <input type="date" id="abs-to" value="${window._absTo}"
-        style="flex:1;min-width:130px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;color:var(--txt);font-size:13px;padding:7px 10px;font-family:inherit;outline:none">
-      <button onclick="applyAbsRange()" class="rbtn" style="height:34px;font-size:13px;padding:0 14px">조회</button>
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px">결석 조회</div>
+    <div style="margin-bottom:10px">
+      <div style="font-size:11px;color:var(--mu);margin-bottom:6px">결산일 입력 → 결산일 다음날~오늘 자동 설정</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <input type="date" id="settle-date" value="${window._settleDate||''}"
+          style="flex:1;min-width:130px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;color:var(--txt);font-size:13px;padding:7px 10px;font-family:inherit;outline:none"
+          placeholder="결산일 선택">
+        <button onclick="applySettleDate()" class="rbtn" style="height:34px;font-size:13px;padding:0 14px;background:var(--acc)">결산일 적용</button>
+      </div>
     </div>
+    <div style="border-top:1px solid var(--brd);padding-top:10px">
+      <div style="font-size:11px;color:var(--mu);margin-bottom:6px">직접 기간 설정</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <input type="date" id="abs-from" value="${window._absFrom}"
+          style="flex:1;min-width:130px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;color:var(--txt);font-size:13px;padding:7px 10px;font-family:inherit;outline:none">
+        <span style="color:var(--mu);font-size:13px">~</span>
+        <input type="date" id="abs-to" value="${window._absTo}"
+          style="flex:1;min-width:130px;background:var(--surf);border:1px solid var(--brd);border-radius:8px;color:var(--txt);font-size:13px;padding:7px 10px;font-family:inherit;outline:none">
+        <button onclick="applyAbsRange()" class="rbtn" style="height:34px;font-size:13px;padding:0 14px">조회</button>
+      </div>
+    </div>
+    ${window._settleDate?`<div style="margin-top:10px;font-size:12px;color:var(--acc)">📅 결산일: ${window._settleDate} → 조회: ${window._absFrom} ~ ${window._absTo}</div>`:''}
   </div>`;
 
   // 기간 내 날짜 목록
@@ -783,7 +781,7 @@ function rAbsCount(){
       if(!counts[name])counts[name]={cls,abs:0,dates:[]};
       counts[name].cls=cls;
       const e=(adminData[dk]||{})[ti]?.[name];
-      if(e&&e.absent&&!e.makeup){
+      if(e&&e.absent){
         counts[name].abs++;
         counts[name].dates.push(`${d.getMonth()+1}/${d.getDate()}(${DW[d.getDay()]})`);
       }
@@ -827,6 +825,28 @@ function rAbsCount(){
   document.getElementById('admin-ct').innerHTML=h;
 }
 
+function applySettleDate(){
+  const sd=document.getElementById('settle-date');
+  if(!sd||!sd.value)return;
+  window._settleDate=sd.value;
+  // 결산일 다음날부터 오늘까지
+  const settle=new Date(sd.value+'T12:00:00');
+  settle.setDate(settle.getDate()+1);
+  window._absFrom=toKey(settle);
+  window._absTo=toKey(new Date());
+  rAbsCount();
+}
+function applySettleDate(){
+  const sd=document.getElementById('settle-date');
+  if(!sd||!sd.value){alert('결산일을 선택해주세요.');return;}
+  window._settleDate=sd.value;
+  // 결산일 다음날부터 오늘까지
+  const settle=new Date(sd.value+'T12:00:00');
+  settle.setDate(settle.getDate()+1);
+  window._absFrom=toKey(settle);
+  window._absTo=toKey(new Date());
+  rAbsCount();
+}
 function applyAbsRange(){
   const f=document.getElementById('abs-from');
   const t=document.getElementById('abs-to');
