@@ -44,6 +44,40 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 .stu-btn{width:100%;text-align:left;padding:8px 12px;background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--tx2);display:flex;justify-content:space-between;align-items:center;}
 .stu-btn:hover{background:var(--sf2);}
 .stu-btn.on{background:var(--bdim);color:var(--blue);font-weight:700;border-right:3px solid var(--blue);}
+.add-stu-btn{width:calc(100% - 24px);margin:4px 12px;padding:6px;background:transparent;border:1px dashed var(--bd2);color:var(--tx3);font-size:11px;border-radius:6px;cursor:pointer;}
+.add-stu-btn:hover{background:var(--sf2);color:var(--tx);}
+.del-stu-btn{background:none;border:none;color:var(--red);opacity:0.4;font-size:11px;cursor:pointer;padding:0 2px;line-height:1;}
+.del-stu-btn:hover{opacity:1;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center;}
+.modal-overlay.on{display:flex;}
+.modal-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;width:320px;max-width:90vw;}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:16px;}
+.modal-label{font-size:11px;color:var(--tx2);margin-bottom:4px;font-weight:600;}
+.modal-input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;}
+.day-grid{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 16px;}
+.day-chip{padding:5px 10px;border-radius:999px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:12px;cursor:pointer;}
+.day-chip.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.modal-btns{display:flex;gap:8px;}
+.modal-btn{flex:1;padding:9px;border-radius:6px;border:none;font-size:13px;font-weight:600;cursor:pointer;}
+.modal-btn.ok{background:var(--blue);color:#fff;}
+.modal-btn.cancel{background:var(--sf2);color:var(--tx2);}
+.add-stu-btn{width:calc(100% - 24px);margin:4px 12px;padding:6px;background:transparent;border:1px dashed var(--bd2);color:var(--tx3);font-size:11px;border-radius:6px;cursor:pointer;}
+.add-stu-btn:hover{background:var(--sf2);color:var(--tx);}
+.del-stu-btn{background:none;border:none;color:var(--red);opacity:0.4;font-size:11px;cursor:pointer;padding:0 2px;line-height:1;}
+.del-stu-btn:hover{opacity:1;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center;}
+.modal-overlay.on{display:flex;}
+.modal-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;width:320px;max-width:90vw;}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:16px;}
+.modal-label{font-size:11px;color:var(--tx2);margin-bottom:4px;font-weight:600;}
+.modal-input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;}
+.day-grid{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 16px;}
+.day-chip{padding:5px 10px;border-radius:999px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:12px;cursor:pointer;}
+.day-chip.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.modal-btns{display:flex;gap:8px;}
+.modal-btn{flex:1;padding:9px;border-radius:6px;border:none;font-size:13px;font-weight:600;cursor:pointer;}
+.modal-btn.ok{background:var(--blue);color:#fff;}
+.modal-btn.cancel{background:var(--sf2);color:var(--tx2);}
 .stu-t{font-size:11px;font-weight:700;color:var(--blue);background:var(--bdim);padding:2px 7px;border-radius:999px;}
 
 /* 가운데 */
@@ -244,6 +278,29 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 
 </div>
 
+<!-- 학생 추가 모달 -->
+<div class="modal-overlay" id="addStudentModal" onclick="closeAddStudent()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title" id="addModalTitle">학생 추가</div>
+    <div class="modal-label">이름</div>
+    <input type="text" class="modal-input" id="newStudentName" placeholder="학생 이름" style="margin-bottom:14px">
+    <div class="modal-label">수업 요일</div>
+    <div class="day-grid" id="dayGrid">
+      <button type="button" class="day-chip" data-day="일" onclick="toggleDayChip(this)">일</button>
+      <button type="button" class="day-chip" data-day="월" onclick="toggleDayChip(this)">월</button>
+      <button type="button" class="day-chip" data-day="화" onclick="toggleDayChip(this)">화</button>
+      <button type="button" class="day-chip" data-day="수" onclick="toggleDayChip(this)">수</button>
+      <button type="button" class="day-chip" data-day="목" onclick="toggleDayChip(this)">목</button>
+      <button type="button" class="day-chip" data-day="금" onclick="toggleDayChip(this)">금</button>
+      <button type="button" class="day-chip" data-day="토" onclick="toggleDayChip(this)">토</button>
+    </div>
+    <div class="modal-btns">
+      <button type="button" class="modal-btn cancel" onclick="closeAddStudent()">취소</button>
+      <button type="button" class="modal-btn ok" onclick="confirmAddStudent()">추가</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const DB='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
 const YEAR=new Date().getFullYear();
@@ -339,6 +396,60 @@ const save=()=>{
 };
 const fmt=n=>n.toLocaleString('ko-KR')+'원';
 
+// ── 학생 추가/제거 ──
+let _addingCls='', _selectedDays=[];
+
+function openAddStudent(cls){
+  _addingCls=cls; _selectedDays=[];
+  document.getElementById('newStudentName').value='';
+  document.getElementById('addModalTitle').textContent=cls+' 학생 추가';
+  document.querySelectorAll('.day-chip').forEach(c=>c.classList.remove('on'));
+  document.getElementById('addStudentModal').classList.add('on');
+}
+function closeAddStudent(){ document.getElementById('addStudentModal').classList.remove('on'); }
+function toggleDayChip(chip){
+  const day=chip.dataset.day;
+  if(_selectedDays.includes(day)){_selectedDays=_selectedDays.filter(d=>d!==day);chip.classList.remove('on');}
+  else{_selectedDays.push(day);chip.classList.add('on');}
+}
+function confirmAddStudent(){
+  const name=document.getElementById('newStudentName').value.trim();
+  if(!name){alert('이름을 입력하세요.');return;}
+  if(_selectedDays.length===0){alert('수업 요일을 선택하세요.');return;}
+  if(STUDENTS[_addingCls]?.find(s=>s.name===name)){alert('이미 같은 이름의 학생이 있습니다.');return;}
+  if(!STUDENTS[_addingCls])STUDENTS[_addingCls]=[];
+  STUDENTS[_addingCls].push({name,days:[..._selectedDays]});
+  saveStudents(); closeAddStudent(); renderSB();
+  alert(name+' 학생이 추가됐습니다.');
+}
+function removeStudent(cls,name){
+  if(!confirm(name+' 학생을 제거할까요?\n수업 데이터도 모두 삭제됩니다.'))return;
+  STUDENTS[cls]=STUDENTS[cls].filter(s=>s.name!==name);
+  Object.keys(db).forEach(k=>{if(k.startsWith(cls+'_'+name+'_'))delete db[k];});
+  save(); saveStudents();
+  if(curStu===name){curStu=null;curCls=null;}
+  renderSB(); renderCal();
+}
+function saveStudents(){
+  const stuData={};
+  Object.entries(STUDENTS).forEach(([cls,stus])=>{stuData[cls]=stus.map(s=>({name:s.name,days:s.days}));});
+  fetch(DB+'/students_list.json',{method:'PUT',body:JSON.stringify(stuData),headers:{'Content-Type':'application/json'}}).catch(()=>{});
+}
+async function loadStudents(){
+  try{
+    const r=await fetch(DB+'/students_list.json?_='+Date.now());
+    if(!r.ok)return;
+    const data=await r.json();
+    if(!data||typeof data!=='object')return;
+    Object.entries(data).forEach(([cls,stus])=>{
+      if(!Array.isArray(stus))return;
+      const valid=stus.filter(s=>s&&s.name&&Array.isArray(s.days)&&s.days.length>0);
+      if(valid.length>0) STUDENTS[cls]=valid.map(s=>({name:s.name,days:s.days}));
+    });
+    console.log('학생 목록 로드 완료');
+  }catch(e){console.log('학생 목록 로드 실패',e);}
+}
+
 function resetLocal(){
   if(!confirm('로컬 데이터를 초기화합니다. 체크한 내용이 모두 사라집니다. 계속할까요?')) return;
   localStorage.removeItem('sch_v1');
@@ -373,11 +484,17 @@ function renderSB(){
       const d=getData(cls,s.name,mon),t=d.lessons.length+d.special.length;
       const btn=document.createElement('button');
       btn.className='stu-btn'+(curCls===cls&&curStu===s.name?' on':'');
-      btn.innerHTML='<span>'+s.name+'</span><span class="stu-t">'+t+'T</span>';
+      btn.innerHTML='<span>'+s.name+'</span><span style="display:flex;align-items:center;gap:4px"><span class="stu-t">'+t+'T</span><button type="button" class="del-stu-btn" onclick="event.stopPropagation();removeStudent(\''+cls+'\',\''+s.name+'\')" title="삭제">✕</button></span>';
       btn.onclick=()=>pick(cls,s.name);
       el.appendChild(btn);
       }catch(e){console.error('renderSB 오류:',cls,s.name,e);}
     });
+    // + 학생 추가 버튼
+    const addBtn=document.createElement('button');
+    addBtn.type='button'; addBtn.className='add-stu-btn';
+    addBtn.textContent='+ 학생 추가';
+    addBtn.onclick=()=>openAddStudent(cls);
+    el.appendChild(addBtn);
   });
 }
 

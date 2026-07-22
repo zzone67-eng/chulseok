@@ -733,6 +733,9 @@ function rAbsCount(){
   if(!window._absFrom)window._absFrom=defStart;
   if(!window._absTo)window._absTo=defEnd;
 
+  // 결산일 localStorage에서 복원
+  if(!window._settleDate){window._settleDate=localStorage.getItem('settle_date')||'';}
+  if(!window._lastSettleDate){window._lastSettleDate=localStorage.getItem('last_settle_date')||'';}
   const todayStr=toKey(new Date());
   let h=`<div style="background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:14px;margin-bottom:12px">
     <div style="font-size:13px;font-weight:600;margin-bottom:10px">결석 조회</div>
@@ -756,7 +759,8 @@ function rAbsCount(){
         <button onclick="applyAbsRange()" class="rbtn" style="height:34px;font-size:13px;padding:0 14px">조회</button>
       </div>
     </div>
-    ${window._settleDate?`<div style="margin-top:10px;font-size:12px;color:var(--acc)">📅 결산일: ${window._settleDate} → 조회: ${window._absFrom} ~ ${window._absTo}</div>`:''}
+    ${window._settleDate?`<div style="margin-top:10px;font-size:12px;color:var(--acc)">📅 입력한 전결산일: ${window._settleDate} → 조회: ${window._absFrom} ~ ${window._absTo}</div>`:''}
+    ${window._lastSettleDate?`<div style="margin-top:4px;font-size:12px;color:var(--mu)">🗓 이번 결산일(자동기록): ${window._lastSettleDate} → 다음 결산 때 이 날짜를 입력하세요</div>`:''}
   </div>`;
 
   // 기간 내 날짜 목록
@@ -827,19 +831,13 @@ function rAbsCount(){
 
 function applySettleDate(){
   const sd=document.getElementById('settle-date');
-  if(!sd||!sd.value)return;
-  window._settleDate=sd.value;
-  // 결산일 다음날부터 오늘까지
-  const settle=new Date(sd.value+'T12:00:00');
-  settle.setDate(settle.getDate()+1);
-  window._absFrom=toKey(settle);
-  window._absTo=toKey(new Date());
-  rAbsCount();
-}
-function applySettleDate(){
-  const sd=document.getElementById('settle-date');
   if(!sd||!sd.value){alert('결산일을 선택해주세요.');return;}
   window._settleDate=sd.value;
+  localStorage.setItem('settle_date',sd.value);
+  // 오늘 날짜를 이번 결산일로 자동 기록 (다음 결산 때 참고용)
+  const todayKey=toKey(new Date());
+  window._lastSettleDate=todayKey;
+  localStorage.setItem('last_settle_date',todayKey);
   // 결산일 다음날부터 오늘까지
   const settle=new Date(sd.value+'T12:00:00');
   settle.setDate(settle.getDate()+1);
