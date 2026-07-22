@@ -568,7 +568,7 @@ function calcFee(){
       reg=actualReg; finalT=netT+sp;
     }
   }
-  return {rate,reg,sp,abs,finalT,fee,actualReg};
+  return {rate,reg,sp,abs,finalT,fee,actualReg}; // actualReg=실제체크수
 }
 
 function updateStats(){
@@ -611,25 +611,46 @@ function updateToggle(){
 // ── 문자 생성 ──
 function genMsg(c){
   const m=mon+'월',dd=DAYS_DESC[curStu]||'',hasA=c.abs>0,hasSp=c.sp>0;
+  const s=STUDENTS[curCls]?.find(x=>x.name===curStu);
+  // 메모 가져오기
+  const memo=localStorage.getItem('note_'+curCls+'_'+curStu+'_'+mon+'_memo')||'';
+  const memoLine=memo?'\n\n■ 참고사항\n'+memo:'';
+  // 방학특강 안내 (중등반)
   const spN=curCls==='중등반'&&hasSp?'★ 방학특강 요일 확정 요청 ★\n현재 특강은 최대 타임 기준으로 안내드리고 있습니다.\n정확한 요일 및 타임 확정 후 수강료가 변동될 수 있으니,\n요일이 확정되는 대로 꼭 학원으로 연락 주시기 바랍니다.\n\n':'';
   let body='';
+
   if(curStu==='박선영'||curStu==='박하영'){
+    // 고정 수강료
     body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료\n'+fmt(c.fee)+' (고정)';
+
   } else if(curStu==='박민지'){
+    // 잔여타임
     body='■ 잔여 타임 안내\n잔여 타임 소진 후 별도 안내 예정입니다.\n\n최근 출결이 나아지고 있습니다. 꾸준한 출석 부탁드립니다.';
+
   } else if(curCls==='취미반'){
-    const s=STUDENTS[curCls].find(x=>x.name===curStu);
-    const base=s.days.length===1?100000:200000;
-    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료'+(hasA?'\n기본: '+fmt(base)+'\n전월 결석 차감: -'+c.abs+'회 (-'+fmt(c.abs*25000)+')\n합계: ':'\n')+fmt(c.fee);
+    const wRate=s.days.length===1?25000:50000;
+    if(!hasA){
+      // 결석 없음: 4주 고정
+      const base=s.days.length===1?100000:200000;
+      body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료\n'+fmt(base)+(hasSp?'\n특강: '+fmt(c.sp*wRate)+'\n합계: '+fmt(c.fee):'');
+    } else {
+      // 결석 있음: 실제 타임 계산
+      body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n실제 수업: '+c.actualReg+'T\n전월 결석 차감: -'+c.abs+'회\n합계: '+c.finalT+'T'+(hasSp?'\n특강: '+c.sp+'T':'')+'\n\n■ '+m+' 수강료\n'+fmt(wRate)+' × '+c.finalT+'T = '+fmt(c.fee);
+    }
+
   } else if(curStu==='김나현'){
-    const s=STUDENTS[curCls].find(x=>x.name===curStu);
-    const rT=c.abs===0?s.days.length*4:getData(curCls,curStu,mon).lessons.length;
+    // 재수생 50% 할인
+    const rT=c.actualReg;
     const rFull=rT*c.rate,rDisc=Math.round(rFull*0.5),spFee=c.sp*c.rate;
-    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n정규 수업: '+rT+'T'+(hasSp?'\n방학 특강: '+c.sp+'T':'')+(hasA?'\n전월 결석 차감: -'+c.abs+'T':'')+'\n합계: 총 '+c.finalT+'T\n\n■ '+m+' 수강료\n· 정규: '+c.rate.toLocaleString()+'원 × '+rT+'T = '+rFull.toLocaleString()+'원\n  재수생 50% 할인 → '+rDisc.toLocaleString()+'원'+(hasSp?'\n· 특강: '+c.rate.toLocaleString()+'원 × '+c.sp+'T = '+spFee.toLocaleString()+'원 (할인 없음)':'')+'\n· 합계: '+fmt(c.fee);
+    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n정규 수업: '+rT+'T'+(hasSp?'\n방학 특강: '+c.sp+'T':'')+(hasA?'\n전월 결석 차감: -'+c.abs+'T':'')+'\n합계: 총 '+c.finalT+'T\n\n■ '+m+' 수강료\n· 정규: '+c.rate.toLocaleString()+'원 × '+rT+'T = '+rFull.toLocaleString()+'원\n  재수생 50% 할인 → '+fmt(rDisc)+(hasSp?'\n· 특강: '+c.rate.toLocaleString()+'원 × '+c.sp+'T = '+fmt(spFee)+' (할인 없음)':'')+'\n· 합계: '+fmt(c.fee);
+
   } else {
-    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n정규 수업: '+c.reg+'T'+(hasSp?'\n방학 특강: '+c.sp+'T':'')+(hasA?'\n전월 결석 차감: -'+c.abs+'T':'')+'\n합계: 총 '+c.finalT+'T\n\n■ '+m+' 수강료\n'+c.rate.toLocaleString()+'원 × '+c.finalT+'T = '+fmt(c.fee);
+    // 일반 학생
+    const regLabel=c.actualReg+'T';
+    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n정규 수업: '+regLabel+(hasSp?'\n방학 특강: '+c.sp+'T':'')+(hasA?'\n전월 결석 차감: -'+c.abs+'T':'')+'\n합계: 총 '+c.finalT+'T\n\n■ '+m+' 수강료\n'+c.rate.toLocaleString()+'원 × '+c.finalT+'T = '+fmt(c.fee);
   }
-  return '['+m+' 수강료 안내 - '+curStu+' 학생 ('+curCls+')]\n안녕하세요. 화강암플러스미술학원입니다.\n\n'+spN+body+FOOT;
+
+  return '['+m+' 수강료 안내 - '+curStu+' 학생 ('+curCls+')]\n안녕하세요. 화강암플러스미술학원입니다.\n\n'+spN+body+memoLine+FOOT;
 }
 
 function updateFee(){
