@@ -556,8 +556,17 @@ function calcFee(){
   }
   if(curCls==='취미반'){
     const base=s.days.length===1?100000:200000;
-    fee=Math.max(0,base-abs*25000)+sp*25000;
-    reg=use4wk?s.days.length*4:actualReg;finalT=reg;
+    const weekRate=s.days.length===1?25000:50000; // 1회=25000, 2회=50000
+    if(abs===0){
+      // 결석 없음: 4주 기준 고정금액
+      fee=base+sp*weekRate;
+      reg=s.days.length*4; finalT=reg;
+    } else {
+      // 결석 있음: 실제 타임수 기준 (타임수-전월결석) × 25000
+      const netT=Math.max(0,actualReg-abs);
+      fee=netT*weekRate+sp*weekRate;
+      reg=actualReg; finalT=netT+sp;
+    }
   }
   return {rate,reg,sp,abs,finalT,fee,actualReg};
 }
