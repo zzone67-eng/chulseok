@@ -289,13 +289,27 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
       <!-- 할인율 버튼 -->
       <div style="padding:6px 14px 0;border-top:1px solid var(--bd)">
         <div style="font-size:11px;color:var(--tx2);font-weight:600;margin-bottom:6px">할인율 적용</div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap" id="discountBtns">
-          <button type="button" class="disc-btn" data-rate="10" onclick="applyDiscount(10)">10%</button>
-          <button type="button" class="disc-btn" data-rate="20" onclick="applyDiscount(20)">20%</button>
-          <button type="button" class="disc-btn" data-rate="30" onclick="applyDiscount(30)">30%</button>
-          <button type="button" class="disc-btn" data-rate="40" onclick="applyDiscount(40)">40%</button>
-          <button type="button" class="disc-btn" data-rate="50" onclick="applyDiscount(50)">50%</button>
-          <button type="button" class="disc-btn" data-rate="0" onclick="applyDiscount(0)" style="color:var(--tx3)">초기화</button>
+        <div style="margin-bottom:4px">
+          <div style="font-size:10px;color:var(--tx3);margin-bottom:3px">정규</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap" id="discountBtnsReg">
+            <button type="button" class="disc-btn" data-rate="0" data-type="reg" onclick="applyDiscount(0,'reg')">0%</button>
+            <button type="button" class="disc-btn" data-rate="10" data-type="reg" onclick="applyDiscount(10,'reg')">10%</button>
+            <button type="button" class="disc-btn" data-rate="20" data-type="reg" onclick="applyDiscount(20,'reg')">20%</button>
+            <button type="button" class="disc-btn" data-rate="30" data-type="reg" onclick="applyDiscount(30,'reg')">30%</button>
+            <button type="button" class="disc-btn" data-rate="40" data-type="reg" onclick="applyDiscount(40,'reg')">40%</button>
+            <button type="button" class="disc-btn" data-rate="50" data-type="reg" onclick="applyDiscount(50,'reg')">50%</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--tx3);margin-bottom:3px">특강</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap" id="discountBtnsSp">
+            <button type="button" class="disc-btn" data-rate="0" data-type="sp" onclick="applyDiscount(0,'sp')">0%</button>
+            <button type="button" class="disc-btn" data-rate="10" data-type="sp" onclick="applyDiscount(10,'sp')">10%</button>
+            <button type="button" class="disc-btn" data-rate="20" data-type="sp" onclick="applyDiscount(20,'sp')">20%</button>
+            <button type="button" class="disc-btn" data-rate="30" data-type="sp" onclick="applyDiscount(30,'sp')">30%</button>
+            <button type="button" class="disc-btn" data-rate="40" data-type="sp" onclick="applyDiscount(40,'sp')">40%</button>
+            <button type="button" class="disc-btn" data-rate="50" data-type="sp" onclick="applyDiscount(50,'sp')">50%</button>
+          </div>
         </div>
       </div>
       <!-- 특이사항 버튼들 -->
@@ -505,7 +519,8 @@ function clearFixedFee(){
   localStorage.removeItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
   clearFixedFeeFromFirebase(monToLabel(mon)+'_'+curStu);
   // 할인율도 초기화
-  localStorage.removeItem('discount_'+curCls+'_'+curStu+'_'+mon);
+  localStorage.removeItem('discount_reg_'+curCls+'_'+curStu+'_'+mon);
+  localStorage.removeItem('discount_sp_'+curCls+'_'+curStu+'_'+mon);
   renderDiscountBtns();
   updateFee();
 }
@@ -547,31 +562,33 @@ function renderSpecialTags(){
 }
 let _editingSpecialIdx=-1;
 // ── 할인율 ──
-function applyDiscount(rate){
+function applyDiscount(rate, type){
   if(!curStu)return;
-  if(rate===0){
-    localStorage.removeItem('discount_'+curCls+'_'+curStu+'_'+mon);
-  } else {
-    localStorage.setItem('discount_'+curCls+'_'+curStu+'_'+mon, String(rate));
-  }
+  // type: 'reg' or 'sp'
+  const key='discount_'+type+'_'+curCls+'_'+curStu+'_'+mon;
+  if(rate===0) localStorage.removeItem(key);
+  else localStorage.setItem(key, String(rate));
   renderDiscountBtns();
   updateFee();
-  // Firebase student_edits에 할인 적용된 금액 저장
+  // Firebase에 최종 계산값 저장
   const sid=monToLabel(mon)+'_'+curStu;
-  const c2=calcFee(); // 할인율 적용된 최종 계산값
+  const c2=calcFee();
   if(!c2)return;
-  if(rate===0){
-    const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
-    if(!_fv||_fv==='')clearFixedFeeFromFirebase(sid);
-    else saveFixedFeeToFirebase(sid, parseInt(_fv));
-  } else {
-    saveFixedFeeToFirebase(sid, c2.fee);
-  }
+  const drReg=parseInt(localStorage.getItem('discount_reg_'+curCls+'_'+curStu+'_'+mon)||'0');
+  const drSp=parseInt(localStorage.getItem('discount_sp_'+curCls+'_'+curStu+'_'+mon)||'0');
+  const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
+  if(!_fv&&drReg===0&&drSp===0) clearFixedFeeFromFirebase(sid);
+  else saveFixedFeeToFirebase(sid, c2.fee);
 }
 function renderDiscountBtns(){
-  const cur=parseInt(localStorage.getItem('discount_'+curCls+'_'+curStu+'_'+mon)||'0');
-  document.querySelectorAll('.disc-btn').forEach(b=>{
-    b.classList.toggle('on', parseInt(b.dataset.rate)===cur&&cur>0);
+  if(!curStu){document.querySelectorAll('.disc-btn').forEach(b=>b.classList.remove('on'));return;}
+  const drReg=parseInt(localStorage.getItem('discount_reg_'+curCls+'_'+curStu+'_'+mon)||'0');
+  const drSp=parseInt(localStorage.getItem('discount_sp_'+curCls+'_'+curStu+'_'+mon)||'0');
+  document.querySelectorAll('#discountBtnsReg .disc-btn').forEach(b=>{
+    b.classList.toggle('on', parseInt(b.dataset.rate)===drReg);
+  });
+  document.querySelectorAll('#discountBtnsSp .disc-btn').forEach(b=>{
+    b.classList.toggle('on', parseInt(b.dataset.rate)===drSp);
   });
 }
 function calcFeeRaw(){
@@ -786,15 +803,28 @@ function calcFee(){
       reg=actualReg; finalT=netT+sp;
     }
   }
-  // 1. 할인율 적용 (수강료 계산에 포함)
-  const discountRate=parseInt(localStorage.getItem('discount_'+curCls+'_'+curStu+'_'+mon)||'0');
-  if(discountRate>0) fee=Math.round(fee*(1-discountRate/100));
+  // 1. 정규/특강 별도 할인율 적용
+  const drReg=parseInt(localStorage.getItem('discount_reg_'+curCls+'_'+curStu+'_'+mon)||'0');
+  const drSp=parseInt(localStorage.getItem('discount_sp_'+curCls+'_'+curStu+'_'+mon)||'0');
+  if(drReg>0||drSp>0){
+    // 정규/특강 각각 할인 적용
+    const regFee=Math.round((finalT-sp)*rate*(1-drReg/100));
+    const spFee=Math.round(sp*rate*(1-drSp/100));
+    fee=regFee+spFee;
+    // 취미반은 별도 처리
+    if(curCls==='취미반'&&s){
+      const wRate=s.days.length===1?25000:50000;
+      const baseFee=abs===0?(s.days.length===1?100000:200000):Math.max(0,actualReg-abs)*wRate;
+      fee=Math.round(baseFee*(1-drReg/100))+Math.round(sp*wRate*(1-drSp/100));
+    }
+  }
+  const discountRate=drReg||drSp;
   // 2. 고정수강료 (독립 적용 - 할인율 무시)
   const fixedFee=getFixedFee();
   const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
   const fixedFeeSet=_fv!==null&&_fv!==''&&_fv!=='undefined';
   if(fixedFeeSet)fee=fixedFee;
-  return {rate,reg,sp,abs,finalT,fee,actualReg,fixedFee,fixedFeeSet,discountRate};
+  return {rate,reg,sp,abs,finalT,fee,actualReg,fixedFee,fixedFeeSet,drReg,drSp};
 }
 
 function updateStats(){
@@ -836,53 +866,94 @@ function updateToggle(){
 
 // ── 문자 생성 ──
 function genMsg(c){
-  const m=mon+'월',dd=DAYS_DESC[curStu]||'',hasA=c.abs>0,hasSp=c.sp>0;
+  const m=mon+'월';
+  const dd=DAYS_DESC[curStu]||'';
   const s=STUDENTS[curCls]?.find(x=>x.name===curStu);
-  // 메모 가져오기
+  const hasA=c.abs>0, hasSp=c.sp>0;
+  const drReg=c.drReg||0, drSp=c.drSp||0;
+  const hasDiscount=drReg>0||drSp>0;
+
+  // 메모
   const memo=localStorage.getItem('note_'+curCls+'_'+curStu+'_'+mon+'_memo')||'';
   const memoLine=memo?'\n\n■ 참고사항\n'+memo:'';
-  // 방학특강 안내 (중등반)
-  const spN=curCls==='중등반'&&hasSp?'★ 방학특강 요일 확정 요청 ★\n현재 특강은 최대 타임 기준으로 안내드리고 있습니다.\n정확한 요일 및 타임 확정 후 수강료가 변동될 수 있으니,\n요일이 확정되는 대로 꼭 학원으로 연락 주시기 바랍니다.\n\n':'';
+
+  // 특이사항
+  const specialsText=_specials.length>0?_specials.map(s=>s.content).join('\n\n')+'\n\n':'';
+
+  // 방학특강 안내 (중등반에 특강 있을 때)
+  const spNote=curCls==='중등반'&&hasSp?'★ 방학특강 요일 확정 요청 ★\n현재 특강은 최대 타임 기준으로 안내드리고 있습니다.\n정확한 요일 및 타임 확정 후 수강료가 변동될 수 있으니,\n요일이 확정되는 대로 꼭 학원으로 연락 주시기 바랍니다.\n\n':'';
+
   let body='';
 
-  if(curStu==='박선영'||curStu==='박하영'){
-    // 고정 수강료
-    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료\n'+fmt(c.fee)+' (고정)';
+  // ── 고정수강료 (0원 포함) ──
+  if(c.fixedFeeSet&&!hasDiscount){
+    const feeLabel=c.fixedFee===0?'수강료 없음 (선납 완료)':fmt(c.fixedFee);
+    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료\n'+feeLabel;
 
+  // ── 잔여타임 학생 (박민지) ──
   } else if(curStu==='박민지'){
-    // 잔여타임
-    body='■ 잔여 타임 안내\n잔여 타임 소진 후 별도 안내 예정입니다.\n\n최근 출결이 나아지고 있습니다. 꾸준한 출석 부탁드립니다.';
+    body='■ 잔여 타임 안내\n잔여 타임 소진 후 별도 안내 예정입니다.\n\n꾸준한 출석 부탁드립니다.';
 
+  // ── 취미반 ──
   } else if(curCls==='취미반'){
-    const wRate=s.days.length===1?25000:50000;
-    if(!hasA){
-      // 결석 없음: 4주 고정
-      const base=s.days.length===1?100000:200000;
-      body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료\n'+fmt(base)+(hasSp?'\n특강: '+fmt(c.sp*wRate)+'\n합계: '+fmt(c.fee):'');
+    const wRate=s?s.days.length===1?25000:50000:25000;
+    const baseWRate=s?s.days.length===1?100000:200000:100000;
+    let feeDetail='';
+    if(!hasA&&!hasSp&&!hasDiscount){
+      // 결석/특강/할인 없음: 4주 고정
+      feeDetail=fmt(baseWRate);
     } else {
-      // 결석 있음: 실제 타임 계산
-      body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n실제 수업: '+c.actualReg+'T\n전월 결석 차감: -'+c.abs+'회\n합계: '+c.finalT+'T'+(hasSp?'\n특강: '+c.sp+'T':'')+'\n\n■ '+m+' 수강료\n'+fmt(wRate)+' × '+c.finalT+'T = '+fmt(c.fee);
+      // 상세 내역
+      const regNet=c.fixedFeeSet?c.fixedFee:c.fee;
+      if(hasA){
+        feeDetail='실제 수업: '+c.actualReg+'T\n전월 결석 차감: -'+c.abs+'회\n정규 합계: '+Math.max(0,c.actualReg-c.abs)+'T';
+      } else {
+        feeDetail='정규: 4주 기준 '+fmt(baseWRate);
+      }
+      if(drReg>0) feeDetail+='\n정규 '+drReg+'% 할인 적용';
+      if(hasSp) feeDetail+='\n특강: '+c.sp+'T × '+fmt(wRate);
+      if(drSp>0) feeDetail+='\n특강 '+drSp+'% 할인 적용';
+      feeDetail+='\n합계: '+fmt(c.fee);
     }
+    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료\n'+feeDetail;
 
-  } else if(curStu==='김나현'){
-    // 재수생 50% 할인
-    const rT=c.actualReg;
-    const rFull=rT*c.rate,rDisc=Math.round(rFull*0.5),spFee=c.sp*c.rate;
-    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n정규 수업: '+rT+'T'+(hasSp?'\n방학 특강: '+c.sp+'T':'')+(hasA?'\n전월 결석 차감: -'+c.abs+'T':'')+'\n합계: 총 '+c.finalT+'T\n\n■ '+m+' 수강료\n· 정규: '+c.rate.toLocaleString()+'원 × '+rT+'T = '+rFull.toLocaleString()+'원\n  재수생 50% 할인 → '+fmt(rDisc)+(hasSp?'\n· 특강: '+c.rate.toLocaleString()+'원 × '+c.sp+'T = '+fmt(spFee)+' (할인 없음)':'')+'\n· 합계: '+fmt(c.fee);
+  // ── 할인율 있는 학생 ──
+  } else if(hasDiscount){
+    const regT=c.actualReg, netT=Math.max(0,regT+c.sp-c.abs);
+    const regFull=Math.max(0,regT-c.abs)*c.rate;
+    const regAfterDisc=Math.round(regFull*(1-drReg/100));
+    const spFull=c.sp*c.rate;
+    const spAfterDisc=Math.round(spFull*(1-drSp/100));
+    let detail='정규 수업: '+regT+'T';
+    if(hasA) detail+='\n전월 결석 차감: -'+c.abs+'T';
+    detail+='\n정규 실수업: '+Math.max(0,regT-c.abs)+'T';
+    if(hasSp) detail+='\n특강: '+c.sp+'T';
+    detail+='\n합계: 총 '+netT+'T';
+    let feeDetail='';
+    if(drReg>0) feeDetail+='· 정규: '+fmt(c.rate)+' × '+Math.max(0,regT-c.abs)+'T = '+fmt(regFull)+'\n  '+drReg+'% 할인 → '+fmt(regAfterDisc)+'\n';
+    else if(regT>c.abs) feeDetail+='· 정규: '+fmt(c.rate)+' × '+Math.max(0,regT-c.abs)+'T = '+fmt(regFull)+'\n';
+    if(hasSp){
+      if(drSp>0) feeDetail+='· 특강: '+fmt(c.rate)+' × '+c.sp+'T = '+fmt(spFull)+'\n  '+drSp+'% 할인 → '+fmt(spAfterDisc)+'\n';
+      else feeDetail+='· 특강: '+fmt(c.rate)+' × '+c.sp+'T = '+fmt(spFull)+'\n';
+    }
+    feeDetail+='· 합계: '+fmt(c.fee);
+    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n'+detail+'\n\n■ '+m+' 수강료\n'+feeDetail;
 
+  // ── 일반 학생 (고정/할인 없음) ──
   } else {
-    // 일반 학생
-    const regLabel=c.actualReg+'T';
-    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n정규 수업: '+regLabel+(hasSp?'\n방학 특강: '+c.sp+'T':'')+(hasA?'\n전월 결석 차감: -'+c.abs+'T':'')+'\n합계: 총 '+c.finalT+'T\n\n■ '+m+' 수강료\n'+c.rate.toLocaleString()+'원 × '+c.finalT+'T = '+fmt(c.fee);
+    const regT=c.actualReg, netT=c.finalT;
+    let detail='정규 수업: '+regT+'T';
+    if(hasSp) detail+='\n방학 특강: '+c.sp+'T';
+    if(hasA) detail+='\n전월 결석 차감: -'+c.abs+'T';
+    detail+='\n합계: 총 '+netT+'T';
+    const feeCalc=fmt(c.rate)+' × '+netT+'T = '+fmt(c.fee);
+    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n'+detail+'\n\n■ '+m+' 수강료\n'+feeCalc;
   }
 
-  // 특이사항 섹션
-  const specialsText=_specials.length>0?'\n'+_specials.map(s=>s.content).join('\n\n')+'\n\n':'';
-  // 고정수강료 문자 처리
-  if(c.fixedFeeSet){
-    body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료\n'+fmt(c.fixedFee)+' (고정)';
-  }
-  return '['+m+' 수강료 안내 - '+curStu+' 학생 ('+curCls+')]\n안녕하세요. 화강암플러스미술학원입니다.\n\n'+spN+specialsText+body+memoLine+FOOT;
+  // 0원인 경우 납부방법 생략
+  const footerText=c.fee===0?'\n\n■ 문의\n'+CONT+'\n감사합니다.':FOOT;
+
+  return '['+m+' 수강료 안내 - '+curStu+' 학생 ('+curCls+')]\n안녕하세요. 화강암플러스미술학원입니다.\n\n'+spNote+specialsText+body+memoLine+footerText;
 }
 
 function updateFee(){
