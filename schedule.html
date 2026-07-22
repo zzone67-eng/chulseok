@@ -484,6 +484,13 @@ function clearFixedFee(){
   clearFixedFeeFromFirebase(monToLabel(mon)+'_'+curStu);
   updateFee();
 }
+function clearAllFixedFees(){
+  // 현재 학생의 모든 달 고정수강료 초기화
+  if(!curStu)return;
+  for(let m=1;m<=12;m++){
+    localStorage.removeItem('fixedFee_'+curCls+'_'+curStu+'_'+m);
+  }
+}
 function getFixedFee(){
   const v=parseInt(localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon)||'0')||0;
   return v;
@@ -491,8 +498,8 @@ function getFixedFee(){
 function loadFixedFee(){
   const el=document.getElementById('fixedFeeIn');
   if(!el)return;
-  const v=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon)||'';
-  el.value=v;
+  const v=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
+  el.value=(v!==null&&v!==''&&v!=='undefined')?v:'';
 }
 
 // ── 특이사항 ──
@@ -708,7 +715,8 @@ function calcFee(){
   }
   // 고정수강료 우선 적용
   const fixedFee=getFixedFee();
-  const fixedFeeSet=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon)!==null;
+  const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
+  const fixedFeeSet=_fv!==null&&_fv!==''&&_fv!=='undefined';
   if(fixedFeeSet)fee=fixedFee;
   return {rate,reg,sp,abs,finalT,fee,actualReg,fixedFee,fixedFeeSet}; // actualReg=실제체크수
 }
