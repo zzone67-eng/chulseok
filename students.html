@@ -406,13 +406,13 @@ const initData = {
 function loadDB(){ return JSON.parse(JSON.stringify(initData)); }
 function saveDB(d){
   const paidMap = {};
-  ['jul','aug'].forEach(m=>{ if(d[m]) d[m].forEach(s=>{ paidMap[s.id]=s.paid; }); });
+  Object.keys(d).forEach(m=>{ if(d[m]&&Array.isArray(d[m])) d[m].forEach(s=>{ paidMap[s.id]=s.paid; }); });
   fetch(`${FB_URL}/paid.json`,{method:'PUT',body:JSON.stringify(paidMap),headers:{'Content-Type':'application/json'}}).catch(()=>{});
 }
 function saveEdits(){
   // 편집된 학생 데이터(수강료, 메모, 수업일자 등) Firebase에 저장
   const edits={};
-  ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{
+  Object.keys(db).forEach(m=>{ if(!db[m]||!Array.isArray(db[m]))return; db[m].forEach(s=>{
     const init=initData[m]?.find(x=>x.id===s.id);
     const changed={};
     // initData에 없는 신규 학생은 모든 편집값 저장
@@ -440,7 +440,7 @@ async function loadEdits(){
     if(!r.ok)return;
     const edits=await r.json();
     if(!edits||typeof edits!=='object')return;
-    ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{
+    Object.keys(db).forEach(m=>{ if(!db[m]||!Array.isArray(db[m]))return; db[m].forEach(s=>{
       const e=edits[s.id];
       if(!e)return;
       if(e.amount!==undefined)s.amount=e.amount;
@@ -465,7 +465,7 @@ async function syncFromFirebase(){
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const paidMap = await r.json();
     if(paidMap && typeof paidMap==='object'){
-      ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{ if(paidMap[s.id]!==undefined) s.paid=paidMap[s.id]; }); });
+      Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])) db[m].forEach(s=>{ if(paidMap[s.id]!==undefined) s.paid=paidMap[s.id]; }); });
     }
 
     // students_list.json - 신규 학생 db에 동적 추가
@@ -473,8 +473,8 @@ async function syncFromFirebase(){
       try{
         const stuList = await sr.json();
         if(stuList&&typeof stuList==='object'){
-          ['jul','aug'].forEach(mon=>{
-            if(!db[mon])return;
+          Object.keys(db).forEach(mon=>{
+            if(!db[mon]||!Array.isArray(db[mon]))return;
             Object.entries(stuList).forEach(([cls,stus])=>{
               if(!Array.isArray(stus))return;
               stus.forEach(stu=>{
@@ -501,7 +501,7 @@ async function syncFromFirebase(){
       if(er.ok){const ed=await er.json();if(ed&&typeof ed==='object')_edits=ed;}
     }catch(e){}
 
-    // schedule_backup.json - 정규/특강 분리된 원본 데이터로 시수/수강료 계산
+    // schedule_backup.json - 시수/수강료 자동계산
     if(br.ok){
       const backup = await br.json();
       if(backup && typeof backup==='object'){
@@ -511,42 +511,34 @@ async function syncFromFirebase(){
         };
         const TAKUMI = ['나은솔','김건휘','김예진','최다윤','신유나','최현우','김윤재','김가람','이지아','명지민'];
 
-        ['jul','aug'].forEach(mon=>{
-          const mNum = mon==='jul'?7:8;
-          if(!db[mon]) return;
+        // 모든 월 처리 (jul, aug, sep 등 동적)
+        Object.keys(db).forEach(mon=>{
+          if(!db[mon]||!Array.isArray(db[mon]))return;
+          // mon 레이블 → 숫자 변환 (jul=7, aug=8, sep=9, oct=10, ...)
+          const MON_MAP={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+          const mNum = MON_MAP[mon];
+          if(!mNum)return;
+
           db[mon].forEach(s=>{
             const rSpec = RATE_MAP[s.name];
-            // 고정/잔여 학생은 건드리지 않음
             if(rSpec && (rSpec.type==='fix' || rSpec.type==='remain')) return;
-            // 취미반은 고정
             if(TAKUMI.includes(s.name)) return;
+            if(_edits[s.id]) return; // 수동 편집된 학생은 건너뜀
 
-            // schedule_backup에서 해당 학생 데이터 찾기
-            // 키 형식: "반_이름_월" (예: "입시반_김나연_7")
-            // student_edits에 수동 편집값 있으면 자동계산 건너뜀
-            if(_edits[s.id]) return;
-
-            // student_edits에 수동 편집값 있으면 자동계산 건너뜀
-            if(_edits[s.id]) return;
-
-            if(_edits[s.id]) return; // 수동 편집된 학생은 자동계산 건너뜀
             const key = `${s.cls}_${s.name}_${mNum}`;
             const sdata = backup[key];
             if(!sdata) return;
 
             const regT = (sdata.lessons||[]).length;
             const spT  = (sdata.special||[]).length;
-            // 전월결석은 schedule의 absIn 값 → schedule_backup에 abs 필드로 저장됨
             const absT = sdata.abs || s.absence || 0;
             const rate = s.cls==='예비반' ? 30000 : 31250;
 
             if(rSpec && rSpec.type==='discount50'){
-              // 재수생: (정규-결석) 50% + 특강 정가
               const netReg = Math.max(0, regT - absT);
               s.amount = Math.round(netReg * rate * 0.5) + spT * rate;
               s.totalT = netReg + spT;
             } else {
-              // 일반: (정규 + 특강 - 전월결석) × 단가
               const netT = Math.max(0, regT + spT - absT);
               s.amount = netT * rate;
               s.totalT = netT;
@@ -560,7 +552,7 @@ async function syncFromFirebase(){
     }
 
     // student_edits 적용
-    ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{
+    Object.keys(db).forEach(m=>{ if(!db[m]||!Array.isArray(db[m]))return; db[m].forEach(s=>{
       const e=_edits[s.id]; if(!e) return;
       if(e.amount!==undefined)s.amount=e.amount;
       if(e.totalT!==undefined)s.totalT=e.totalT;
@@ -601,6 +593,7 @@ function renderAll(){
 const isPC = () => window.innerWidth >= 900;
 
 function init(){
+  updateMonthLabels();
   if(isPC()){
     document.body.className='pc';
     document.getElementById('app-mob').style.display='none';
@@ -737,11 +730,12 @@ function mobRenderSummary(month){
 function openUnpaid(){
   const isMobile=!isPC();
   const ul=document.getElementById(isMobile?'mobUnpaidList':'pcUnpaidList'); ul.innerHTML=''; let total=0;
-  ['jul','aug'].forEach(month=>{
-    const today=new Date(),cut=month==='jul'?new Date(2026,6,10):new Date(2026,7,10); if(today<cut)return;
+  const MON_LABEL={jan:'1월',feb:'2월',mar:'3월',apr:'4월',may:'5월',jun:'6월',jul:'7월',aug:'8월',sep:'9월',oct:'10월',nov:'11월',dec:'12월'};
+  Object.keys(db).forEach(month=>{
+    if(!db[month]||!Array.isArray(db[month]))return;
     db[month].filter(s=>!s.paid&&s.amount>0).forEach(s=>{
       total+=s.amount;
-      const label=month==='jul'?'7월':'8월';
+      const label=MON_LABEL[month]||month;
       if(isMobile) ul.innerHTML+=`<div class="unpaid-item"><div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--text3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div><div class="unpaid-amt">${fmt(s.amount)}</div></div>`;
       else ul.innerHTML+=`<div class="unpaid-row"><div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--text3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div><div class="unpaid-amt">${fmt(s.amount)}</div></div>`;
     });
@@ -817,7 +811,7 @@ function pcRenderSummary(){
 }
 function pcToggleCls(){ const p=document.getElementById('clsPanel'),b=document.getElementById('clsToggleBtn'); if(!p)return; p.classList.toggle('open'); b.textContent=p.classList.contains('open')?'‹':'›'; }
 function pcSelectStudent(id){ const s=db[pcMonth].find(x=>x.id===id); if(!s)return; pcStudent=s; pcMsgTab=0; pcEditing=false; pcRenderSidebar(); pcRenderDetail(); }
-function pcTogglePaid(e,id){ e.stopPropagation(); ['jul','aug'].forEach(m=>{ const s=db[m].find(x=>x.id===id); if(s)s.paid=!s.paid; }); saveDB(db); pcRenderSidebar(); pcRenderSummary(); if(pcStudent?.id===id){pcStudent=db[pcMonth].find(x=>x.id===id);pcRenderDetail();} }
+function pcTogglePaid(e,id){ e.stopPropagation(); Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])){ const s=db[m].find(x=>x.id===id); if(s)s.paid=!s.paid; } }); saveDB(db); pcRenderSidebar(); pcRenderSummary(); if(pcStudent?.id===id){pcStudent=db[pcMonth].find(x=>x.id===id);pcRenderDetail();} }
 
 // ── 문자 생성 ──
 function msgFeeNormal(s,month){
@@ -903,6 +897,39 @@ function pcSaveEdit(){
 function pcCopyMsg(){
   const msgs=getMessages(pcStudent,pcMonth); if(!msgs[pcMsgTab]) return;
   navigator.clipboard.writeText(msgs[pcMsgTab].text).then(()=>{ const btn=document.querySelector('.msg-copy-btn'); btn.textContent='복사됨!'; setTimeout(()=>btn.textContent='문자 복사',2000); });
+}
+
+// ── 월 레이블 동적 업데이트 ──
+function updateMonthLabels(){
+  const now=new Date();
+  const cur={m:now.getMonth()+1,y:now.getFullYear()};
+  const nxt=now.getMonth()===11?{m:1,y:now.getFullYear()+1}:{m:now.getMonth()+2,y:now.getFullYear()};
+  // 모바일 탭
+  const tabs=document.querySelectorAll('#app-mob .tab');
+  if(tabs[0])tabs[0].textContent=cur.m+'월';
+  if(tabs[1])tabs[1].textContent=nxt.m+'월(예정)';
+  // PC 버튼
+  const smBtns=document.querySelectorAll('#app-pc .sm-btn');
+  if(smBtns[0])smBtns[0].textContent=cur.m+'월';
+  if(smBtns[1])smBtns[1].textContent=nxt.m+'월(예정)';
+  // hdrSub
+  const sub=document.getElementById('hdrSub');
+  if(sub)sub.textContent=`${cur.y}년 ${cur.m}월`;
+}
+
+// ── 월 레이블 동적 업데이트 ──
+function updateMonthLabels(){
+  const now=new Date();
+  const cur={m:now.getMonth()+1,y:now.getFullYear()};
+  const nxt=now.getMonth()===11?{m:1,y:now.getFullYear()+1}:{m:now.getMonth()+2,y:now.getFullYear()};
+  const tabs=document.querySelectorAll('#app-mob .tab');
+  if(tabs[0])tabs[0].textContent=cur.m+'월';
+  if(tabs[1])tabs[1].textContent=nxt.m+'월(예정)';
+  const smBtns=document.querySelectorAll('#app-pc .sm-btn');
+  if(smBtns[0])smBtns[0].textContent=cur.m+'월';
+  if(smBtns[1])smBtns[1].textContent=nxt.m+'월(예정)';
+  const sub=document.getElementById('hdrSub');
+  if(sub)sub.textContent=cur.y+'년 '+cur.m+'월';
 }
 
 // ── 시작 ──

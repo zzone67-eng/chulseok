@@ -143,25 +143,6 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 .note-ta::placeholder{color:var(--tx3);}
 
 /* 반응형 */
-.add-stu-btn{width:100%;padding:6px;margin-top:4px;background:transparent;border:1px dashed var(--bd2);color:var(--tx3);font-size:11px;border-radius:var(--rs);cursor:pointer;}
-.add-stu-btn:hover{background:var(--sf2);color:var(--tx);}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center;}
-.modal-overlay.on{display:flex;}
-.modal-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;width:340px;max-width:90vw;}
-.modal-title{font-size:15px;font-weight:700;margin-bottom:16px;}
-.modal-field{margin-bottom:12px;}
-.modal-label{font-size:11px;color:var(--tx2);margin-bottom:4px;font-weight:600;}
-.modal-input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--bd2);border-radius:var(--rs);color:var(--tx);font-size:13px;font-family:inherit;outline:none;}
-.modal-input:focus{border-color:var(--blue);}
-.day-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
-.day-chip{padding:5px 10px;border-radius:999px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:12px;cursor:pointer;}
-.day-chip.on{background:var(--blue);color:#fff;border-color:var(--blue);}
-.modal-btns{display:flex;gap:8px;margin-top:16px;}
-.modal-btn{flex:1;padding:9px;border-radius:var(--rs);border:none;font-size:13px;font-weight:600;cursor:pointer;}
-.modal-btn.ok{background:var(--blue);color:#fff;}
-.modal-btn.cancel{background:var(--sf2);color:var(--tx2);}
-.del-stu-btn{margin-left:4px;color:var(--red);opacity:0.5;font-size:11px;cursor:pointer;background:none;border:none;padding:0 2px;}
-.del-stu-btn:hover{opacity:1;}
 </style>
 </head>
 <body>
@@ -177,7 +158,10 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 
   <!-- PC 사이드바 -->
   <div class="sidebar">
-    <div class="month-row" id="monthRow"></div>
+    <div class="month-row" id="monthRow">
+<!-- 월 버튼은 JS로 동적 생성 -->
+      
+    </div>
     <div class="sb-list" id="sbList"></div>
   </div>
 
@@ -260,39 +244,32 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 
 </div>
 
-<!-- 학생 추가 모달 -->
-<div class="modal-overlay" id="addStudentModal" onclick="closeAddStudent()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="modal-title" id="addModalTitle">학생 추가</div>
-    <div class="modal-field">
-      <div class="modal-label">이름</div>
-      <input class="modal-input" id="newStudentName" placeholder="학생 이름">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">수업 요일 (중복 선택 가능)</div>
-      <div class="day-grid" id="dayGrid">
-        <button type="button" class="day-chip" data-day="일" onclick="toggleDayChip(this)">일</button>
-        <button type="button" class="day-chip" data-day="월" onclick="toggleDayChip(this)">월</button>
-        <button type="button" class="day-chip" data-day="화" onclick="toggleDayChip(this)">화</button>
-        <button type="button" class="day-chip" data-day="수" onclick="toggleDayChip(this)">수</button>
-        <button type="button" class="day-chip" data-day="목" onclick="toggleDayChip(this)">목</button>
-        <button type="button" class="day-chip" data-day="금" onclick="toggleDayChip(this)">금</button>
-        <button type="button" class="day-chip" data-day="토" onclick="toggleDayChip(this)">토</button>
-      </div>
-    </div>
-    <div class="modal-btns">
-      <button type="button" class="modal-btn cancel" onclick="closeAddStudent()">취소</button>
-      <button type="button" class="modal-btn ok" onclick="confirmAddStudent()">추가</button>
-    </div>
-  </div>
-</div>
-
 <script>
 const DB='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
 const YEAR=new Date().getFullYear();
 const BANK='부산은행 101-2092-8547-06 (예금주: 화강암플러스미술학원)';
 const CONT='학원: 051-553-3698\n원장: 010-7701-6594 (문자 문의 가능)';
 const FOOT='\n\n■ 납부 방법\n'+BANK+'\n카드결제 시 아이편으로 보내주시면 결제 도와드리겠습니다.\n\n■ 문의\n'+CONT+'\n감사합니다.';
+
+function buildMonthButtons(){
+  const row=document.getElementById('monthRow');
+  if(!row) return;
+  row.innerHTML='';
+  const now=new Date();
+  const months=[];
+  // 현재 달 + 다음 달
+  for(let i=0;i<2;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()+i,1);
+    months.push({y:d.getFullYear(),m:d.getMonth()+1});
+  }
+  months.forEach(({y,m},i)=>{
+    const btn=document.createElement('button');
+    btn.className='mth-btn'+(mon===m&&YEAR===y?' on':'');
+    btn.textContent=m+'월';
+    btn.onclick=()=>setMonth(m,btn);
+    row.appendChild(btn);
+  });
+}
 
 const STUDENTS={
   '입시반':[{name:'박민지',days:['수','목','금','토']},{name:'김나연',days:['수','목','금','토','토']},{name:'박선영',days:['수','목','금','토','토']},{name:'김나현',days:['수','목','금','토']}],
@@ -310,21 +287,21 @@ const DAYS_DESC={
 
 const DAY=['일','월','화','수','목','금','토'];
 // Firebase 백업 데이터 (기본값)
+const FIREBASE_DEFAULT={"예비반_김도훈_7":{"lessons":[{"day":4,"tim":2,"type":"regular"},{"day":11,"tim":2,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":25,"tim":2,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"},{"day":25,"tim":3,"type":"regular"},{"day":26,"tim":2,"type":"regular"},{"day":19,"tim":2,"type":"regular"},{"day":12,"tim":2,"type":"regular"},{"day":5,"tim":2,"type":"regular"}],"special":[],"excluded":[19,12,5]},"예비반_김도훈_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":1,"tim":2,"type":"regular"},{"day":2,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":8,"tim":2,"type":"regular"},{"day":9,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":15,"tim":2,"type":"regular"},{"day":16,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":22,"tim":2,"type":"regular"},{"day":23,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":29,"tim":2,"type":"regular"},{"day":30,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"예비반_박하영_7":{"lessons":[{"day":1,"tim":3,"type":"regular"},{"day":2,"tim":3,"type":"regular"},{"day":3,"tim":3,"type":"regular"},{"day":10,"tim":3,"type":"regular"},{"day":9,"tim":3,"type":"regular"},{"day":8,"tim":3,"type":"regular"},{"day":15,"tim":3,"type":"regular"},{"day":16,"tim":3,"type":"regular"},{"day":17,"tim":3,"type":"regular"},{"day":22,"tim":3,"type":"regular"},{"day":23,"tim":3,"type":"regular"},{"day":24,"tim":3,"type":"regular"},{"day":29,"tim":3,"type":"regular"},{"day":30,"tim":3,"type":"regular"},{"day":31,"tim":3,"type":"regular"}],"special":[],"excluded":[3,2,10]},"예비반_박하영_8":{"lessons":[{"day":5,"tim":1,"type":"regular"},{"day":6,"tim":1,"type":"regular"},{"day":7,"tim":1,"type":"regular"},{"day":12,"tim":1,"type":"regular"},{"day":13,"tim":1,"type":"regular"},{"day":14,"tim":1,"type":"regular"},{"day":19,"tim":1,"type":"regular"},{"day":20,"tim":1,"type":"regular"},{"day":21,"tim":1,"type":"regular"},{"day":26,"tim":1,"type":"regular"},{"day":27,"tim":1,"type":"regular"},{"day":28,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"입시반_김나연_7":{"lessons":[{"day":4,"tim":2,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":11,"tim":2,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":10,"tim":3,"type":"regular"},{"day":9,"tim":3,"type":"regular"},{"day":8,"tim":3,"type":"regular"},{"day":15,"tim":3,"type":"regular"},{"day":16,"tim":3,"type":"regular"},{"day":17,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"},{"day":18,"tim":2,"type":"regular"}],"special":[{"day":22,"tim":2,"type":"special"},{"day":22,"tim":3,"type":"special"},{"day":23,"tim":3,"type":"special"},{"day":23,"tim":2,"type":"special"},{"day":24,"tim":2,"type":"special"},{"day":24,"tim":3,"type":"special"},{"day":25,"tim":3,"type":"special"},{"day":25,"tim":2,"type":"special"},{"day":30,"tim":2,"type":"special"},{"day":29,"tim":2,"type":"special"},{"day":29,"tim":3,"type":"special"},{"day":30,"tim":3,"type":"special"},{"day":26,"tim":1,"type":"special"},{"day":26,"tim":2,"type":"special"}],"excluded":[1,2,3,31]},"입시반_김나연_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":1,"tim":2,"type":"regular"},{"day":5,"tim":1,"type":"regular"},{"day":6,"tim":1,"type":"regular"},{"day":7,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":8,"tim":2,"type":"regular"},{"day":12,"tim":1,"type":"regular"},{"day":13,"tim":1,"type":"regular"},{"day":14,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":15,"tim":2,"type":"regular"},{"day":19,"tim":1,"type":"regular"},{"day":20,"tim":1,"type":"regular"},{"day":21,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":22,"tim":2,"type":"regular"},{"day":26,"tim":1,"type":"regular"},{"day":27,"tim":1,"type":"regular"},{"day":28,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":29,"tim":2,"type":"regular"}],"special":[],"excluded":[]},"입시반_김나현_7":{"lessons":[{"day":1,"tim":3,"type":"regular"},{"day":2,"tim":3,"type":"regular"},{"day":3,"tim":3,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":8,"tim":3,"type":"regular"},{"day":9,"tim":3,"type":"regular"},{"day":10,"tim":3,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":15,"tim":3,"type":"regular"},{"day":16,"tim":3,"type":"regular"},{"day":17,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"}],"special":[{"day":30,"tim":3,"type":"special"},{"day":29,"tim":3,"type":"special"},{"day":29,"tim":2,"type":"special"},{"day":30,"tim":2,"type":"special"},{"day":26,"tim":2,"type":"special"},{"day":26,"tim":1,"type":"special"},{"day":22,"tim":2,"type":"special"},{"day":22,"tim":3,"type":"special"},{"day":23,"tim":3,"type":"special"},{"day":23,"tim":2,"type":"special"},{"day":24,"tim":2,"type":"special"},{"day":24,"tim":3,"type":"special"},{"day":25,"tim":3,"type":"special"},{"day":25,"tim":2,"type":"special"}],"excluded":[4,31]},"입시반_김나현_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":5,"tim":1,"type":"regular"},{"day":6,"tim":1,"type":"regular"},{"day":7,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":12,"tim":1,"type":"regular"},{"day":13,"tim":1,"type":"regular"},{"day":14,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":19,"tim":1,"type":"regular"},{"day":20,"tim":1,"type":"regular"},{"day":21,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":26,"tim":1,"type":"regular"},{"day":27,"tim":1,"type":"regular"},{"day":28,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"입시반_박민지_7":{"lessons":[],"special":[],"excluded":[1,2,3,4,8,9,10,11,15,16,17,18,22,23,24,25,29,30,31]},"입시반_박민지_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":5,"tim":1,"type":"regular"},{"day":6,"tim":1,"type":"regular"},{"day":7,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":12,"tim":1,"type":"regular"},{"day":13,"tim":1,"type":"regular"},{"day":14,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":19,"tim":1,"type":"regular"},{"day":20,"tim":1,"type":"regular"},{"day":21,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":26,"tim":1,"type":"regular"},{"day":27,"tim":1,"type":"regular"},{"day":28,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"입시반_박선영_7":{"lessons":[{"day":11,"tim":2,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":4,"tim":2,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":3,"tim":3,"type":"regular"},{"day":1,"tim":3,"type":"regular"},{"day":2,"tim":3,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":10,"tim":3,"type":"regular"},{"day":9,"tim":3,"type":"regular"},{"day":8,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"},{"day":17,"tim":3,"type":"regular"},{"day":16,"tim":3,"type":"regular"},{"day":15,"tim":3,"type":"regular"}],"special":[{"day":22,"tim":2,"type":"special"},{"day":22,"tim":3,"type":"special"},{"day":23,"tim":3,"type":"special"},{"day":23,"tim":2,"type":"special"},{"day":24,"tim":2,"type":"special"},{"day":24,"tim":3,"type":"special"},{"day":25,"tim":3,"type":"special"},{"day":25,"tim":2,"type":"special"},{"day":30,"tim":2,"type":"special"},{"day":29,"tim":3,"type":"special"},{"day":29,"tim":2,"type":"special"},{"day":30,"tim":3,"type":"special"},{"day":26,"tim":1,"type":"special"},{"day":26,"tim":2,"type":"special"}],"excluded":[31]},"입시반_박선영_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":1,"tim":2,"type":"regular"},{"day":5,"tim":1,"type":"regular"},{"day":6,"tim":1,"type":"regular"},{"day":7,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":8,"tim":2,"type":"regular"},{"day":12,"tim":1,"type":"regular"},{"day":13,"tim":1,"type":"regular"},{"day":14,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":15,"tim":2,"type":"regular"},{"day":19,"tim":1,"type":"regular"},{"day":20,"tim":1,"type":"regular"},{"day":21,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":22,"tim":2,"type":"regular"},{"day":26,"tim":1,"type":"regular"},{"day":27,"tim":1,"type":"regular"},{"day":28,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":29,"tim":2,"type":"regular"}],"special":[],"excluded":[]},"중등반_권해원_7":{"lessons":[{"day":4,"tim":2,"type":"regular"},{"day":11,"tim":2,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":2,"tim":3,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":9,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"},{"day":16,"tim":3,"type":"regular"},{"day":23,"tim":3,"type":"regular"}],"special":[{"day":26,"tim":1,"type":"special"},{"day":26,"tim":2,"type":"special"},{"day":29,"tim":2,"type":"special"},{"day":29,"tim":3,"type":"special"},{"day":30,"tim":3,"type":"special"},{"day":30,"tim":2,"type":"special"},{"day":24,"tim":2,"type":"special"},{"day":24,"tim":3,"type":"special"},{"day":25,"tim":3,"type":"special"},{"day":25,"tim":2,"type":"special"}],"excluded":[]},"중등반_권해원_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":1,"tim":2,"type":"regular"},{"day":6,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":8,"tim":2,"type":"regular"},{"day":13,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":15,"tim":2,"type":"regular"},{"day":20,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":22,"tim":2,"type":"regular"},{"day":27,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":29,"tim":2,"type":"regular"}],"special":[],"excluded":[]},"중등반_김현준_7":{"lessons":[{"day":22,"tim":3,"type":"regular"},{"day":15,"tim":3,"type":"regular"},{"day":8,"tim":3,"type":"regular"},{"day":5,"tim":2,"type":"regular"},{"day":12,"tim":2,"type":"regular"},{"day":19,"tim":2,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"}],"special":[{"day":29,"tim":3,"type":"special"},{"day":29,"tim":2,"type":"special"},{"day":25,"tim":3,"type":"special"}],"excluded":[1,15,8,26]},"중등반_김현준_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":2,"tim":1,"type":"regular"},{"day":5,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":9,"tim":1,"type":"regular"},{"day":12,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":16,"tim":1,"type":"regular"},{"day":19,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":23,"tim":1,"type":"regular"},{"day":26,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":30,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"중등반_안시연_7":{"lessons":[{"day":4,"tim":2,"type":"regular"},{"day":5,"tim":1,"type":"regular"},{"day":5,"tim":2,"type":"regular"},{"day":11,"tim":2,"type":"regular"},{"day":12,"tim":1,"type":"regular"},{"day":12,"tim":2,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":19,"tim":2,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"},{"day":19,"tim":1,"type":"regular"}],"special":[{"day":30,"tim":2,"type":"special"},{"day":30,"tim":3,"type":"special"},{"day":29,"tim":3,"type":"special"},{"day":26,"tim":1,"type":"special"},{"day":26,"tim":2,"type":"special"},{"day":29,"tim":2,"type":"special"},{"day":24,"tim":2,"type":"special"},{"day":24,"tim":3,"type":"special"},{"day":25,"tim":3,"type":"special"},{"day":25,"tim":2,"type":"special"}],"excluded":[]},"중등반_안시연_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":1,"tim":2,"type":"regular"},{"day":2,"tim":1,"type":"regular"},{"day":2,"tim":2,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":8,"tim":2,"type":"regular"},{"day":9,"tim":1,"type":"regular"},{"day":9,"tim":2,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":15,"tim":2,"type":"regular"},{"day":16,"tim":1,"type":"regular"},{"day":16,"tim":2,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":22,"tim":2,"type":"regular"},{"day":23,"tim":1,"type":"regular"},{"day":23,"tim":2,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":29,"tim":2,"type":"regular"},{"day":30,"tim":1,"type":"regular"},{"day":30,"tim":2,"type":"regular"}],"special":[],"excluded":[]},"중등반_전서빈_7":{"lessons":[{"day":4,"tim":2,"type":"regular"},{"day":11,"tim":2,"type":"regular"},{"day":16,"tim":1,"type":"regular"},{"day":18,"tim":1,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":9,"tim":3,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":23,"tim":3,"type":"regular"}],"special":[{"day":24,"tim":3,"type":"special"},{"day":24,"tim":2,"type":"special"},{"day":25,"tim":2,"type":"special"},{"day":25,"tim":3,"type":"special"},{"day":30,"tim":2,"type":"special"},{"day":30,"tim":3,"type":"special"},{"day":29,"tim":3,"type":"special"},{"day":29,"tim":2,"type":"special"},{"day":26,"tim":2,"type":"special"},{"day":26,"tim":1,"type":"special"}],"excluded":[2,11]},"중등반_전서빈_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":1,"tim":2,"type":"regular"},{"day":6,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":8,"tim":2,"type":"regular"},{"day":13,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":15,"tim":2,"type":"regular"},{"day":20,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":22,"tim":2,"type":"regular"},{"day":27,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":29,"tim":2,"type":"regular"}],"special":[],"excluded":[]},"중등반_조제우_7":{"lessons":[{"day":11,"tim":2,"type":"regular"},{"day":10,"tim":3,"type":"regular"},{"day":8,"tim":3,"type":"regular"},{"day":15,"tim":3,"type":"regular"},{"day":17,"tim":3,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":22,"tim":3,"type":"regular"},{"day":5,"tim":1,"type":"regular"}],"special":[{"day":26,"tim":1,"type":"special"},{"day":26,"tim":2,"type":"special"},{"day":29,"tim":2,"type":"special"},{"day":29,"tim":3,"type":"special"},{"day":30,"tim":3,"type":"special"},{"day":24,"tim":2,"type":"special"},{"day":24,"tim":3,"type":"special"},{"day":25,"tim":2,"type":"special"}],"excluded":[3,1,31]},"중등반_조제우_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":5,"tim":1,"type":"regular"},{"day":7,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":12,"tim":1,"type":"regular"},{"day":14,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":19,"tim":1,"type":"regular"},{"day":21,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":26,"tim":1,"type":"regular"},{"day":28,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"중등반_최주연_7":{"lessons":[{"day":11,"tim":2,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":25,"tim":2,"type":"regular"},{"day":4,"tim":2,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"},{"day":12,"tim":2,"type":"regular"},{"day":19,"tim":2,"type":"regular"},{"day":25,"tim":3,"type":"regular"},{"day":26,"tim":2,"type":"regular"}],"special":[],"excluded":[]},"중등반_최주연_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":1,"tim":2,"type":"regular"},{"day":2,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":8,"tim":2,"type":"regular"},{"day":9,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":15,"tim":2,"type":"regular"},{"day":16,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":22,"tim":2,"type":"regular"},{"day":23,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":29,"tim":2,"type":"regular"},{"day":30,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"중등반_한지유_7":{"lessons":[{"day":4,"tim":2,"type":"regular"},{"day":11,"tim":2,"type":"regular"},{"day":12,"tim":2,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":19,"tim":2,"type":"regular"},{"day":5,"tim":2,"type":"regular"}],"special":[{"day":30,"tim":3,"type":"special"},{"day":30,"tim":2,"type":"special"},{"day":29,"tim":2,"type":"special"},{"day":29,"tim":3,"type":"special"},{"day":26,"tim":2,"type":"special"},{"day":26,"tim":1,"type":"special"},{"day":24,"tim":2,"type":"special"},{"day":24,"tim":3,"type":"special"},{"day":25,"tim":3,"type":"special"},{"day":25,"tim":2,"type":"special"}],"excluded":[4,18,19,5]},"중등반_한지유_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":2,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":9,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":16,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":23,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":30,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_김가람_7":{"lessons":[{"day":26,"tim":2,"type":"regular"},{"day":19,"tim":2,"type":"regular"},{"day":12,"tim":2,"type":"regular"},{"day":5,"tim":2,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"},{"day":25,"tim":3,"type":"regular"}],"special":[],"excluded":[19,12,5]},"취미반_김가람_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":2,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":9,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":16,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":23,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":30,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_김건휘_7":{"lessons":[{"day":12,"tim":1,"type":"regular"},{"day":19,"tim":1,"type":"regular"},{"day":26,"tim":1,"type":"regular"},{"day":5,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_김건휘_8":{"lessons":[{"day":2,"tim":1,"type":"regular"},{"day":9,"tim":1,"type":"regular"},{"day":16,"tim":1,"type":"regular"},{"day":23,"tim":1,"type":"regular"},{"day":30,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_김예진_7":{"lessons":[{"day":2,"tim":3,"type":"regular"},{"day":9,"tim":3,"type":"regular"},{"day":16,"tim":3,"type":"regular"},{"day":23,"tim":3,"type":"regular"},{"day":30,"tim":3,"type":"regular"},{"day":4,"tim":3,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"},{"day":25,"tim":3,"type":"regular"}],"special":[],"excluded":[]},"취미반_김예진_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":6,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":13,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":20,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":27,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_김윤재_7":{"lessons":[{"day":4,"tim":2,"type":"regular"},{"day":11,"tim":2,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":25,"tim":2,"type":"regular"},{"day":26,"tim":2,"type":"regular"},{"day":19,"tim":2,"type":"regular"},{"day":12,"tim":2,"type":"regular"},{"day":5,"tim":2,"type":"regular"}],"special":[],"excluded":[25,19,12,5]},"취미반_김윤재_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":2,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":9,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":16,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":23,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"},{"day":30,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_나은솔_7":{"lessons":[{"day":4,"tim":2,"type":"regular"},{"day":11,"tim":2,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":25,"tim":2,"type":"regular"}],"special":[],"excluded":[]},"취미반_나은솔_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_명지민_7":{"lessons":[{"day":25,"tim":3,"type":"regular"},{"day":18,"tim":3,"type":"regular"},{"day":11,"tim":3,"type":"regular"},{"day":4,"tim":3,"type":"regular"}],"special":[],"excluded":[25,18,11,4]},"취미반_명지민_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_신유나_7":{"lessons":[{"day":19,"tim":1,"type":"regular"},{"day":12,"tim":1,"type":"regular"},{"day":5,"tim":1,"type":"regular"},{"day":26,"tim":1,"type":"regular"}],"special":[],"excluded":[18,25]},"취미반_신유나_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_이지아_7":{"lessons":[{"day":25,"tim":2,"type":"regular"},{"day":18,"tim":2,"type":"regular"},{"day":11,"tim":2,"type":"regular"},{"day":4,"tim":2,"type":"regular"}],"special":[],"excluded":[25,18,11,4]},"취미반_이지아_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_최다윤_7":{"lessons":[{"day":12,"tim":1,"type":"regular"},{"day":19,"tim":1,"type":"regular"},{"day":26,"tim":1,"type":"regular"},{"day":5,"tim":2,"type":"regular"}],"special":[],"excluded":[5]},"취미반_최다윤_8":{"lessons":[{"day":2,"tim":1,"type":"regular"},{"day":9,"tim":1,"type":"regular"},{"day":16,"tim":1,"type":"regular"},{"day":23,"tim":1,"type":"regular"},{"day":30,"tim":1,"type":"regular"}],"special":[],"excluded":[]},"취미반_최현우_7":{"lessons":[{"day":26,"tim":2,"type":"regular"},{"day":19,"tim":2,"type":"regular"},{"day":12,"tim":2,"type":"regular"},{"day":5,"tim":2,"type":"regular"}],"special":[],"excluded":[25,18,11,4]},"취미반_최현우_8":{"lessons":[{"day":1,"tim":1,"type":"regular"},{"day":8,"tim":1,"type":"regular"},{"day":15,"tim":1,"type":"regular"},{"day":22,"tim":1,"type":"regular"},{"day":29,"tim":1,"type":"regular"}],"special":[],"excluded":[]}};
 (()=>{
   try{
     const raw=localStorage.getItem('sch_v1');
-    if(!raw){window._db={};return;}
+    if(!raw){window._db=Object.assign({},FIREBASE_DEFAULT);return;}
     const parsed=JSON.parse(raw);
     const clean={};
     Object.entries(parsed).forEach(([k,v])=>{
-      if(v&&typeof v==='object'&&Array.isArray(v.lessons)){
-        if(!Array.isArray(v.special))v.special=[];
-        if(!Array.isArray(v.excluded))v.excluded=[];
+      if(v&&typeof v==='object'&&Array.isArray(v.lessons)&&Array.isArray(v.special)&&Array.isArray(v.excluded)){
         clean[k]=v;
       }
     });
-    window._db=clean;
-  }catch(e){window._db={};}
+    // 로컬이 비어있거나 유효 데이터 없으면 Firebase 기본값 사용
+    window._db=Object.keys(clean).length>0?clean:Object.assign({},FIREBASE_DEFAULT);
+  }catch(e){window._db=Object.assign({},FIREBASE_DEFAULT);}
 })();
 let db=window._db;
 let mon=new Date().getMonth()+1,curCls=null,curStu=null,ptimer=null,lock=false;
@@ -362,95 +339,6 @@ const save=()=>{
 };
 const fmt=n=>n.toLocaleString('ko-KR')+'원';
 
-// ── 월 버튼 동적 생성 ──
-// ── 학생 추가/제거 ──
-
-function openAddStudent(cls){
-  _addingCls=cls;
-  _selectedDays=[];
-  document.getElementById('newStudentName').value='';
-  document.getElementById('addModalTitle').textContent=cls+' 학생 추가';
-  document.querySelectorAll('.day-chip').forEach(c=>c.classList.remove('on'));
-  document.getElementById('addStudentModal').classList.add('on');
-}
-function closeAddStudent(){
-  document.getElementById('addStudentModal').classList.remove('on');
-}
-// 학생 관리 함수는 아래에 정의됨
-
-// ── 월 버튼 동적 생성 ──
-function buildMonthButtons(){
-  const row=document.getElementById('monthRow');if(!row)return;
-  row.innerHTML='';
-  const curM=new Date().getMonth()+1;
-  const months=[curM,curM===12?1:curM+1];
-  months.forEach(m=>{
-    const btn=document.createElement('button');
-    btn.className='mth-btn'+(mon===m?' on':'');
-    btn.textContent=m+'월';
-    btn.onclick=()=>setMonth(m,btn);
-    row.appendChild(btn);
-  });
-}
-
-// ── 학생 추가/제거 ──
-let _addingCls='',_selectedDays=[];
-
-function openAddStudent(cls){
-  _addingCls=cls;_selectedDays=[];
-  document.getElementById('newStudentName').value='';
-  document.getElementById('addModalTitle').textContent=cls+' 학생 추가';
-  document.querySelectorAll('.day-chip').forEach(c=>c.classList.remove('on'));
-  document.getElementById('addStudentModal').classList.add('on');
-}
-function closeAddStudent(){document.getElementById('addStudentModal').classList.remove('on');}
-function confirmAddStudent(){
-  const name=document.getElementById('newStudentName').value.trim();
-  if(!name){alert('이름을 입력하세요.');return;}
-  if(_selectedDays.length===0){alert('수업 요일을 선택하세요.');return;}
-  if(STUDENTS[_addingCls].find(s=>s.name===name)){alert('이미 같은 이름의 학생이 있습니다.');return;}
-  STUDENTS[_addingCls].push({name,days:[..._selectedDays]});
-  saveStudents();closeAddStudent();renderSB();
-  alert(name+' 학생이 추가됐습니다.');
-}
-function toggleDayChip(chip){
-  const day=chip.dataset.day;
-  if(_selectedDays.includes(day)){_selectedDays=_selectedDays.filter(d=>d!==day);chip.classList.remove('on');}
-  else{_selectedDays.push(day);chip.classList.add('on');}
-}
-function removeStudent(cls,name){
-  if(!confirm(name+' 학생을 제거할까요?\n수업 데이터도 모두 삭제됩니다.'))return;
-  STUDENTS[cls]=STUDENTS[cls].filter(s=>s.name!==name);
-  Object.keys(db).forEach(k=>{if(k.includes('_'+name+'_'))delete db[k];});
-  save();saveStudents();
-  if(curStu===name){curStu=null;curCls=null;}
-  renderSB();renderCal();
-}
-function saveStudents(){
-  const stuData={};
-  Object.entries(STUDENTS).forEach(([cls,stus])=>{stuData[cls]=stus.map(s=>({name:s.name,days:s.days}));});
-  fetch(DB+'/students_list.json',{method:'PUT',body:JSON.stringify(stuData),headers:{'Content-Type':'application/json'}}).catch(()=>{});
-}
-async function loadStudents(){
-  try{
-    const r=await fetch(DB+'/students_list.json?_='+Date.now());
-    if(!r.ok){ console.log('students_list 없음, 기본값 사용'); return; }
-    const data=await r.json();
-    if(!data||typeof data!=='object')return;
-    // Firebase 데이터로 STUDENTS 완전 교체 (유효한 데이터만)
-    let updated=false;
-    Object.entries(data).forEach(([cls,stus])=>{
-      if(!Array.isArray(stus))return;
-      const valid=stus.filter(s=>s&&s.name&&Array.isArray(s.days)&&s.days.length>0);
-      if(valid.length>0){
-        STUDENTS[cls]=valid.map(s=>({name:s.name,days:s.days}));
-        updated=true;
-      }
-    });
-    if(updated) console.log('학생 목록 로드 완료:', Object.entries(STUDENTS).map(([c,s])=>c+':'+s.length+'명').join(', '));
-  }catch(e){console.log('학생 목록 로드 실패',e);}
-}
-
 function resetLocal(){
   if(!confirm('로컬 데이터를 초기화합니다. 체크한 내용이 모두 사라집니다. 계속할까요?')) return;
   localStorage.removeItem('sch_v1');
@@ -462,21 +350,15 @@ function getData(cls,name,month){
   const k=sk(cls,name,month);
   if(!db[k]||typeof db[k]!=='object'||!Array.isArray(db[k].lessons)){
     const s=STUDENTS[cls]?.find(x=>x.name===name);
-    if(!s||!Array.isArray(s.days)){db[k]={lessons:[],special:[],excluded:[]};return db[k];}
+    if(!s){db[k]={lessons:[],special:[],excluded:[]};return db[k];}
     const tot=getDays(month),fst=getFirst(month),ls=[];
     for(let d=1;d<=tot;d++){
       const dw=(fst+d-1)%7,cnt=s.days.filter(x=>x===DAY[dw]).length;
       for(let t=1;t<=cnt;t++) ls.push({day:d,tim:t,type:'regular'});
     }
-    db[k]={lessons:ls,special:[],excluded:[]};
-    try{save();}catch(e){}
+    db[k]={lessons:ls,special:[],excluded:[]};save();
   }
-  // special/excluded 없을 경우 보완
-  if(db[k]&&!Array.isArray(db[k].special))db[k].special=[];
-  if(db[k]&&!Array.isArray(db[k].excluded))db[k].excluded=[];
-  if(db[k]&&!Array.isArray(db[k].special))db[k].special=[];
-  if(db[k]&&!Array.isArray(db[k].excluded))db[k].excluded=[];
-  return db[k]||{lessons:[],special:[],excluded:[]};
+  return db[k];
 }
 
 // ── 사이드바 렌더 ──
@@ -491,17 +373,11 @@ function renderSB(){
       const d=getData(cls,s.name,mon),t=d.lessons.length+d.special.length;
       const btn=document.createElement('button');
       btn.className='stu-btn'+(curCls===cls&&curStu===s.name?' on':'');
-      btn.innerHTML='<span>'+s.name+'</span><span style="display:flex;align-items:center;gap:4px"><span class="stu-t">'+t+'T</span><button class="del-stu-btn" onclick="event.stopPropagation();removeStudent(\''+cls+'\',\''+s.name+'\')">✕</button></span>';
+      btn.innerHTML='<span>'+s.name+'</span><span class="stu-t">'+t+'T</span>';
       btn.onclick=()=>pick(cls,s.name);
       el.appendChild(btn);
       }catch(e){console.error('renderSB 오류:',cls,s.name,e);}
     });
-    // 반별 학생 추가 버튼
-    const addBtn=document.createElement('button');
-    addBtn.type='button';addBtn.className='add-stu-btn';
-    addBtn.textContent='+ 학생 추가';
-    addBtn.onclick=()=>openAddStudent(cls);
-    el.appendChild(addBtn);
   });
 }
 
@@ -754,8 +630,10 @@ async function syncFB(){
   const btn=document.getElementById('syncBtn');
   btn.textContent='동기화 중...';btn.className='sync-btn ing';
   try{
-    const curYear=new Date().getFullYear();const months=[new Date().getMonth()+1];const nm=new Date().getMonth()+2;if(nm<=12)months.push(nm);else months.push(1);
-    for(const month of months){
+    const now2=new Date();
+    const syncMonths=[];
+    for(let i=0;i<2;i++){const d=new Date(now2.getFullYear(),now2.getMonth()+i,1);syncMonths.push(d.getMonth()+1);}
+    for(const month of syncMonths){
       Object.entries(STUDENTS).forEach(([cls,stus])=>{
         stus.forEach(s=>getData(cls,s.name,month));
       });
@@ -824,10 +702,10 @@ async function syncFB(){
 // ── 초기화 ──
 buildMonthButtons();
 (async()=>{
-  // 1. 학생 목록 로드 (Firebase students_list.json)
-  await loadStudents();
+  // 1. 학생 목록 로드
+  if(typeof loadStudents==='function') await loadStudents();
 
-  // 2. 수업 데이터 로드 (Firebase schedule_backup.json)
+  // 2. Firebase schedule_backup 로드
   try{
     const r=await fetch(DB+'/schedule_backup.json?_='+Date.now());
     if(r.ok){
@@ -836,19 +714,30 @@ buildMonthButtons();
         const {_updatedAt:fbTs=0,...backupClean}=backup;
         const validKeys=Object.keys(backupClean).filter(k=>{
           const v=backupClean[k];
-          return v&&typeof v==='object'&&Array.isArray(v.lessons)&&Array.isArray(v.special);
+          return v&&typeof v==='object'&&Array.isArray(v.lessons);
         });
         if(validKeys.length>0){
           const localTs=parseInt(localStorage.getItem('sch_v1_ts')||'0');
           if(fbTs>localTs||Object.keys(db).length===0){
+            // special/excluded 누락 보완
+            Object.values(backupClean).forEach(v=>{
+              if(v&&typeof v==='object'){
+                if(!Array.isArray(v.special))v.special=[];
+                if(!Array.isArray(v.excluded))v.excluded=[];
+              }
+            });
             db=backupClean;
             localStorage.setItem('sch_v1',JSON.stringify(db));
             localStorage.setItem('sch_v1_ts',String(fbTs||Date.now()));
+            // abs 값도 localStorage에 동기화
+            Object.entries(db).forEach(([k,v])=>{
+              if(v&&v.abs!==undefined) localStorage.setItem('abs_'+k,String(v.abs));
+            });
           }
         }
       }
     }
-  }catch(e){console.log('schedule_backup 로드 실패:',e.message);}
+  }catch(e){console.log('Firebase 로드 실패:',e.message);}
 
   // 3. 렌더
   renderSB();
