@@ -479,19 +479,42 @@ async function syncFromFirebase(){
       Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])) db[m].forEach(s=>{ if(paidMap[s.id]!==undefined) s.paid=paidMap[s.id]; }); });
     }
 
-    // students_list.json - 신규 학생 db에 동적 추가
+    // students_list.json - 학생 목록 동기화 (추가/제거 모두 처리)
     if(sr&&sr.ok){
       try{
         const stuList = await sr.json();
         if(stuList&&typeof stuList==='object'){
+          // Firebase students_list의 전체 학생 ID 목록
+          const fbIds=new Set();
+          Object.entries(stuList).forEach(([cls,stus])=>{
+            if(!Array.isArray(stus))return;
+            stus.forEach(stu=>{ if(stu.name) fbIds.add(cls+'_'+stu.name); });
+          });
+
           Object.keys(db).forEach(mon=>{
             if(!db[mon]||!Array.isArray(db[mon]))return;
+
+            // 1. 제거된 학생 삭제 (initData에 없고 students_list에도 없는 학생)
+            db[mon]=db[mon].filter(s=>{
+              // initData에 있으면 유지
+              if(initData[mon]?.find(x=>x.id===s.id))return true;
+              // students_list에 있으면 유지
+              const clsName=s.id.replace(mon+'_','');
+              // id형식: jul_이름 → cls_이름 형태로 fbIds 확인
+              for(const fbId of fbIds){
+                if(fbId.endsWith('_'+s.name)&&s.cls===fbId.split('_')[0])return true;
+              }
+              return false;
+            });
+
+            // 2. 신규 학생 추가
             Object.entries(stuList).forEach(([cls,stus])=>{
               if(!Array.isArray(stus))return;
               stus.forEach(stu=>{
                 if(!stu.name)return;
                 const id=mon+'_'+stu.name;
-                if(db[mon].find(s=>s.id===id))return; // 기존 학생 스킵
+                if(db[mon].find(s=>s.id===id))return; // 이미 있으면 스킵
+                if(initData[mon]?.find(x=>x.name===stu.name))return; // initData에 있으면 스킵
                 db[mon].push({
                   id, name:stu.name, cls,
                   tags:[], schedule:(stu.days||[]).join(','), days:'',
@@ -534,7 +557,9 @@ async function syncFromFirebase(){
             const rSpec = RATE_MAP[s.name];
             if(rSpec && (rSpec.type==='fix' || rSpec.type==='remain')) return;
             if(TAKUMI.includes(s.name)) return;
-            if(_edits[s.id]) return; // 수동 편집된 학생은 건너뜀
+            // amount/totalT가 edits에 있을 때만 자동계산 건너뜀 (memo/absence만 있으면 통과)
+            const _e=_edits[s.id];
+            if(_e&&(_e.amount!==undefined||_e.totalT!==undefined||_e.days!==undefined)) return;
 
             const key = `${s.cls}_${s.name}_${mNum}`;
             const sdata = backup[key];
