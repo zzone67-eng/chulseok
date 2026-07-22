@@ -480,7 +480,7 @@ function onFixedFee(){
   const v=parseInt(document.getElementById('fixedFeeIn')?.value||'0')||0;
   localStorage.setItem('fixedFee_'+curCls+'_'+curStu+'_'+mon, v||'');
   const sid=monToLabel(mon)+'_'+curStu;
-  if(v>0) saveFixedFeeToFirebase(sid, v);
+  if(v>=0&&document.getElementById('fixedFeeIn')?.value!=='') saveFixedFeeToFirebase(sid, v);
   else clearFixedFeeFromFirebase(sid);
   updateFee();
 }
@@ -715,8 +715,10 @@ function calcFee(){
   }
   // 고정수강료 우선 적용
   const fixedFee=getFixedFee();
-  if(fixedFee>0)fee=fixedFee;
-  return {rate,reg,sp,abs,finalT,fee,actualReg,fixedFee}; // actualReg=실제체크수
+  const fixedFeeSet=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon)!==null&&
+    localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon)!=='';
+  if(fixedFeeSet)fee=fixedFee;
+  return {rate,reg,sp,abs,finalT,fee,actualReg,fixedFee,fixedFeeSet}; // actualReg=실제체크수
 }
 
 function updateStats(){
@@ -801,7 +803,7 @@ function genMsg(c){
   // 특이사항 섹션
   const specialsText=_specials.length>0?'\n'+_specials.map(s=>s.content).join('\n\n')+'\n\n':'';
   // 고정수강료 문자 처리
-  if(c.fixedFee>0){
+  if(c.fixedFeeSet){
     body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료\n'+fmt(c.fixedFee)+' (고정)';
   }
   return '['+m+' 수강료 안내 - '+curStu+' 학생 ('+curCls+')]\n안녕하세요. 화강암플러스미술학원입니다.\n\n'+spN+specialsText+body+memoLine+FOOT;
