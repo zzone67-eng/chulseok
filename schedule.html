@@ -445,36 +445,29 @@ let _addingCls='', _selectedDays=[];
 
 // ── 고정수강료 ──
 function monToLabel(m){
-  // 월 숫자 → 레이블 (현재 mon 변수는 숫자)
-  const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-  return labels[(m-1)%12]||'jul';
-}
-function monToLabel(m){
   const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
   return labels[(m-1)%12]||'jul';
 }
 async function saveFixedFeeToFirebase(id, amount){
-  // student_edits.json 전체를 읽어서 해당 항목만 추가/수정 후 저장
   try{
     const r=await fetch(DB+'/student_edits.json?_='+Date.now());
-    const edits=(r.ok&&await r.json())||{};
-    if(typeof edits!=='object'||edits===null) return;
-    edits[id]={...edits[id], amount};
-    await fetch(DB+'/student_edits.json',{method:'PUT',body:JSON.stringify(edits),headers:{'Content-Type':'application/json'}});
-    console.log('고정수강료 저장:', id, amount);
+    let edits={};
+    if(r.ok){ const raw=await r.json(); if(raw&&typeof raw==='object') edits=raw; }
+    edits[id]=Object.assign({},edits[id]||{},{amount});
+    const res=await fetch(DB+'/student_edits.json',{method:'PUT',body:JSON.stringify(edits),headers:{'Content-Type':'application/json'}});
+    console.log('고정수강료 저장:', id, amount, res.status);
   }catch(e){console.error('고정수강료 저장 실패:',e);}
 }
 async function clearFixedFeeFromFirebase(id){
   try{
     const r=await fetch(DB+'/student_edits.json?_='+Date.now());
-    const edits=(r.ok&&await r.json())||{};
-    if(typeof edits!=='object'||edits===null) return;
+    let edits={};
+    if(r.ok){ const raw=await r.json(); if(raw&&typeof raw==='object') edits=raw; }
     delete edits[id];
     await fetch(DB+'/student_edits.json',{method:'PUT',body:JSON.stringify(edits),headers:{'Content-Type':'application/json'}});
     console.log('고정수강료 제거:', id);
   }catch(e){console.error('고정수강료 제거 실패:',e);}
 }
-
 function onFixedFee(){
   if(!curStu)return;
   const v=parseInt(document.getElementById('fixedFeeIn')?.value||'0')||0;
