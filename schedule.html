@@ -570,6 +570,21 @@ function onExtraFee(){
     localStorage.removeItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon);
   }
   updateFee();
+  // Firebase에 최종 수강료(추가분 포함) 저장
+  const c2=calcFee();
+  if(!c2)return;
+  const sid=monToLabel(mon)+'_'+curStu;
+  if(v>0){
+    const desc2=document.getElementById('extraFeeDescIn')?.value||'';
+    saveFixedFeeToFirebase(sid, c2.fee, {extraFee:v, extraFeeDesc:desc2});
+  } else {
+    // 추가분 없을 때 - 고정/할인도 없으면 edits 제거
+    const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
+    const drR=parseInt(localStorage.getItem('discount_reg_'+curCls+'_'+curStu+'_'+mon)||'0');
+    const drS=parseInt(localStorage.getItem('discount_sp_'+curCls+'_'+curStu+'_'+mon)||'0');
+    if(!_fv&&!drR&&!drS) clearFixedFeeFromFirebase(sid);
+    else saveFixedFeeToFirebase(sid, c2.fee);
+  }
 }
 function clearExtraFee(){
   const el=document.getElementById('extraFeeIn');
@@ -578,6 +593,15 @@ function clearExtraFee(){
   localStorage.removeItem('extraFee_'+curCls+'_'+curStu+'_'+mon);
   localStorage.removeItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon);
   updateFee();
+  // Firebase에서 최종 수강료 업데이트
+  const c2=calcFee();
+  if(!c2)return;
+  const sid=monToLabel(mon)+'_'+curStu;
+  const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
+  const drR=parseInt(localStorage.getItem('discount_reg_'+curCls+'_'+curStu+'_'+mon)||'0');
+  const drS=parseInt(localStorage.getItem('discount_sp_'+curCls+'_'+curStu+'_'+mon)||'0');
+  if(!_fv&&!drR&&!drS) clearFixedFeeFromFirebase(sid);
+  else saveFixedFeeToFirebase(sid, c2.fee);
 }
 function getExtraFee(){return parseInt(localStorage.getItem('extraFee_'+curCls+'_'+curStu+'_'+mon)||'0')||0;}
 function getExtraFeeDesc(){return localStorage.getItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon)||'';}
