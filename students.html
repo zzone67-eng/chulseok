@@ -588,13 +588,14 @@ async function syncFromFirebase(){
       if(e.absence!==undefined)s.absence=e.absence;
       if(e.remain!==undefined)s.remain=e.remain;
     });});
+    await loadEdits();
     renderAll();
     if(statusEl) statusEl.textContent='';
   } catch(e){ if(statusEl) statusEl.textContent='연결 실패'; console.error(e); }
 }
 function getDB(){
   const saved=loadDB();
-  ['jul','aug'].forEach(m=>{
+  Object.keys(initData).forEach(m=>{
     initData[m].forEach(init=>{ if(!saved[m].find(s=>s.id===init.id)) saved[m].push(JSON.parse(JSON.stringify(init))); });
     saved[m].forEach(s=>{ if(!s.tags)s.tags=[]; if(s.remain===undefined)s.remain=null; });
   });
@@ -674,7 +675,7 @@ function mobRender(month){
     if(s.amount===0&&s.remain==null&&!s.fixed) return false;
     if(mobSearchQ&&!s.name.toLowerCase().includes(mobSearchQ)) return false;
     if(filter==='all') return true;
-    if(filter==='미납'){ const today=new Date(),cut=month==='jul'?new Date(2026,6,10):new Date(2026,7,10); if(today<cut)return false; return !s.paid&&s.amount>0; }
+    if(filter==='미납'){ return !s.paid&&s.amount>0; }
     return s.cls===filter;
   });
   const groups={}; items.forEach(s=>{ if(!groups[s.cls])groups[s.cls]=[]; groups[s.cls].push(s); });
@@ -799,7 +800,7 @@ function pcRenderSidebar(){
     if(s.amount===0&&s.remain==null&&!s.fixed) return false;
     if(pcSearchQ&&!s.name.includes(pcSearchQ)) return false;
     if(pcFilter==='all') return true;
-    if(pcFilter==='미납'){ const today=new Date(),cut=pcMonth==='jul'?new Date(2026,6,10):new Date(2026,7,10); if(today<cut)return false; return !s.paid&&s.amount>0; }
+    if(pcFilter==='미납'){ return !s.paid&&s.amount>0; }
     return s.cls===pcFilter;
   });
   const groups={}; ['입시반','예비반','중등반','취미반'].forEach(c=>groups[c]=[]);
@@ -944,19 +945,6 @@ function updateMonthLabels(){
 }
 
 // ── 월 레이블 동적 업데이트 ──
-function updateMonthLabels(){
-  const now=new Date();
-  const cur={m:now.getMonth()+1,y:now.getFullYear()};
-  const nxt=now.getMonth()===11?{m:1,y:now.getFullYear()+1}:{m:now.getMonth()+2,y:now.getFullYear()};
-  const tabs=document.querySelectorAll('#app-mob .tab');
-  if(tabs[0])tabs[0].textContent=cur.m+'월';
-  if(tabs[1])tabs[1].textContent=nxt.m+'월(예정)';
-  const smBtns=document.querySelectorAll('#app-pc .sm-btn');
-  if(smBtns[0])smBtns[0].textContent=cur.m+'월';
-  if(smBtns[1])smBtns[1].textContent=nxt.m+'월(예정)';
-  const sub=document.getElementById('hdrSub');
-  if(sub)sub.textContent=cur.y+'년 '+cur.m+'월';
-}
 
 // ── 시작 ──
 init();
