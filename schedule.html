@@ -541,6 +541,7 @@ function onExtraFee(){
   const sid=monToLabel(mon)+'_'+curStu;
   const c2=calcFee();
   if(!c2)return;
+  console.log('[extraFee] sid:', sid, 'fee:', c2.fee, 'v:', v);
   if(v>0) saveFixedFeeToFirebase(sid, c2.fee, {extraFee:v, extraFeeDesc:desc});
   else {
     const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
