@@ -332,9 +332,6 @@ const initData = {
     { id:'jul_박하영', name:'박하영', cls:'예비반', tags:['fix:월고정'],
       schedule:'수,목,금 주3회', days:'', absence:0, totalT:0,
       amount:250000, fixed:true, paid:false, memo:'고1 고정 250,000원/월', remain:null },
-    { id:'jul_김도훈', name:'김도훈', cls:'예비반', tags:[],
-      schedule:'토1,토2,일 주3회', days:'12T (4주기준)', absence:0, totalT:12,
-      amount:360000, fixed:false, paid:false, memo:'', remain:null },
     { id:'jul_안시연', name:'안시연', cls:'중등반', tags:['re:전월결석5'],
       schedule:'토1,토2,일1,일2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
       days:'정규 12T / 특강 10T', absence:9, totalT:13, regularT:12, specialT:10,
@@ -381,7 +378,6 @@ const initData = {
     { id:'aug_김나연', name:'김나연', cls:'입시반', tags:['special:특강'], schedule:'수,목,금,토1,토2 주5회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2', days:'정규 10T / 특강 26T = 총 36T', absence:0, totalT:36, regularT:10, specialT:26, amount:1125000, fixed:false, paid:false, memo:'8월 예상' },
     { id:'aug_김나현', name:'김나현', cls:'입시반', tags:['dis:재수50%','special:특강'], schedule:'수,목,금,토2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2', days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34, regularT:8, specialT:26, amount:937500, fixed:false, paid:false, memo:'8월 예상. 정규50%+특강정가' },
     { id:'aug_박하영', name:'박하영', cls:'예비반', tags:['fix:월고정'], schedule:'수,목,금 주3회', days:'', absence:0, totalT:0, amount:250000, fixed:true, paid:false, memo:'고1 고정 250,000원/월', remain:null },
-    { id:'aug_김도훈', name:'김도훈', cls:'예비반', tags:[], schedule:'토1,토2,일 주3회', days:'예정', absence:0, totalT:0, amount:360000, fixed:false, paid:false, memo:'8월 예상' },
     { id:'aug_안시연', name:'안시연', cls:'중등반', tags:['special:특강'], schedule:'토1,토2,일1,일2 주4회\n특강: 선택타임', days:'정규 12T / 특강 20T = 총 32T', absence:0, totalT:32, regularT:12, specialT:20, amount:1000000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'혜화여중', vacStart:'7/22(수)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
     { id:'aug_한지유', name:'한지유', cls:'중등반', tags:['special:특강'], schedule:'토,일 주2회\n특강: 선택타임', days:'정규 6T / 특강 20T = 총 26T', absence:0, totalT:26, regularT:6, specialT:20, amount:812500, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'초연중', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
     { id:'aug_조제우', name:'조제우', cls:'중등반', tags:['special:특강'], schedule:'수,금,토 주3회\n특강: 선택타임', days:'정규 8T / 특강 16T = 총 24T', absence:0, totalT:24, regularT:8, specialT:16, amount:750000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'초읍중', vacStart:'7/24(목)', vacEnd:'8/13(목)', openDay:'8/14(금)' } },
@@ -464,28 +460,42 @@ async function syncFromFirebase(){
     ]);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const paidMap = await r.json();
-    if(paidMap && typeof paidMap==='object'){
-      ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{ if(paidMap[s.id]!==undefined) s.paid=paidMap[s.id]; }); });
-    }
+    const _paidMap=(paidMap&&typeof paidMap==='object')?paidMap:{};
+    // 기존 학생 paid 적용
+    Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])) db[m].forEach(s=>{ if(_paidMap[s.id]!==undefined) s.paid=_paidMap[s.id]; }); });
 
-    // students_list.json - 신규 학생 db에 동적 추가
+    // students_list.json - 학생 목록 동기화
     if(sr&&sr.ok){
       try{
         const stuList = await sr.json();
         if(stuList&&typeof stuList==='object'){
-          ['jul','aug'].forEach(mon=>{
-            if(!db[mon])return;
+          // Firebase 전체 학생 이름 목록
+          const fbNamesByCls={};
+          Object.entries(stuList).forEach(([cls,stus])=>{
+            if(!Array.isArray(stus))return;
+            fbNamesByCls[cls]=stus.filter(s=>s.name).map(s=>s.name);
+          });
+          const allFbNames=new Set(Object.values(fbNamesByCls).flat());
+
+          Object.keys(db).forEach(mon=>{
+            if(!db[mon]||!Array.isArray(db[mon]))return;
+
+            // 1. 제거된 학생 삭제 (students_list 기준)
+            db[mon]=db[mon].filter(s=>allFbNames.has(s.name));
+
+            // 2. 신규 학생 추가
             Object.entries(stuList).forEach(([cls,stus])=>{
               if(!Array.isArray(stus))return;
               stus.forEach(stu=>{
                 if(!stu.name)return;
                 const id=mon+'_'+stu.name;
-                if(db[mon].find(s=>s.id===id))return; // 기존 학생 스킵
+                if(db[mon].find(s=>s.id===id))return;
+                if(initData[mon]?.find(x=>x.name===stu.name))return;
                 db[mon].push({
                   id, name:stu.name, cls,
                   tags:[], schedule:(stu.days||[]).join(','), days:'',
                   absence:0, totalT:0, amount:0,
-                  fixed:false, paid:false, memo:'', remain:null
+                  fixed:false, paid:_paidMap[id]||false, memo:'', remain:null
                 });
               });
             });
@@ -511,9 +521,10 @@ async function syncFromFirebase(){
         };
         const TAKUMI = ['나은솔','김건휘','김예진','최다윤','신유나','최현우','김윤재','김가람','이지아','명지민'];
 
-        ['jul','aug'].forEach(mon=>{
-          const mNum = mon==='jul'?7:8;
-          if(!db[mon]) return;
+        const MON_MAP={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+        Object.keys(db).forEach(mon=>{
+          const mNum=MON_MAP[mon]; if(!mNum) return;
+          if(!db[mon]||!Array.isArray(db[mon])) return;
           db[mon].forEach(s=>{
             const rSpec = RATE_MAP[s.name];
             // 고정/잔여 학생은 건드리지 않음
@@ -521,15 +532,9 @@ async function syncFromFirebase(){
             // 취미반은 고정
             if(TAKUMI.includes(s.name)) return;
 
-            // schedule_backup에서 해당 학생 데이터 찾기
-            // 키 형식: "반_이름_월" (예: "입시반_김나연_7")
-            // student_edits에 수동 편집값 있으면 자동계산 건너뜀
-            if(_edits[s.id]) return;
-
-            // student_edits에 수동 편집값 있으면 자동계산 건너뜀
-            if(_edits[s.id]) return;
-
-            if(_edits[s.id]) return; // 수동 편집된 학생은 자동계산 건너뜀
+            // amount/totalT가 edits에 있으면 자동계산 건너뜀
+            const _e=_edits[s.id];
+            if(_e&&(_e.amount!==undefined||_e.totalT!==undefined||_e.days!==undefined)) return;
             const key = `${s.cls}_${s.name}_${mNum}`;
             const sdata = backup[key];
             if(!sdata) return;
