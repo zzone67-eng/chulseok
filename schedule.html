@@ -285,6 +285,17 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
             <button type="button" onclick="clearFixedFee()" style="background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;padding:0 4px">✕</button>
           </div>
         </div>
+        <div style="padding:4px 0 0">
+          <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">추가 결제분 (다음달 이월 추가금)</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
+            <input id="extraFeeIn" placeholder="0" oninput="onExtraFee()"
+              style="flex:1;background:var(--bg);border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-size:13px;padding:5px 8px;font-family:inherit;outline:none;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield" type="text" inputmode="numeric">
+            <span style="font-size:12px;color:var(--tx2)">원</span>
+            <button type="button" onclick="clearExtraFee()" style="background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;padding:0 4px">✕</button>
+          </div>
+          <input id="extraFeeDescIn" placeholder="추가 내역 (예: 8월 보강 2회)" oninput="onExtraFee()"
+            style="width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-size:12px;padding:5px 8px;font-family:inherit;outline:none;box-sizing:border-box">
+        </div>
       </div>
       <!-- 할인율 버튼 -->
       <div style="padding:6px 14px 0;border-top:1px solid var(--bd)">
@@ -512,6 +523,70 @@ function onFixedFee(){
   localStorage.setItem('fixedFee_'+curCls+'_'+curStu+'_'+mon, String(v));
   saveFixedFeeToFirebase(monToLabel(mon)+'_'+curStu, v);
   updateFee();
+}
+// ── 추가결제분 ──
+function onExtraFee(){
+  if(!curStu)return;
+  const v=parseInt(document.getElementById('extraFeeIn')?.value||'0')||0;
+  const desc=document.getElementById('extraFeeDescIn')?.value||'';
+  if(v>0){
+    localStorage.setItem('extraFee_'+curCls+'_'+curStu+'_'+mon, String(v));
+    localStorage.setItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon, desc);
+  } else {
+    localStorage.removeItem('extraFee_'+curCls+'_'+curStu+'_'+mon);
+    localStorage.removeItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon);
+  }
+  updateFee();
+}
+function clearExtraFee(){
+  const el=document.getElementById('extraFeeIn');
+  const dl=document.getElementById('extraFeeDescIn');
+  if(el)el.value='';
+  if(dl)dl.value='';
+  localStorage.removeItem('extraFee_'+curCls+'_'+curStu+'_'+mon);
+  localStorage.removeItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon);
+  updateFee();
+}
+function getExtraFee(){ return parseInt(localStorage.getItem('extraFee_'+curCls+'_'+curStu+'_'+mon)||'0')||0; }
+function getExtraFeeDesc(){ return localStorage.getItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon)||''; }
+function loadExtraFee(){
+  const el=document.getElementById('extraFeeIn');
+  const dl=document.getElementById('extraFeeDescIn');
+  const v=localStorage.getItem('extraFee_'+curCls+'_'+curStu+'_'+mon);
+  const desc=localStorage.getItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon)||'';
+  if(el)el.value=(v&&v!=='0')?v:'';
+  if(dl)dl.value=desc;
+}
+// ── 추가결제분 ──
+function onExtraFee(){
+  if(!curStu)return;
+  const v=parseInt(document.getElementById('extraFeeIn')?.value||'0')||0;
+  const desc=document.getElementById('extraFeeDescIn')?.value||'';
+  if(v>0){
+    localStorage.setItem('extraFee_'+curCls+'_'+curStu+'_'+mon, String(v));
+    localStorage.setItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon, desc);
+  } else {
+    localStorage.removeItem('extraFee_'+curCls+'_'+curStu+'_'+mon);
+    localStorage.removeItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon);
+  }
+  updateFee();
+}
+function clearExtraFee(){
+  const el=document.getElementById('extraFeeIn');
+  const dl=document.getElementById('extraFeeDescIn');
+  if(el)el.value='';if(dl)dl.value='';
+  localStorage.removeItem('extraFee_'+curCls+'_'+curStu+'_'+mon);
+  localStorage.removeItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon);
+  updateFee();
+}
+function getExtraFee(){return parseInt(localStorage.getItem('extraFee_'+curCls+'_'+curStu+'_'+mon)||'0')||0;}
+function getExtraFeeDesc(){return localStorage.getItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon)||'';}
+function loadExtraFee(){
+  const el=document.getElementById('extraFeeIn');
+  const dl=document.getElementById('extraFeeDescIn');
+  const v=localStorage.getItem('extraFee_'+curCls+'_'+curStu+'_'+mon);
+  if(el)el.value=(v&&v!=='0')?v:'';
+  if(dl)dl.value=localStorage.getItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon)||'';
 }
 function clearFixedFee(){
   const el=document.getElementById('fixedFeeIn');
@@ -753,7 +828,7 @@ function pick(cls,name){
   document.getElementById('stuStats').style.display='flex';
   document.getElementById('actRow').style.display='flex';
   // 모바일: 달력 탭으로
-  renderCal();updateStats();loadNote();loadFixedFee();loadSpecials();renderDiscountBtns();updateFee();renderSB();}
+  renderCal();updateStats();loadNote();loadFixedFee();loadExtraFee();loadSpecials();renderDiscountBtns();updateFee();renderSB();}
 
 // ── 월 변경 ──
 function setMonth(m,el,ctx){
@@ -767,7 +842,7 @@ function setMonth(m,el,ctx){
     const absDB=db[k_m]?.abs||0;
     const absLocal=localStorage.getItem('abs_'+curCls+'_'+curStu+'_'+m);
     if(absEl) absEl.value=absLocal!==null?absLocal:String(absDB);
-    renderCal();updateStats();loadNote();loadFixedFee();loadSpecials();updateFee();
+    renderCal();updateStats();loadNote();loadFixedFee();loadExtraFee();loadSpecials();renderDiscountBtns();updateFee();
   }
   renderSB();}
 
@@ -824,7 +899,10 @@ function calcFee(){
   const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
   const fixedFeeSet=_fv!==null&&_fv!==''&&_fv!=='undefined';
   if(fixedFeeSet)fee=fixedFee;
-  return {rate,reg,sp,abs,finalT,fee,actualReg,fixedFee,fixedFeeSet,drReg,drSp};
+  // 추가결제분 합산
+  const extraFee=getExtraFee();
+  const totalFee=fee+extraFee;
+  return {rate,reg,sp,abs,finalT,fee:totalFee,baseFee:fee,actualReg,fixedFee,fixedFeeSet,drReg,drSp,extraFee};
 }
 
 function updateStats(){
@@ -950,10 +1028,16 @@ function genMsg(c){
     body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수업 내역\n'+detail+'\n\n■ '+m+' 수강료\n'+feeCalc;
   }
 
-  // 0원인 경우 납부방법 생략
-  const footerText=c.fee===0?'\n\n■ 문의\n'+CONT+'\n감사합니다.':FOOT;
+  // 추가결제분
+  const extraFee=c.extraFee||0;
+  const extraDesc=getExtraFeeDesc();
+  const extraLine=extraFee>0?'\n\n■ 추가 결제분\n'+(extraDesc||'추가 수업')+': '+fmt(extraFee)+'\n최종 합계: '+fmt(c.fee):'';
 
-  return '['+m+' 수강료 안내 - '+curStu+' 학생 ('+curCls+')]\n안녕하세요. 화강암플러스미술학원입니다.\n\n'+spNote+specialsText+body+memoLine+footerText;
+  // 0원인 경우 납부방법 생략
+  const baseFeeZero=(c.baseFee||c.fee)===0&&extraFee===0;
+  const footerText=baseFeeZero?'\n\n■ 문의\n'+CONT+'\n감사합니다.':FOOT;
+
+  return '['+m+' 수강료 안내 - '+curStu+' 학생 ('+curCls+')]\n안녕하세요. 화강암플러스미술학원입니다.\n\n'+spNote+specialsText+body+extraLine+memoLine+footerText;
 }
 
 function updateFee(){
