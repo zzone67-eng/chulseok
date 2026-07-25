@@ -293,7 +293,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
             <span style="font-size:12px;color:var(--tx2)">원</span>
             <button type="button" onclick="clearExtraFee()" style="background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;padding:0 4px">✕</button>
           </div>
-          <input id="extraFeeDescIn" placeholder="추가 내역 (예: 8월 보강 2회)" oninput="onExtraFee()"
+          <input id="extraFeeDescIn" placeholder="추가 내역 (예: 8월 보강 2회)" oninput="onExtraFeeDesc()"
             style="width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-size:12px;padding:5px 8px;font-family:inherit;outline:none;box-sizing:border-box">
         </div>
       </div>
@@ -525,6 +525,18 @@ function onFixedFee(){
   updateFee();
 }
 // ── 추가결제분 ──
+function onExtraFeeDesc(){
+  if(!curStu)return;
+  const v=getExtraFee();
+  const desc=document.getElementById('extraFeeDescIn')?.value||'';
+  if(v>0){
+    localStorage.setItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon, desc);
+    // desc 변경 시에도 Firebase 업데이트
+    const sid=monToLabel(mon)+'_'+curStu;
+    const c2=calcFee();
+    if(c2) saveFixedFeeToFirebase(sid, c2.fee, {extraFee:v, extraFeeDesc:desc});
+  }
+}
 function onExtraFee(){
   if(!curStu)return;
   const v=parseInt(document.getElementById('extraFeeIn')?.value||'0')||0;
@@ -541,7 +553,6 @@ function onExtraFee(){
   const sid=monToLabel(mon)+'_'+curStu;
   const c2=calcFee();
   if(!c2)return;
-  console.log('[extraFee] sid:', sid, 'fee:', c2.fee, 'v:', v);
   if(v>0) saveFixedFeeToFirebase(sid, c2.fee, {extraFee:v, extraFeeDesc:desc});
   else {
     const _fv=localStorage.getItem('fixedFee_'+curCls+'_'+curStu+'_'+mon);
@@ -1175,11 +1186,11 @@ async function syncFB(){
     const now2=new Date();
     const syncMonths=[];
     for(let i=0;i<2;i++){const d=new Date(now2.getFullYear(),now2.getMonth()+i,1);syncMonths.push(d.getMonth()+1);}
-    for(const month of syncMonths){
-      Object.entries(STUDENTS).forEach(([cls,stus])=>{
-        stus.forEach(s=>getData(cls,s.name,month));
-      });
 
+    for(const month of syncMonths){
+      Object.entries(STUDENTS).forEach(([cls,stus])=>{ stus.forEach(s=>getData(cls,s.name,month)); });
+
+      // timetable 저장 (출석부 연동)
       const sch={};
       const tot=getDays(month),fst=getFirst(month);
       for(let day=1;day<=tot;day++){
@@ -1188,7 +1199,6 @@ async function syncFB(){
         Object.entries(STUDENTS).forEach(([cls,stus])=>{
           stus.forEach(s=>{
             const d=getData(cls,s.name,month);
-            // excluded는 UI 표시용 — 실제 lessons/special에 있는 것만 Firebase에 저장
             [...d.lessons,...d.special].filter(l=>l.day===day).forEach(l=>{
               const tk=l.tim+'타임';
               if(!sch[ds][tk][cls].includes(s.name))sch[ds][tk][cls].push(s.name);
@@ -1196,49 +1206,110 @@ async function syncFB(){
           });
         });
       }
-
-      // ── 디버그: 7월 4일 데이터 확인 ──
-      console.log('[syncFB] 동기화 완료 - 월:', month);
-      
-      // ── 디버그: 주요 학생 localStorage 원본 확인 ──
-      ['입시반_박민지_7','입시반_김나연_7','중등반_한지유_7','취미반_나은솔_7'].forEach(k => {
-        const raw = localStorage.getItem('sch_v1');
-        const parsed = raw ? JSON.parse(raw) : {};
-        if(parsed[k]) console.log(`[localStorage] ${k}:`, JSON.stringify(parsed[k]));
-        else console.log(`[localStorage] ${k}: 없음 (미초기화)`);
-      });
-      
-      const totalNames = Object.values(sch).reduce((sum, day) =>
-        sum + Object.values(day).reduce((s2, tim) =>
-          s2 + Object.values(tim).reduce((s3, arr) => s3 + arr.length, 0), 0), 0);
-      console.log('[syncFB] 전체 수업 수:', totalNames, '명/일');
-
       const monthKey='timetable/'+YEAR+'-'+String(month).padStart(2,'0');
-      const url=DB+'/'+monthKey+'.json';
-      console.log('[syncFB] PUT URL:', url);
-      const res=await fetch(url,{method:'PUT',body:JSON.stringify(sch),headers:{'Content-Type':'application/json'}});
-      const resText=await res.text();
-      console.log('[syncFB] PUT 응답 status:', res.status, '| body:', resText.slice(0,200));
+      await fetch(DB+'/'+monthKey+'.json',{method:'PUT',body:JSON.stringify(sch),headers:{'Content-Type':'application/json'}});
     }
-    // schedule_backup 저장 (students.html 수강료 연동용) - abs 포함
+
+    // schedule_backup 저장 (수강료 연동)
     const nowTs=Date.now();
     localStorage.setItem('sch_v1_ts',String(nowTs));
     const dbWithAbs2={};
     Object.entries(db).forEach(([k,v])=>{
       const parts=k.split('_');
       if(parts.length>=3){
-        const m2=parts[parts.length-1];
-        const n2=parts[parts.length-2];
-        const c2=parts.slice(0,parts.length-2).join('_');
+        const m2=parts[parts.length-1],n2=parts[parts.length-2],c2=parts.slice(0,parts.length-2).join('_');
         const av=parseInt(localStorage.getItem('abs_'+c2+'_'+n2+'_'+m2)||'0')||0;
         dbWithAbs2[k]={...v,abs:av};
       } else { dbWithAbs2[k]=v; }
     });
-    const dbForFB2=Object.assign({},dbWithAbs2,{_updatedAt:nowTs});
-    await fetch(DB+'/schedule_backup.json',{method:'PUT',body:JSON.stringify(dbForFB2),headers:{'Content-Type':'application/json'}});
+    await fetch(DB+'/schedule_backup.json',{method:'PUT',body:JSON.stringify(Object.assign({},dbWithAbs2,{_updatedAt:nowTs})),headers:{'Content-Type':'application/json'}});
+
+    // 할인율/추가결제분 설정된 학생의 student_edits 재계산
+    const editsR=await fetch(DB+'/student_edits.json?_='+Date.now());
+    let edits=(editsR.ok&&await editsR.json())||{};
+    if(typeof edits!=='object'||edits===null)edits={};
+    let editsChanged=false;
+    const syncMonths2=[];
+    for(let i=0;i<2;i++){const d=new Date(now2.getFullYear(),now2.getMonth()+i,1);syncMonths2.push(d.getMonth()+1);}
+    syncMonths2.forEach(month=>{
+      Object.entries(STUDENTS).forEach(([cls,stus])=>{
+        stus.forEach(s=>{
+          const monLabel=monToLabel(month);
+          const sid=monLabel+'_'+s.name;
+          const drReg=parseInt(localStorage.getItem('discount_reg_'+cls+'_'+s.name+'_'+month)||'0');
+          const drSp=parseInt(localStorage.getItem('discount_sp_'+cls+'_'+s.name+'_'+month)||'0');
+          const extraFee=parseInt(localStorage.getItem('extraFee_'+cls+'_'+s.name+'_'+month)||'0')||0;
+          const fixedFv=localStorage.getItem('fixedFee_'+cls+'_'+s.name+'_'+month);
+          const fixedFeeSet=fixedFv!==null&&fixedFv!==''&&fixedFv!=='undefined';
+          // 할인율이나 추가결제분 있으면 재계산
+          if((drReg>0||drSp>0||extraFee>0)&&!fixedFeeSet){
+            const d=getData(cls,s.name,month);
+            const rate=cls==='예비반'?30000:31250;
+            const regT=(d.lessons||[]).length,spT=(d.special||[]).length;
+            const abs=parseInt(localStorage.getItem('abs_'+cls+'_'+s.name+'_'+month)||'0')||0;
+            const regNet=Math.max(0,regT-abs);
+            const regFee=Math.round(regNet*rate*(1-drReg/100));
+            const spFee=Math.round(spT*rate*(1-drSp/100));
+            const newAmt=regFee+spFee+extraFee;
+            if(!edits[sid]||edits[sid].amount!==newAmt){
+              edits[sid]=Object.assign({},edits[sid]||{},{amount:newAmt});
+              if(extraFee>0){
+                edits[sid].extraFee=extraFee;
+                edits[sid].extraFeeDesc=localStorage.getItem('extraFeeDesc_'+cls+'_'+s.name+'_'+month)||'';
+              }
+              editsChanged=true;
+              console.log('edits 재계산:', sid, newAmt);
+            }
+          }
+        });
+      });
+    });
+    // 고정/할인/추가 없는 학생의 edits 자동 정리
+    syncMonths2.forEach(month=>{
+      Object.entries(STUDENTS).forEach(([cls,stus])=>{
+        stus.forEach(s=>{
+          const monLabel=monToLabel(month);
+          const sid=monLabel+'_'+s.name;
+          if(!edits[sid])return;
+          const drReg=parseInt(localStorage.getItem('discount_reg_'+cls+'_'+s.name+'_'+month)||'0');
+          const drSp=parseInt(localStorage.getItem('discount_sp_'+cls+'_'+s.name+'_'+month)||'0');
+          const extraFee=parseInt(localStorage.getItem('extraFee_'+cls+'_'+s.name+'_'+month)||'0')||0;
+          const fixedFv=localStorage.getItem('fixedFee_'+cls+'_'+s.name+'_'+month);
+          const fixedFeeSet=fixedFv!==null&&fixedFv!==''&&fixedFv!=='undefined';
+          // 고정/할인/추가 모두 없으면 edits 제거 → 자동계산 복원
+          if(!fixedFeeSet&&drReg===0&&drSp===0&&extraFee===0){
+            delete edits[sid];
+            editsChanged=true;
+            console.log('edits 자동 정리:', sid);
+          }
+        });
+      });
+    });
+    // 고정/할인/추가 없는 학생의 edits 자동 정리 (시간표 변경 시 자동계산 복원)
+    syncMonths2.forEach(month=>{
+      Object.entries(STUDENTS).forEach(([cls,stus])=>{
+        stus.forEach(s=>{
+          const monLabel=monToLabel(month);
+          const sid=monLabel+'_'+s.name;
+          if(!edits[sid])return;
+          const drReg=parseInt(localStorage.getItem('discount_reg_'+cls+'_'+s.name+'_'+month)||'0');
+          const drSp=parseInt(localStorage.getItem('discount_sp_'+cls+'_'+s.name+'_'+month)||'0');
+          const extraFee=parseInt(localStorage.getItem('extraFee_'+cls+'_'+s.name+'_'+month)||'0')||0;
+          const fixedFv=localStorage.getItem('fixedFee_'+cls+'_'+s.name+'_'+month);
+          const fixedFeeSet=fixedFv!==null&&fixedFv!==''&&fixedFv!=='undefined';
+          // 고정/할인/추가 모두 없으면 edits 제거 → 자동계산 복원
+          if(!fixedFeeSet&&drReg===0&&drSp===0&&extraFee===0){
+            delete edits[sid];
+            editsChanged=true;
+          }
+        });
+      });
+    });
+    if(editsChanged) await fetch(DB+'/student_edits.json',{method:'PUT',body:JSON.stringify(edits),headers:{'Content-Type':'application/json'}});
+
     btn.textContent='✓ 동기화됨';btn.className='sync-btn ok';
     setTimeout(()=>{btn.textContent='Firebase 동기화';btn.className='sync-btn';},3000);
-  }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error('[syncFB] 에러:', e);}
+  }catch(e){btn.textContent='실패';btn.className='sync-btn';console.error('syncFB 에러:',e);}
 }
 
 // ── 초기화 ──
