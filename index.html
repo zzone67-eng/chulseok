@@ -333,7 +333,7 @@ let cur='',att={},drafts={},curTime=null,saveTimer=null,toastTimer=null,pollTime
 let _inputActive=false,_inputTimer=null;
 document.addEventListener('focusin',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'){_inputActive=true;if(_inputTimer){clearTimeout(_inputTimer);_inputTimer=null;}}});
 document.addEventListener('focusout',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'){_inputTimer=setTimeout(()=>{_inputActive=false;_inputTimer=null;},300);}});
-let adminY=2026,adminM=7,adminTab=0,adminData={};
+const _now=new Date();let adminY=_now.getFullYear(),adminM=_now.getMonth()+1,adminTab=0,adminData={};
 
 function toKey(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 const isMob=()=>window.innerWidth<1100;
@@ -526,7 +526,7 @@ function buildMobNav(tk){
   if(nav){nav.innerHTML=h;setTimeout(()=>{const b=nav.querySelector('.act');if(b)b.scrollIntoView({block:'nearest',inline:'center'});},50);}
 }
 function buildPcCal(tk){
-  const fd=new Date('2026-07-01T12:00:00').getDay();
+  const _curD=new Date(cur+'T12:00:00');const fd=new Date(_curD.getFullYear(),_curD.getMonth(),1).getDay();
   let h='';for(let i=0;i<fd;i++)h+='<div></div>';
   for(let i=1;i<=31;i++){
     const dk=`2026-07-${String(i).padStart(2,'0')}`;
