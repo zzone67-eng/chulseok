@@ -532,8 +532,32 @@ async function syncFromFirebase(){
             // 고정/잔여 학생은 건드리지 않음
             if(rSpec && (rSpec.type==='fix' || rSpec.type==='remain')) return;
             // 취미반은 고정
-            if(s.cls==='취미반') return; // 취미반은 고정요금
-
+            // 취미반 수강료 계산 (결석 없으면 4주 고정, 있으면 타임수 기반)
+            if(s.cls==='취미반'){
+              const _e2=_edits[s.id];
+              if(_e2&&_e2.amount!==undefined) return;
+              const key2=`${s.cls}_${s.name}_${mNum}`;
+              const sd2=backup[key2]; if(!sd2) return;
+              const _sl=window._stuList||{};
+              const stuInfo=Object.values(_sl).flat().find(x=>x.name===s.name);
+              const daysPerWeek=stuInfo?.days?.length||1;
+              const wRate=daysPerWeek>=2?50000:25000;
+              const baseAmt=daysPerWeek>=2?200000:100000;
+              const absT2=sd2.abs||s.absence||0;
+              const regT2=(sd2.lessons||[]).length;
+              const spT2=(sd2.special||[]).length;
+              if(absT2===0&&spT2===0){
+                s.amount=baseAmt;
+                s.days='주'+daysPerWeek+'회';
+              } else {
+                const netT=Math.max(0,regT2-absT2);
+                s.amount=netT*wRate+spT2*wRate;
+                s.days=absT2>0?`실수업 ${regT2}T - 결석 ${absT2}회 = ${netT}T`:`${regT2}T`;
+              }
+              s.totalT=Math.max(0,regT2-absT2)+spT2;
+              s.absence=absT2;
+              return;
+            }
             // amount/totalT가 edits에 있으면 자동계산 건너뜀
             const _e=_edits[s.id];
             if(_e&&(_e.amount!==undefined||_e.totalT!==undefined||_e.days!==undefined)) return;
