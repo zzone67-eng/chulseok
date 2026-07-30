@@ -468,6 +468,8 @@ async function syncFromFirebase(){
     if(sr&&sr.ok){
       try{
         const stuList = await sr.json();
+        window._stuList=stuList;
+        window._stuList=stuList; // 스코프 밖에서 접근 가능하게
         if(stuList&&typeof stuList==='object'){
           // Firebase 전체 학생 이름 목록
           const fbNamesByCls={};
@@ -519,7 +521,7 @@ async function syncFromFirebase(){
           '박선영': {type:'fix'}, '박하영': {type:'fix'},
           '박민지': {type:'remain'}, '김나현': {type:'discount50'}
         };
-        const TAKUMI = ['나은솔','김건휘','김예진','최다윤','신유나','최현우','김윤재','김가람','이지아','명지민'];
+        // 취미반은 cls로 판단 (하드코딩 목록 불필요)
 
         const MON_MAP={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
         Object.keys(db).forEach(mon=>{
@@ -530,7 +532,7 @@ async function syncFromFirebase(){
             // 고정/잔여 학생은 건드리지 않음
             if(rSpec && (rSpec.type==='fix' || rSpec.type==='remain')) return;
             // 취미반은 고정
-            if(TAKUMI.includes(s.name)) return;
+            if(s.cls==='취미반') return; // 취미반은 고정요금
 
             // amount/totalT가 edits에 있으면 자동계산 건너뜀
             const _e=_edits[s.id];
