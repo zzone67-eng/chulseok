@@ -893,18 +893,19 @@ function calcFee(){
   const abs=getAbs(),sp=d.special.length;
   const actualReg=d.lessons.length; // 실제 체크 시수
   const use4wk=document.getElementById('use4wk')?.checked;
-  let reg=use4wk ? s.days.length*4 : actualReg; // 수강료 계산용
+  let reg=use4wk ? (s.days?.length||1)*4 : actualReg; // 수강료 계산용
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
-    const base=s.days.length===1?100000:200000;
-    const weekRate=s.days.length===1?25000:50000; // 1회=25000, 2회=50000
+    // 실제 타임수로 주당 횟수 판단 (5주 달 기준)
+    const wkT=actualReg>0?Math.round(actualReg/5):1;
+    const isW2=wkT>=2;
+    const weekRate=isW2?50000:25000;
+    const base=isW2?200000:100000;
     if(abs===0){
-      // 결석 없음: 4주 기준 고정금액
       fee=base+sp*weekRate;
-      reg=s.days.length*4; finalT=reg;
+      reg=isW2?8:4; finalT=reg+sp;
     } else {
-      // 결석 있음: 실제 타임수 기준 (타임수-전월결석) × 25000
       const netT=Math.max(0,actualReg-abs);
       fee=netT*weekRate+sp*weekRate;
       reg=actualReg; finalT=netT+sp;
@@ -914,14 +915,13 @@ function calcFee(){
   const drReg=parseInt(localStorage.getItem('discount_reg_'+curCls+'_'+curStu+'_'+mon)||'0');
   const drSp=parseInt(localStorage.getItem('discount_sp_'+curCls+'_'+curStu+'_'+mon)||'0');
   if(drReg>0||drSp>0){
-    // 정규/특강 각각 할인 적용
     const regFee=Math.round((finalT-sp)*rate*(1-drReg/100));
     const spFee=Math.round(sp*rate*(1-drSp/100));
     fee=regFee+spFee;
-    // 취미반은 별도 처리
     if(curCls==='취미반'&&s){
-      const wRate=s.days.length===1?25000:50000;
-      const baseFee=abs===0?(s.days.length===1?100000:200000):Math.max(0,actualReg-abs)*wRate;
+      const wkT2=actualReg>0?Math.round(actualReg/5):1;
+      const wRate=wkT2>=2?50000:25000;
+      const baseFee=abs===0?(wkT2>=2?200000:100000):Math.max(0,actualReg-abs)*wRate;
       fee=Math.round(baseFee*(1-drReg/100))+Math.round(sp*wRate*(1-drSp/100));
     }
   }
