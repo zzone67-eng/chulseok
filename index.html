@@ -374,7 +374,6 @@ function launch(){
   ['prevMonBtn','prevMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(-1);});
   ['nextMonBtn','nextMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(1);});
   // 월 이동 버튼 이벤트
-  ['prevMonBtn','prevMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(-1);});
   ['nextMonBtn','nextMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(1);});
   const sd=document.getElementById('sch-date');if(sd)sd.textContent=SCHEDULE_UPDATED;
   if(pollTimer)clearInterval(pollTimer);
@@ -520,6 +519,13 @@ function tgMakeup(ti,n){
 }
 
 // ── 네비게이션 ────────────────────────────────────────
+function moveMonth(dir){
+  const d=new Date(cur+'T12:00:00');
+  d.setMonth(d.getMonth()+dir);
+  d.setDate(1);
+  cur=toKey(d);
+  loadTimetable().then(()=>{buildNav();load(cur);});
+}
 function buildNav(){
   const tk=toKey(new Date());
   const d=new Date(cur+'T12:00:00');
