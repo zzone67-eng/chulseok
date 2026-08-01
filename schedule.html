@@ -488,15 +488,16 @@ function monToLabel(m){
   const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
   return labels[(m-1)%12]||'jul';
 }
-async function saveFixedFeeToFirebase(id, amount){
+async function saveFixedFeeToFirebase(id, amount, extra){
   try{
     const r=await fetch(DB+'/student_edits.json?_='+Date.now());
     let edits={};
     if(r.ok){ const raw=await r.json(); if(raw&&typeof raw==='object') edits=raw; }
     edits[id]=Object.assign({},edits[id]||{},{amount});
+    if(extra&&typeof extra==='object') Object.assign(edits[id], extra);
     const res=await fetch(DB+'/student_edits.json',{method:'PUT',body:JSON.stringify(edits),headers:{'Content-Type':'application/json'}});
-    console.log('고정수강료 저장:', id, amount, res.status);
-  }catch(e){console.error('고정수강료 저장 실패:',e);}
+    console.log('저장 완료:', id, amount, res.status);
+  }catch(e){console.error('저장 실패:',e);}
 }
 async function clearFixedFeeFromFirebase(id){
   try{
