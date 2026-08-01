@@ -481,7 +481,7 @@ const save=()=>{
 const fmt=n=>n.toLocaleString('ko-KR')+'원';
 
 // ── 학생 추가/제거 ──
-let _addingCls='', _selectedDays=[];
+let _addingCls='';
 
 // ── 고정수강료 ──
 function monToLabel(m){
@@ -732,18 +732,13 @@ function openAddStudent(cls){
   document.getElementById('addStudentModal').classList.add('on');
 }
 function closeAddStudent(){ document.getElementById('addStudentModal').classList.remove('on'); }
-function toggleDayChip(chip){
-  const day=chip.dataset.day;
-  if(_selectedDays.includes(day)){_selectedDays=_selectedDays.filter(d=>d!==day);chip.classList.remove('on');}
-  else{_selectedDays.push(day);chip.classList.add('on');}
-}
+
 function confirmAddStudent(){
   const name=document.getElementById('newStudentName').value.trim();
   if(!name){alert('이름을 입력하세요.');return;}
-  if(_selectedDays.length===0){alert('수업 요일을 선택하세요.');return;}
   if(STUDENTS[_addingCls]?.find(s=>s.name===name)){alert('이미 같은 이름의 학생이 있습니다.');return;}
   if(!STUDENTS[_addingCls])STUDENTS[_addingCls]=[];
-  STUDENTS[_addingCls].push({name,days:[..._selectedDays]});
+  STUDENTS[_addingCls].push({name,days:[]});
   saveStudents(); closeAddStudent(); renderSB();
   alert(name+' 학생이 추가됐습니다.');
 }
