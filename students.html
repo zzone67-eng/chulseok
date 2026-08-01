@@ -635,22 +635,37 @@ function renderAll(){
 // ══════════════════════════════════
 const isPC = () => window.innerWidth >= 900;
 
+function getCurMonLabel(){
+  // 현재 달 → initData/db 키 반환 (jan,feb,...,dec)
+  const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  return labels[new Date().getMonth()];
+}
+function getNxtMonLabel(){
+  const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  return labels[(new Date().getMonth()+1)%12];
+}
 function updateMonthLabels(){
   const now=new Date();
   const cm=now.getMonth()+1,cy=now.getFullYear();
-  const nm=cm===12?1:cm+1;
+  const nm=cm===12?1:cm+1,ny=cm===12?cy+1:cy;
+  const curLabel=getCurMonLabel(),nxtLabel=getNxtMonLabel();
+  // 탭 텍스트 + onclick 업데이트
   const t1=document.getElementById('mobTab1');
   const t2=document.getElementById('mobTab2');
   const b1=document.getElementById('pcBtn1');
   const b2=document.getElementById('pcBtn2');
-  if(t1)t1.textContent=cm+'월';
-  if(t2)t2.textContent=nm+'월(예정)';
-  if(b1)b1.textContent=cm+'월';
-  if(b2)b2.textContent=nm+'월(예정)';
+  if(t1){t1.textContent=cm+'월';t1.onclick=()=>mobSwitchTab(curLabel,t1);}
+  if(t2){t2.textContent=nm+'월(예정)';t2.onclick=()=>mobSwitchTab(nxtLabel,t2);}
+  if(b1){b1.textContent=cm+'월';b1.onclick=()=>pcSwitchMonth(curLabel,b1);}
+  if(b2){b2.textContent=nm+'월(예정)';b2.onclick=()=>pcSwitchMonth(nxtLabel,b2);}
+  // panel/list ID는 그대로 두고 mobGetActiveMonth가 올바른 키 반환하도록
+  window._curMonLabel=curLabel;
+  window._nxtMonLabel=nxtLabel;
 }
 function init(){
   updateMonthLabels();
   if(isPC()){
+    pcMonth=getCurMonLabel(); // 현재 달로 초기화
     document.body.className='pc';
     document.getElementById('app-mob').style.display='none';
     document.getElementById('app-pc').style.display='flex';
@@ -681,7 +696,7 @@ function init(){
 let mobFilter = {jul:'all', aug:'all'};
 let mobSearchQ = '';
 
-function mobGetActiveMonth(){ return document.getElementById('panel-aug')?.classList.contains('on')?'aug':'jul'; }
+function mobGetActiveMonth(){ return document.getElementById('panel-aug')?.classList.contains('on')?(window._nxtMonLabel||'aug'):(window._curMonLabel||'jul'); }
 function mobOnSearch(v){ mobSearchQ=v.trim().toLowerCase(); document.getElementById('searchClear').style.display=v?'block':'none'; mobRender(mobGetActiveMonth()); }
 function mobClearSearch(){ document.getElementById('mobSearchInput').value=''; document.getElementById('searchClear').style.display='none'; mobSearchQ=''; mobRender(mobGetActiveMonth()); }
 function mobSwitchTab(month,el){
@@ -692,7 +707,8 @@ function mobSwitchTab(month,el){
   const now2=new Date();
   const curM=now2.getMonth()+1,curY=now2.getFullYear();
   const nxtM=curM===12?1:curM+1,nxtY=curM===12?curY+1:curY;
-  document.getElementById('hdrSub').textContent=month==='jul'?(curY+'년 '+curM+'월'):(nxtY+'년 '+nxtM+'월 (예정)');
+  const _cur=window._curMonLabel||'jul',_nxt=window._nxtMonLabel||'aug';
+  document.getElementById('hdrSub').textContent=month===_cur?(curY+'년 '+curM+'월'):(nxtY+'년 '+nxtM+'월 (예정)');
 }
 function mobFilterCls(month,cls,btn){
   mobFilter[month]=cls;
@@ -811,7 +827,7 @@ function closePcUnpaid(){ document.getElementById('pcUnpaidOverlay').classList.r
 // ══════════════════════════════════
 // PC 로직
 // ══════════════════════════════════
-let pcMonth='jul', pcFilter='all', pcStudent=null, pcMsgTab=0, pcSearchQ='', pcEditing=false;
+let pcMonth=getCurMonLabel(), pcFilter='all', pcStudent=null, pcMsgTab=0, pcSearchQ='', pcEditing=false;
 
 function pcSwitchMonth(m,el){
   pcMonth=m; pcStudent=null;
@@ -834,7 +850,7 @@ function pcRenderSidebar(){
     if(s.amount===0&&s.remain==null&&!s.fixed) return false;
     if(pcSearchQ&&!s.name.includes(pcSearchQ)) return false;
     if(pcFilter==='all') return true;
-    if(pcFilter==='미납'){ const today=new Date(),cut=pcMonth==='jul'?new Date(2026,6,10):new Date(2026,7,10); if(today<cut)return false; return !s.paid&&s.amount>0; }
+    if(pcFilter==='미납'){ return !s.paid&&s.amount>0; }
     return s.cls===pcFilter;
   });
   const groups={}; ['입시반','예비반','중등반','취미반'].forEach(c=>groups[c]=[]);
@@ -878,7 +894,8 @@ function pcTogglePaid(e,id){ e.stopPropagation(); ['jul','aug'].forEach(m=>{ con
 function msgFeeNormal(s,month){
   const now3=new Date();const _cm=now3.getMonth()+1,_cy=now3.getFullYear();
   const _nm=_cm===12?1:_cm+1;
-  const mon=month==='jul'?(_cm+'월'):(_nm+'월');
+  const _cur2=window._curMonLabel||'jul';
+  const mon=month===_cur2?(_cm+'월'):(_nm+'월');
   if(s.remain!=null) return `[수강 현황 안내 - ${s.name} 학생 (${s.cls})]\n안녕하세요. 화강암플러스미술학원입니다.\n\n■ 잔여 타임\n${s.remain}T 남음\n\n■ 문의\n${CONTACT}\n감사합니다.`;
   let body=`■ 수업 일정\n${s.schedule}`;
   if(s.days) body+=`\n\n■ 수업 일자 / 시수\n${s.days}`;
