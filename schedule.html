@@ -144,11 +144,8 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 .leg-box{width:10px;height:10px;border-radius:3px;}
 
 /* 우측 패널 */
-.right{width:280px;background:var(--sf);border-left:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
-.rp-sec{display:flex;flex-direction:column;border-bottom:1px solid var(--bd);overflow:hidden;}
-.rp-sec.grow2{flex:2;}
-.rp-sec.grow1{flex:1;}
-.rp-sec.fixed{flex-shrink:0;}
+.right{width:380px;background:var(--sf);border-left:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.rp-sec{display:flex;flex-direction:column;border-bottom:1px solid var(--bd);}
 .rp-hdr{font-size:11px;font-weight:700;color:var(--tx2);letter-spacing:.05em;padding:9px 14px;background:var(--sf2);border-bottom:1px solid var(--bd);flex-shrink:0;}
 .rp-body{padding:12px 14px;}
 .rp-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;}
@@ -166,7 +163,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 .abs-input{width:52px;background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--rs);color:var(--tx);font-size:14px;font-weight:700;padding:5px 8px;text-align:center;outline:none;-moz-appearance:textfield;}
 .abs-input::-webkit-outer-spin-button,.abs-input::-webkit-inner-spin-button{-webkit-appearance:none;}
 .abs-input:focus{border-color:var(--blue);}
-.rp-ta{flex:1;width:100%;background:transparent;border:none;color:var(--tx);font-size:12px;font-family:inherit;line-height:1.75;padding:10px 14px;resize:none;outline:none;}
+.rp-ta{width:100%;background:transparent;border:none;color:var(--tx);font-size:12px;font-family:inherit;line-height:1.75;padding:10px 14px;resize:vertical;outline:none;min-height:280px;}
 .rp-ta::placeholder{color:var(--tx3);}
 .copy-btn{margin:0 14px 10px;padding:8px;background:var(--bmid);border:1px solid var(--bbr);color:var(--blue);border-radius:var(--rs);font-size:12px;font-weight:700;cursor:pointer;text-align:center;flex-shrink:0;}
 
@@ -255,7 +252,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
   <!-- PC 우측 패널 -->
   <div class="right">
     <!-- 전월결석 + 수강료 -->
-    <div class="rp-sec fixed">
+    <div class="rp-sec">
       <div class="rp-hdr">전월 결석 / 수강료</div>
       <div class="abs-row">
         <span class="abs-lbl">전월 결석</span>
@@ -333,15 +330,15 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
       </div>
     </div>
     <!-- 수강료 문자 -->
-    <div class="rp-sec grow2" style="display:flex;flex-direction:column;">
+    <div class="rp-sec">
       <div class="rp-hdr">수강료 안내 문자</div>
       <textarea class="rp-ta" id="feeMsg" placeholder="학생을 선택하면 자동 생성됩니다..."></textarea>
-      <button class="copy-btn" id="feeCopyBtn" style="display:none;" onclick="copyMsg('feeMsg','feeCopyBtn')">문자 복사</button>
+      <button class="copy-btn" id="feeCopyBtn" onclick="copyMsg('feeMsg','feeCopyBtn')">문자 복사</button>
     </div>
     <!-- 메모 -->
-    <div class="rp-sec grow1" style="display:flex;flex-direction:column;">
+    <div class="rp-sec">
       <div class="rp-hdr">메모</div>
-      <textarea class="rp-ta" id="memoMsg" placeholder="수업 메모, 특이사항..."></textarea>
+      <textarea class="rp-ta" id="memoMsg" placeholder="수업 메모, 특이사항..." style="min-height:100px;"></textarea>
     </div>
   </div>
 
@@ -1079,7 +1076,6 @@ function updateFee(){
   const ta=document.getElementById('feeMsg');
   const btn=document.getElementById('feeCopyBtn');
   if(ta) ta.value=genMsg(c);
-  if(btn) btn.style.display='block';
   // 헤더 수강료도 업데이트
   const sAmt=document.getElementById('sAmt');
   const rpFee=document.getElementById('rpFee');
