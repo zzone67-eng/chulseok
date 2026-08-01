@@ -538,15 +538,14 @@ async function syncFromFirebase(){
               if(_e2&&_e2.amount!==undefined) return;
               const key2=`${s.cls}_${s.name}_${mNum}`;
               const sd2=backup[key2]; if(!sd2) return;
-              // 시간표 기반 주당 횟수 계산 (4주 기준 총 타임수로 판단)
-              // 4주 기준 5T 이상이면 주2회, 아니면 주1회
-              const weeklyCount=regT2>0?Math.round(regT2/4):1;
+              const regT2=(sd2.lessons||[]).length;
+              const spT2=(sd2.special||[]).length;
+              const absT2=sd2.abs||s.absence||0;
+              // 실제 타임수 기반 주당 횟수 (5주 달 기준으로 나눔)
+              const weeklyCount=regT2>0?Math.round(regT2/5):1;
               const daysPerWeek=weeklyCount>=2?2:1;
               const wRate=daysPerWeek>=2?50000:25000;
               const baseAmt=daysPerWeek>=2?200000:100000;
-              const absT2=sd2.abs||s.absence||0;
-              const regT2=(sd2.lessons||[]).length;
-              const spT2=(sd2.special||[]).length;
               if(absT2===0&&spT2===0){
                 s.amount=baseAmt;
                 s.days='주'+daysPerWeek+'회';
