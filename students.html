@@ -594,6 +594,8 @@ async function syncFromFirebase(){
     ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{
       const e=_edits[s.id]; if(!e) return;
       if(e.amount!==undefined)s.amount=e.amount;
+      if(e.extraFee!==undefined)s.extraFee=e.extraFee;
+      if(e.extraFeeDesc!==undefined)s.extraFeeDesc=e.extraFeeDesc;
       if(e.totalT!==undefined)s.totalT=e.totalT;
       if(e.days!==undefined)s.days=e.days;
       if(e.schedule!==undefined)s.schedule=e.schedule;
@@ -658,9 +660,19 @@ function updateMonthLabels(){
   if(t2){t2.textContent=nm+'월(예정)';t2.onclick=()=>mobSwitchTab(nxtLabel,t2);}
   if(b1){b1.textContent=cm+'월';b1.onclick=()=>pcSwitchMonth(curLabel,b1);}
   if(b2){b2.textContent=nm+'월(예정)';b2.onclick=()=>pcSwitchMonth(nxtLabel,b2);}
-  // panel/list ID는 그대로 두고 mobGetActiveMonth가 올바른 키 반환하도록
   window._curMonLabel=curLabel;
   window._nxtMonLabel=nxtLabel;
+  // 현재 달 패널을 on으로 설정 (jul이 현재달이 아니면 aug로 전환)
+  if(curLabel!=='jul'){
+    const pJul=document.getElementById('panel-jul');
+    const pAug=document.getElementById('panel-aug');
+    const tJul=document.getElementById('mobTab1');
+    const tAug=document.getElementById('mobTab2');
+    if(pJul)pJul.classList.remove('on');
+    if(pAug)pAug.classList.add('on');
+    if(tJul)tJul.classList.remove('on');
+    if(tAug)tAug.classList.add('on');
+  }
 }
 function init(){
   updateMonthLabels();
