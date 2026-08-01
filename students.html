@@ -218,8 +218,8 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
     <div class="summary" id="summaryBox" style="min-height:20px;color:white;font-size:12px">로딩중...</div>
   </div>
   <div class="tabs">
-    <div class="tab on" onclick="mobSwitchTab('jul',this)">7월</div>
-    <div class="tab" onclick="mobSwitchTab('aug',this)">8월(예정)</div>
+    <div class="tab on" onclick="mobSwitchTab('jul',this)" id="mobTab1">7월</div>
+    <div class="tab" onclick="mobSwitchTab('aug',this)" id="mobTab2">8월(예정)</div>
   </div>
 </div>
 <div class="search-wrap">
@@ -280,8 +280,8 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
 <div class="main">
   <div class="sidebar">
     <div class="sidebar-month">
-      <button class="sm-btn on" onclick="pcSwitchMonth('jul',this)">7월</button>
-      <button class="sm-btn" onclick="pcSwitchMonth('aug',this)">8월(예정)</button>
+      <button class="sm-btn on" onclick="pcSwitchMonth('jul',this)" id="pcBtn1">7월</button>
+      <button class="sm-btn" onclick="pcSwitchMonth('aug',this)" id="pcBtn2">8월(예정)</button>
     </div>
     <div class="sidebar-search">
       <input class="search-input" id="pcSearchInput" placeholder="이름 검색..." oninput="pcOnSearch(this.value)">
@@ -635,7 +635,21 @@ function renderAll(){
 // ══════════════════════════════════
 const isPC = () => window.innerWidth >= 900;
 
+function updateMonthLabels(){
+  const now=new Date();
+  const cm=now.getMonth()+1,cy=now.getFullYear();
+  const nm=cm===12?1:cm+1;
+  const t1=document.getElementById('mobTab1');
+  const t2=document.getElementById('mobTab2');
+  const b1=document.getElementById('pcBtn1');
+  const b2=document.getElementById('pcBtn2');
+  if(t1)t1.textContent=cm+'월';
+  if(t2)t2.textContent=nm+'월(예정)';
+  if(b1)b1.textContent=cm+'월';
+  if(b2)b2.textContent=nm+'월(예정)';
+}
 function init(){
+  updateMonthLabels();
   if(isPC()){
     document.body.className='pc';
     document.getElementById('app-mob').style.display='none';
@@ -675,7 +689,10 @@ function mobSwitchTab(month,el){
   document.querySelectorAll('#app-mob .panel').forEach(p=>p.classList.remove('on'));
   el.classList.add('on'); document.getElementById('panel-'+month).classList.add('on');
   mobRenderSummary(month);
-  document.getElementById('hdrSub').textContent=month==='jul'?'2026년 7월':'2026년 8월 (예정)';
+  const now2=new Date();
+  const curM=now2.getMonth()+1,curY=now2.getFullYear();
+  const nxtM=curM===12?1:curM+1,nxtY=curM===12?curY+1:curY;
+  document.getElementById('hdrSub').textContent=month==='jul'?(curY+'년 '+curM+'월'):(nxtY+'년 '+nxtM+'월 (예정)');
 }
 function mobFilterCls(month,cls,btn){
   mobFilter[month]=cls;
@@ -859,7 +876,9 @@ function pcTogglePaid(e,id){ e.stopPropagation(); ['jul','aug'].forEach(m=>{ con
 
 // ── 문자 생성 ──
 function msgFeeNormal(s,month){
-  const mon=month==='jul'?'7월':'8월';
+  const now3=new Date();const _cm=now3.getMonth()+1,_cy=now3.getFullYear();
+  const _nm=_cm===12?1:_cm+1;
+  const mon=month==='jul'?(_cm+'월'):(_nm+'월');
   if(s.remain!=null) return `[수강 현황 안내 - ${s.name} 학생 (${s.cls})]\n안녕하세요. 화강암플러스미술학원입니다.\n\n■ 잔여 타임\n${s.remain}T 남음\n\n■ 문의\n${CONTACT}\n감사합니다.`;
   let body=`■ 수업 일정\n${s.schedule}`;
   if(s.days) body+=`\n\n■ 수업 일자 / 시수\n${s.days}`;
