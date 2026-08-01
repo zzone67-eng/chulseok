@@ -688,7 +688,22 @@ function init(){
     document.body.className='mob';
     document.getElementById('app-pc').style.display='none';
     document.getElementById('app-mob').style.display='block';
-    document.getElementById('list-jul').innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">불러오는 중...</div>';
+    // 현재 달 패널 활성화
+    const _cur=getCurMonLabel(),_nxt=getNxtMonLabel();
+    const _pJul=document.getElementById('panel-jul');
+    const _pAug=document.getElementById('panel-aug');
+    const _tJul=document.getElementById('mobTab1');
+    const _tAug=document.getElementById('mobTab2');
+    if(_cur==='aug'){
+      // 8월이 현재달: panel-aug 활성화
+      if(_pJul){_pJul.classList.remove('on');}
+      if(_pAug){_pAug.classList.add('on');}
+      if(_tJul){_tJul.classList.remove('on');}
+      if(_tAug){_tAug.classList.add('on');}
+      document.getElementById('list-aug').innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">불러오는 중...</div>';
+    } else {
+      document.getElementById('list-jul').innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">불러오는 중...</div>';
+    }
     window.addEventListener('scroll',()=>{
       const btn=document.getElementById('topBtn');
       if(btn) btn.classList.toggle('show', window.scrollY>200);
@@ -708,7 +723,13 @@ function init(){
 let mobFilter = {jul:'all', aug:'all'};
 let mobSearchQ = '';
 
-function mobGetActiveMonth(){ return document.getElementById('panel-aug')?.classList.contains('on')?(window._nxtMonLabel||'aug'):(window._curMonLabel||'jul'); }
+function mobGetActiveMonth(){
+  const isAugOn=document.getElementById('panel-aug')?.classList.contains('on');
+  const cur=window._curMonLabel||getCurMonLabel();
+  const nxt=window._nxtMonLabel||getNxtMonLabel();
+  // panel-aug가 on이면 nxt, 아니면 cur
+  return isAugOn?nxt:cur;
+}
 function mobOnSearch(v){ mobSearchQ=v.trim().toLowerCase(); document.getElementById('searchClear').style.display=v?'block':'none'; mobRender(mobGetActiveMonth()); }
 function mobClearSearch(){ document.getElementById('mobSearchInput').value=''; document.getElementById('searchClear').style.display='none'; mobSearchQ=''; mobRender(mobGetActiveMonth()); }
 function mobSwitchTab(month,el){
