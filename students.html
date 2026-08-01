@@ -604,7 +604,12 @@ async function syncFromFirebase(){
       if(e.absence!==undefined)s.absence=e.absence;
       if(e.remain!==undefined)s.remain=e.remain;
     });});
-    renderAll();
+    // 명시적으로 현재 모드에 맞게 렌더
+    if(isPC()){
+      pcRenderFilters(); pcRenderSidebar(); pcRenderSummary();
+    } else {
+      Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])){ mobRender(m); mobRenderSummary(m); } });
+    }
     if(statusEl) statusEl.textContent='';
   } catch(e){ if(statusEl) statusEl.textContent='연결 실패'; console.error(e); }
 }
