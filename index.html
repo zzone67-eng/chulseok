@@ -213,14 +213,14 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
       <div style="font-size:11px;color:#444;padding-bottom:8px;padding-left:1px">시간표 업데이트 <span id="sch-date"></span></div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px 0">
-      <button onclick="moveMonth(-1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">‹</button>
+      <button id="prevMonBtnMob" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">‹</button>
       <span id="mob-ym-label" style="font-size:13px;font-weight:600;color:var(--txt)"></span>
-      <button onclick="moveMonth(1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">›</button>
+      <button id="nextMonBtnMob" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">›</button>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px 0">
-      <button onclick="moveMonth(-1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">‹</button>
+      <button id="prevMonBtnMob" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">‹</button>
       <span id="mob-ym-label" style="font-size:13px;font-weight:600;color:var(--txt)"></span>
-      <button onclick="moveMonth(1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">›</button>
+      <button id="nextMonBtnMob" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">›</button>
     </div>
     <div class="mob-nav" id="mob-nav"></div>
     <div class="cls-tabs" id="cls-tabs"></div>
@@ -244,9 +244,9 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
   </div>
   <div class="pc-sidebar">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <button onclick="moveMonth(-1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 10px;cursor:pointer;font-size:14px">‹</button>
+      <button id="prevMonBtn" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 10px;cursor:pointer;font-size:14px">‹</button>
       <h3 id="pc-ym-label" style="margin:0"></h3>
-      <button onclick="moveMonth(1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 10px;cursor:pointer;font-size:14px">›</button>
+      <button id="nextMonBtn" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 10px;cursor:pointer;font-size:14px">›</button>
     </div>
     <div class="cal-hdr">
       <div class="cal-hd" style="color:#ff6b6b">일</div>
@@ -371,6 +371,11 @@ function launch(){
   if(isMob()||isTab()) document.getElementById('main-mob').style.display='block';
   else                   document.getElementById('main-pc').style.display='grid';
   cur=toKey(new Date());loadTimetable().then(()=>{buildNav();load(cur);});
+  ['prevMonBtn','prevMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(-1);});
+  ['nextMonBtn','nextMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(1);});
+  // 월 이동 버튼 이벤트
+  ['prevMonBtn','prevMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(-1);});
+  ['nextMonBtn','nextMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(1);});
   const sd=document.getElementById('sch-date');if(sd)sd.textContent=SCHEDULE_UPDATED;
   if(pollTimer)clearInterval(pollTimer);
   pollTimer=setInterval(()=>loadTimetable().then(()=>{buildNav();load(cur,false);}),30000);
