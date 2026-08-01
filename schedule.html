@@ -695,8 +695,11 @@ function calcFeeRaw(){
   let fee=finalT*rate;
   if(curStu==='김나현'){fee=Math.round((use4wk?s.days.length*4:actualReg)*rate*0.5)+sp*rate;}
   if(curCls==='취미반'){
-    const wRate=s.days.length===1?25000:50000;
-    fee=abs===0?(s.days.length===1?100000:200000)+sp*wRate:Math.max(0,actualReg-abs)*wRate+sp*wRate;
+    // 실제 타임수 기반 주당 횟수 판단 (4주 기준)
+    const weeklyT=actualReg>0?Math.round(actualReg/5):1; // 5주 달 대비 보수적으로 판단
+    const isWeekly2=weeklyT>=2;
+    const wRate=isWeekly2?50000:25000;
+    fee=abs===0?(isWeekly2?200000:100000)+sp*wRate:Math.max(0,actualReg-abs)*wRate+sp*wRate;
   }
   return {fee,rate,reg,sp,abs,finalT,actualReg};
 }
@@ -984,8 +987,10 @@ function genMsg(c){
 
   // ── 취미반 ──
   } else if(curCls==='취미반'){
-    const wRate=s?s.days.length===1?25000:50000:25000;
-    const baseWRate=s?s.days.length===1?100000:200000:100000;
+    const _weeklyT=c.actualReg>0?Math.round(c.actualReg/5):1;
+    const _isW2=_weeklyT>=2;
+    const wRate=_isW2?50000:25000;
+    const baseWRate=_isW2?200000:100000;
     let feeDetail='';
     if(!hasA&&!hasSp&&!hasDiscount){
       // 결석/특강/할인 없음: 4주 고정
