@@ -710,12 +710,12 @@ function init(){
       if(btn) btn.classList.toggle('show', window.scrollY>200);
     });
   }
-  // Firebase 먼저 불러온 후 렌더 (syncFromFirebase 안에서 renderAll 호출)
   // 헤더 날짜 동적 설정
   const now=new Date();const sub=document.getElementById('hdrSub');if(sub)sub.textContent=`${now.getFullYear()}년 ${now.getMonth()+1}월`;
-  syncFromFirebase();
-  // 30초마다 자동 업데이트 (schedule 변경사항 반영)
-  setInterval(syncFromFirebase, 30000);
+  // Firebase 로드 후 렌더
+  syncFromFirebase().then(()=>{
+    setInterval(syncFromFirebase, 30000);
+  });
 }
 
 // ══════════════════════════════════
