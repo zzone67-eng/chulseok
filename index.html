@@ -212,6 +212,16 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
       </div>
       <div style="font-size:11px;color:#444;padding-bottom:8px;padding-left:1px">시간표 업데이트 <span id="sch-date"></span></div>
     </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px 0">
+      <button onclick="moveMonth(-1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">‹</button>
+      <span id="mob-ym-label" style="font-size:13px;font-weight:600;color:var(--txt)"></span>
+      <button onclick="moveMonth(1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">›</button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px 0">
+      <button onclick="moveMonth(-1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">‹</button>
+      <span id="mob-ym-label" style="font-size:13px;font-weight:600;color:var(--txt)"></span>
+      <button onclick="moveMonth(1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 12px;cursor:pointer;font-size:16px">›</button>
+    </div>
     <div class="mob-nav" id="mob-nav"></div>
     <div class="cls-tabs" id="cls-tabs"></div>
     <div class="time-tabs" id="time-tabs"></div>
@@ -233,7 +243,11 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
     </div>
   </div>
   <div class="pc-sidebar">
-    <h3 id="pc-ym-label"></h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <button onclick="moveMonth(-1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 10px;cursor:pointer;font-size:14px">‹</button>
+      <h3 id="pc-ym-label" style="margin:0"></h3>
+      <button onclick="moveMonth(1)" style="background:none;border:1px solid var(--brd);border-radius:6px;color:var(--txt);padding:4px 10px;cursor:pointer;font-size:14px">›</button>
+    </div>
     <div class="cal-hdr">
       <div class="cal-hd" style="color:#ff6b6b">일</div>
       <div class="cal-hd">월</div><div class="cal-hd">화</div><div class="cal-hd">수</div>
@@ -291,11 +305,11 @@ const TAGS=["병결","사고결석","시험공부","개인사정","여행","기�
 let S = {}; // Firebase에서 로드
 
 async function loadTimetable() {
-  const now=new Date();
-  // 현재 달 + 다음 달 시간표 로드
+  // cur 기준 이전달/현재달/다음달 로드 (달력 이동 대응)
+  const baseDate=cur?new Date(cur+'T12:00:00'):new Date();
   const months=[];
-  for(let i=0;i<2;i++){
-    const d=new Date(now.getFullYear(),now.getMonth()+i,1);
+  for(let i=-1;i<=1;i++){
+    const d=new Date(baseDate.getFullYear(),baseDate.getMonth()+i,1);
     months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
   }
   let retries=3;
