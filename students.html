@@ -386,28 +386,40 @@ async function syncFromFirebase(){
     ]);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const paidMap = await r.json();
-    if(paidMap && typeof paidMap==='object'){
-      ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{ if(paidMap[s.id]!==undefined) s.paid=paidMap[s.id]; }); });
-    }
+    const _paidMap=(paidMap&&typeof paidMap==='object')?paidMap:{};
+    // 모든 달에 paid 적용
+    Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])) db[m].forEach(s=>{ if(_paidMap[s.id]!==undefined) s.paid=_paidMap[s.id]; }); });
 
-    // students_list.json - 신규 학생 db에 동적 추가
+    // students_list.json - 학생 목록 동기화
     if(sr&&sr.ok){
       try{
         const stuList = await sr.json();
+        window._stuList=stuList;
         if(stuList&&typeof stuList==='object'){
-          ['jul','aug'].forEach(mon=>{
-            if(!db[mon])return;
+          // Firebase 전체 학생 이름
+          const fbNamesByCls={};
+          Object.entries(stuList).forEach(([cls,stus])=>{
+            if(!Array.isArray(stus))return;
+            fbNamesByCls[cls]=stus.filter(s=>s.name).map(s=>s.name);
+          });
+          const allFbNames=new Set(Object.values(fbNamesByCls).flat());
+
+          Object.keys(db).forEach(mon=>{
+            if(!db[mon]||!Array.isArray(db[mon]))return;
+            // 제거된 학생 삭제
+            db[mon]=db[mon].filter(s=>allFbNames.has(s.name));
+            // 신규 학생 추가
             Object.entries(stuList).forEach(([cls,stus])=>{
               if(!Array.isArray(stus))return;
               stus.forEach(stu=>{
                 if(!stu.name)return;
                 const id=mon+'_'+stu.name;
-                if(db[mon].find(s=>s.id===id))return; // 기존 학생 스킵
+                if(db[mon].find(s=>s.id===id))return;
                 db[mon].push({
                   id, name:stu.name, cls,
                   tags:[], schedule:(stu.days||[]).join(','), days:'',
                   absence:0, totalT:0, amount:0,
-                  fixed:false, paid:false, memo:'', remain:null
+                  fixed:false, paid:_paidMap[id]||false, memo:'', remain:null
                 });
               });
             });
@@ -427,60 +439,40 @@ async function syncFromFirebase(){
     if(br.ok){
       const backup = await br.json();
       if(backup && typeof backup==='object'){
-        const RATE_MAP = {
-          '박선영': {type:'fix'}, '박하영': {type:'fix'},
-          '박민지': {type:'remain'}, '김나현': {type:'discount50'}
-        };
-
-        ['jul','aug'].forEach(mon=>{
-          const mNum = mon==='jul'?7:8;
-          if(!db[mon]) return;
+        const MON_MAP2={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+        Object.keys(db).forEach(mon=>{
+          const mNum=MON_MAP2[mon]; if(!mNum) return;
+          if(!db[mon]||!Array.isArray(db[mon])) return;
           db[mon].forEach(s=>{
-            const rSpec = RATE_MAP[s.name];
-            // 고정/잔여 학생은 건드리지 않음
-            if(rSpec && (rSpec.type==='fix' || rSpec.type==='remain')) return;
-            // 취미반은 별도 계산 (아래에서 처리)
+            // 잔여타임(pause 태그) 학생은 건드리지 않음
+            if(s.tags?.some?.(t=>t.startsWith('pause:'))) return;
+            // edits에 amount 있으면 자동계산 건너뜀
+            const _e=_edits[s.id];
+            if(_e&&(_e.amount!==undefined||_e.totalT!==undefined)) return;
+            // 취미반은 아래에서 별도 처리
+            if(s.cls==='취미반') return;
 
-            // schedule_backup에서 해당 학생 데이터 찾기
-            // 키 형식: "반_이름_월" (예: "입시반_김나연_7")
-            // student_edits에 수동 편집값 있으면 자동계산 건너뜀
-            if(_edits[s.id]) return;
-
-            // student_edits에 수동 편집값 있으면 자동계산 건너뜀
-            if(_edits[s.id]) return;
-
-            if(_edits[s.id]) return; // 수동 편집된 학생은 자동계산 건너뜀
-            const key = `${s.cls}_${s.name}_${mNum}`;
-            const sdata = backup[key];
+            const key=`${s.cls}_${s.name}_${mNum}`;
+            const sdata=backup[key];
             if(!sdata) return;
 
-            const regT = (sdata.lessons||[]).length;
-            const spT  = (sdata.special||[]).length;
-            // 전월결석은 schedule의 absIn 값 → schedule_backup에 abs 필드로 저장됨
-            const absT = sdata.abs || s.absence || 0;
-            const rate = s.cls==='예비반' ? 30000 : 31250;
-
-            if(rSpec && rSpec.type==='discount50'){
-              // 재수생: (정규-결석) 50% + 특강 정가
-              const netReg = Math.max(0, regT - absT);
-              s.amount = Math.round(netReg * rate * 0.5) + spT * rate;
-              s.totalT = netReg + spT;
-            } else {
-              // 일반: (정규 + 특강 - 전월결석) × 단가
-              const netT = Math.max(0, regT + spT - absT);
-              s.amount = netT * rate;
-              s.totalT = netT;
-            }
-            s.absence = absT;
-            if(spT > 0) s.days = `정규 ${regT}T / 특강 ${spT}T${absT>0?' / 전월결석 -'+absT+'T':''} = 총 ${s.totalT}T`;
-            else s.days = `${regT}T${absT>0?' (전월결석 -'+absT+'T)':''}`;
+            const regT=(sdata.lessons||[]).length;
+            const spT=(sdata.special||[]).length;
+            const absT=sdata.abs||s.absence||0;
+            const rate=s.cls==='예비반'?30000:31250;
+            const netT=Math.max(0,regT+spT-absT);
+            s.amount=netT*rate;
+            s.totalT=netT;
+            s.absence=absT;
+            if(spT>0) s.days=`정규 ${regT}T / 특강 ${spT}T${absT>0?' / 전월결석 -'+absT+'T':''} = 총 ${s.totalT}T`;
+            else s.days=`${regT}T${absT>0?' (전월결석 -'+absT+'T)':''}`;
           });
         });
       }
     }
 
     // student_edits 적용
-    ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{
+    Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])) db[m].forEach(s=>{
       const e=_edits[s.id]; if(!e) return;
       if(e.amount!==undefined)s.amount=e.amount;
       if(e.totalT!==undefined)s.totalT=e.totalT;
@@ -490,6 +482,68 @@ async function syncFromFirebase(){
       if(e.absence!==undefined)s.absence=e.absence;
       if(e.remain!==undefined)s.remain=e.remain;
     });});
+    // 취미반 수강료 계산
+    const MON_MAP3={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+    if(br.ok){
+      const backup2=await br.ok?fetch(`${FB_URL}/schedule_backup.json?_=${Date.now()}`).then(r=>r.json()).catch(()=>({})):{}; 
+    }
+    // backup은 이미 위에서 로드됨 - 취미반도 같은 backup 사용
+    Object.keys(db).forEach(mon=>{
+      const mNum2=MON_MAP3[mon]; if(!mNum2) return;
+      if(!db[mon]||!Array.isArray(db[mon])) return;
+      db[mon].forEach(s=>{
+        if(s.cls!=='취미반') return;
+        const _e2=_edits[s.id];
+        if(_e2&&_e2.amount!==undefined) return;
+        const key2=`${s.cls}_${s.name}_${mNum2}`;
+        const sd2=backup&&backup[key2]; if(!sd2) return;
+        const regT2=(sd2.lessons||[]).length;
+        const spT2=(sd2.special||[]).length;
+        const absT2=sd2.abs||s.absence||0;
+        const weeklyCount=regT2>0?Math.round(regT2/5):1;
+        const isW2=weeklyCount>=2;
+        const wRate=isW2?50000:25000;
+        const baseAmt=isW2?200000:100000;
+        if(absT2===0&&spT2===0){
+          s.amount=baseAmt; s.days='주'+(isW2?2:1)+'회';
+        } else {
+          const netT=Math.max(0,regT2-absT2);
+          s.amount=netT*wRate+spT2*wRate;
+          s.days=absT2>0?`실수업 ${regT2}T - 결석 ${absT2}회 = ${netT}T`:`${regT2}T`;
+        }
+        s.totalT=Math.max(0,regT2-absT2)+spT2;
+        s.absence=absT2;
+      });
+    });
+
+    // 취미반 수강료 계산 (schedule_backup 기반)
+    Object.keys(db).forEach(mon=>{
+      const mNum2=MON_MAP3[mon]; if(!mNum2) return;
+      if(!db[mon]||!Array.isArray(db[mon])) return;
+      db[mon].forEach(s=>{
+        if(s.cls!=='취미반') return;
+        const _e2=_edits[s.id];
+        if(_e2&&_e2.amount!==undefined) return;
+        const key2=`${s.cls}_${s.name}_${mNum2}`;
+        const sd2=backup[key2]; if(!sd2) return;
+        const regT2=(sd2.lessons||[]).length;
+        const spT2=(sd2.special||[]).length;
+        const absT2=sd2.abs||s.absence||0;
+        const weeklyCount=regT2>0?Math.round(regT2/5):1;
+        const isW2=weeklyCount>=2;
+        const wRate=isW2?50000:25000;
+        const baseAmt=isW2?200000:100000;
+        if(absT2===0&&spT2===0){
+          s.amount=baseAmt; s.days='주'+(isW2?2:1)+'회';
+        } else {
+          const netT=Math.max(0,regT2-absT2);
+          s.amount=netT*wRate+spT2*wRate;
+          s.days=absT2>0?`실수업 ${regT2}T - 결석 ${absT2}회 = ${netT}T`:`${regT2}T`;
+        }
+        s.totalT=Math.max(0,regT2-absT2)+spT2;
+        s.absence=absT2;
+      });
+    });
     if(isPC()){ pcRenderFilters(); pcRenderSidebar(); pcRenderSummary(); }
     else { Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])){ mobRender(m); mobRenderSummary(m); } }); }
     if(statusEl) statusEl.textContent='';
