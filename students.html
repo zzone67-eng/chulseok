@@ -579,15 +579,16 @@ function init(){
   // Firebase 먼저 불러온 후 렌더 (syncFromFirebase 안에서 renderAll 호출)
   // 헤더 날짜 동적 설정
   const now=new Date();const sub=document.getElementById('hdrSub');if(sub)sub.textContent=`${now.getFullYear()}년 ${now.getMonth()+1}월`;
-  syncFromFirebase();
-  // 30초마다 자동 업데이트 (schedule 변경사항 반영)
-  setInterval(syncFromFirebase, 30000);
+  syncFromFirebase().then(()=>{
+    setInterval(syncFromFirebase, 30000);
+  }).catch(()=>setInterval(syncFromFirebase, 30000));
 }
 
 // ══════════════════════════════════
 // 모바일 로직
 // ══════════════════════════════════
-let mobFilter = {jul:'all', aug:'all'};
+let mobFilter = {}; // 동적으로 현재달/다음달 키 사용
+function getMobFilter(mon){ return mobFilter[mon]||'all'; }
 let mobSearchQ = '';
 
 function mobGetActiveMonth(){
@@ -611,7 +612,7 @@ function mobFilterCls(month,cls,btn){
   btn.classList.add('on'); mobRender(month);
 }
 function mobRender(month){
-  const filter=mobFilter[month];
+  const filter=getMobFilter(month);
   const list=document.getElementById('list-'+month); if(!list) return;
   list.innerHTML='';
   const items=db[month].filter(s=>{
