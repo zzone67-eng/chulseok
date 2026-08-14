@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head><!-- 화강암플러스 수강료 관리 v0730-1012 -->
+<head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -218,8 +218,8 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
     <div class="summary" id="summaryBox" style="min-height:20px;color:white;font-size:12px">로딩중...</div>
   </div>
   <div class="tabs">
-    <div class="tab on" onclick="mobSwitchTab('jul',this)" id="mobTab1">7월</div>
-    <div class="tab" onclick="mobSwitchTab('aug',this)" id="mobTab2">8월(예정)</div>
+    <div class="tab on" onclick="mobSwitchTab('jul',this)">7월</div>
+    <div class="tab" onclick="mobSwitchTab('aug',this)">8월(예정)</div>
   </div>
 </div>
 <div class="search-wrap">
@@ -280,8 +280,8 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
 <div class="main">
   <div class="sidebar">
     <div class="sidebar-month">
-      <button class="sm-btn on" onclick="pcSwitchMonth('jul',this)" id="pcBtn1">7월</button>
-      <button class="sm-btn" onclick="pcSwitchMonth('aug',this)" id="pcBtn2">8월(예정)</button>
+      <button class="sm-btn on" onclick="pcSwitchMonth('jul',this)">7월</button>
+      <button class="sm-btn" onclick="pcSwitchMonth('aug',this)">8월(예정)</button>
     </div>
     <div class="sidebar-search">
       <input class="search-input" id="pcSearchInput" placeholder="이름 검색..." oninput="pcOnSearch(this.value)">
@@ -332,6 +332,9 @@ const initData = {
     { id:'jul_박하영', name:'박하영', cls:'예비반', tags:['fix:월고정'],
       schedule:'수,목,금 주3회', days:'', absence:0, totalT:0,
       amount:250000, fixed:true, paid:false, memo:'고1 고정 250,000원/월', remain:null },
+    { id:'jul_김도훈', name:'김도훈', cls:'예비반', tags:[],
+      schedule:'토1,토2,일 주3회', days:'12T (4주기준)', absence:0, totalT:12,
+      amount:360000, fixed:false, paid:false, memo:'', remain:null },
     { id:'jul_안시연', name:'안시연', cls:'중등반', tags:['re:전월결석5'],
       schedule:'토1,토2,일1,일2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
       days:'정규 12T / 특강 10T', absence:9, totalT:13, regularT:12, specialT:10,
@@ -378,6 +381,7 @@ const initData = {
     { id:'aug_김나연', name:'김나연', cls:'입시반', tags:['special:특강'], schedule:'수,목,금,토1,토2 주5회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2', days:'정규 10T / 특강 26T = 총 36T', absence:0, totalT:36, regularT:10, specialT:26, amount:1125000, fixed:false, paid:false, memo:'8월 예상' },
     { id:'aug_김나현', name:'김나현', cls:'입시반', tags:['dis:재수50%','special:특강'], schedule:'수,목,금,토2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2', days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34, regularT:8, specialT:26, amount:937500, fixed:false, paid:false, memo:'8월 예상. 정규50%+특강정가' },
     { id:'aug_박하영', name:'박하영', cls:'예비반', tags:['fix:월고정'], schedule:'수,목,금 주3회', days:'', absence:0, totalT:0, amount:250000, fixed:true, paid:false, memo:'고1 고정 250,000원/월', remain:null },
+    { id:'aug_김도훈', name:'김도훈', cls:'예비반', tags:[], schedule:'토1,토2,일 주3회', days:'예정', absence:0, totalT:0, amount:360000, fixed:false, paid:false, memo:'8월 예상' },
     { id:'aug_안시연', name:'안시연', cls:'중등반', tags:['special:특강'], schedule:'토1,토2,일1,일2 주4회\n특강: 선택타임', days:'정규 12T / 특강 20T = 총 32T', absence:0, totalT:32, regularT:12, specialT:20, amount:1000000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'혜화여중', vacStart:'7/22(수)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
     { id:'aug_한지유', name:'한지유', cls:'중등반', tags:['special:특강'], schedule:'토,일 주2회\n특강: 선택타임', days:'정규 6T / 특강 20T = 총 26T', absence:0, totalT:26, regularT:6, specialT:20, amount:812500, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'초연중', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
     { id:'aug_조제우', name:'조제우', cls:'중등반', tags:['special:특강'], schedule:'수,금,토 주3회\n특강: 선택타임', days:'정규 8T / 특강 16T = 총 24T', absence:0, totalT:24, regularT:8, specialT:16, amount:750000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'초읍중', vacStart:'7/24(목)', vacEnd:'8/13(목)', openDay:'8/14(금)' } },
@@ -460,44 +464,28 @@ async function syncFromFirebase(){
     ]);
     if(!r.ok){ if(statusEl)statusEl.textContent='Firebase 오류: '+r.status; return; }
     const paidMap = await r.json();
-    const _paidMap=(paidMap&&typeof paidMap==='object')?paidMap:{};
-    // 기존 학생 paid 적용
-    Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])) db[m].forEach(s=>{ if(_paidMap[s.id]!==undefined) s.paid=_paidMap[s.id]; }); });
+    if(paidMap && typeof paidMap==='object'){
+      ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{ if(paidMap[s.id]!==undefined) s.paid=paidMap[s.id]; }); });
+    }
 
-    // students_list.json - 학생 목록 동기화
+    // students_list.json - 신규 학생 db에 동적 추가
     if(sr&&sr.ok){
       try{
         const stuList = await sr.json();
-        window._stuList=stuList;
-        window._stuList=stuList; // 스코프 밖에서 접근 가능하게
         if(stuList&&typeof stuList==='object'){
-          // Firebase 전체 학생 이름 목록
-          const fbNamesByCls={};
-          Object.entries(stuList).forEach(([cls,stus])=>{
-            if(!Array.isArray(stus))return;
-            fbNamesByCls[cls]=stus.filter(s=>s.name).map(s=>s.name);
-          });
-          const allFbNames=new Set(Object.values(fbNamesByCls).flat());
-
-          Object.keys(db).forEach(mon=>{
-            if(!db[mon]||!Array.isArray(db[mon]))return;
-
-            // 1. 제거된 학생 삭제 (students_list 기준)
-            db[mon]=db[mon].filter(s=>allFbNames.has(s.name));
-
-            // 2. 신규 학생 추가
+          ['jul','aug'].forEach(mon=>{
+            if(!db[mon])return;
             Object.entries(stuList).forEach(([cls,stus])=>{
               if(!Array.isArray(stus))return;
               stus.forEach(stu=>{
                 if(!stu.name)return;
                 const id=mon+'_'+stu.name;
-                if(db[mon].find(s=>s.id===id))return;
-                if(initData[mon]?.find(x=>x.name===stu.name))return;
+                if(db[mon].find(s=>s.id===id))return; // 기존 학생 스킵
                 db[mon].push({
                   id, name:stu.name, cls,
                   tags:[], schedule:(stu.days||[]).join(','), days:'',
                   absence:0, totalT:0, amount:0,
-                  fixed:false, paid:_paidMap[id]||false, memo:'', remain:null
+                  fixed:false, paid:false, memo:'', remain:null
                 });
               });
             });
@@ -521,46 +509,27 @@ async function syncFromFirebase(){
           '박선영': {type:'fix'}, '박하영': {type:'fix'},
           '박민지': {type:'remain'}, '김나현': {type:'discount50'}
         };
-        // 취미반은 cls로 판단 (하드코딩 목록 불필요)
+        const TAKUMI = ['나은솔','김건휘','김예진','최다윤','신유나','최현우','김윤재','김가람','이지아','명지민'];
 
-        const MON_MAP={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
-        Object.keys(db).forEach(mon=>{
-          const mNum=MON_MAP[mon]; if(!mNum) return;
-          if(!db[mon]||!Array.isArray(db[mon])) return;
+        ['jul','aug'].forEach(mon=>{
+          const mNum = mon==='jul'?7:8;
+          if(!db[mon]) return;
           db[mon].forEach(s=>{
             const rSpec = RATE_MAP[s.name];
             // 고정/잔여 학생은 건드리지 않음
             if(rSpec && (rSpec.type==='fix' || rSpec.type==='remain')) return;
             // 취미반은 고정
-            // 취미반 수강료 계산 (결석 없으면 4주 고정, 있으면 타임수 기반)
-            if(s.cls==='취미반'){
-              const _e2=_edits[s.id];
-              if(_e2&&_e2.amount!==undefined) return;
-              const key2=`${s.cls}_${s.name}_${mNum}`;
-              const sd2=backup[key2]; if(!sd2) return;
-              const regT2=(sd2.lessons||[]).length;
-              const spT2=(sd2.special||[]).length;
-              const absT2=sd2.abs||s.absence||0;
-              // 실제 타임수 기반 주당 횟수 (5주 달 기준으로 나눔)
-              const weeklyCount=regT2>0?Math.round(regT2/5):1;
-              const daysPerWeek=weeklyCount>=2?2:1;
-              const wRate=daysPerWeek>=2?50000:25000;
-              const baseAmt=daysPerWeek>=2?200000:100000;
-              if(absT2===0&&spT2===0){
-                s.amount=baseAmt;
-                s.days='주'+daysPerWeek+'회';
-              } else {
-                const netT=Math.max(0,regT2-absT2);
-                s.amount=netT*wRate+spT2*wRate;
-                s.days=absT2>0?`실수업 ${regT2}T - 결석 ${absT2}회 = ${netT}T`:`${regT2}T`;
-              }
-              s.totalT=Math.max(0,regT2-absT2)+spT2;
-              s.absence=absT2;
-              return;
-            }
-            // amount/totalT가 edits에 있으면 자동계산 건너뜀
-            const _e=_edits[s.id];
-            if(_e&&(_e.amount!==undefined||_e.totalT!==undefined||_e.days!==undefined)) return;
+            if(TAKUMI.includes(s.name)) return;
+
+            // schedule_backup에서 해당 학생 데이터 찾기
+            // 키 형식: "반_이름_월" (예: "입시반_김나연_7")
+            // student_edits에 수동 편집값 있으면 자동계산 건너뜀
+            if(_edits[s.id]) return;
+
+            // student_edits에 수동 편집값 있으면 자동계산 건너뜀
+            if(_edits[s.id]) return;
+
+            if(_edits[s.id]) return; // 수동 편집된 학생은 자동계산 건너뜀
             const key = `${s.cls}_${s.name}_${mNum}`;
             const sdata = backup[key];
             if(!sdata) return;
@@ -594,8 +563,6 @@ async function syncFromFirebase(){
     ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{
       const e=_edits[s.id]; if(!e) return;
       if(e.amount!==undefined)s.amount=e.amount;
-      if(e.extraFee!==undefined)s.extraFee=e.extraFee;
-      if(e.extraFeeDesc!==undefined)s.extraFeeDesc=e.extraFeeDesc;
       if(e.totalT!==undefined)s.totalT=e.totalT;
       if(e.days!==undefined)s.days=e.days;
       if(e.schedule!==undefined)s.schedule=e.schedule;
@@ -603,19 +570,13 @@ async function syncFromFirebase(){
       if(e.absence!==undefined)s.absence=e.absence;
       if(e.remain!==undefined)s.remain=e.remain;
     });});
-    // 명시적으로 현재 모드에 맞게 렌더
-    if(isPC()){
-      pcRenderFilters(); pcRenderSidebar(); pcRenderSummary();
-    } else {
-      Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])){ mobRender(m); mobRenderSummary(m); } });
-    }
+    renderAll();
     if(statusEl) statusEl.textContent='';
   } catch(e){ if(statusEl) statusEl.textContent='연결 실패'; console.error(e); }
 }
 function getDB(){
   const saved=loadDB();
-  Object.keys(initData).forEach(m=>{
-    if(!saved[m])saved[m]=[];
+  ['jul','aug'].forEach(m=>{
     initData[m].forEach(init=>{ if(!saved[m].find(s=>s.id===init.id)) saved[m].push(JSON.parse(JSON.stringify(init))); });
     saved[m].forEach(s=>{ if(!s.tags)s.tags=[]; if(s.remain===undefined)s.remain=null; });
   });
@@ -631,10 +592,7 @@ function tagHtml(t){
 
 function renderAll(){
   if(isPC()){ pcRenderFilters(); pcRenderSidebar(); pcRenderSummary(); }
-  else {
-    // 양쪽 탭 모두 렌더 (비활성 탭도 데이터 갱신)
-    Object.keys(db).forEach(m=>{ if(db[m]&&Array.isArray(db[m])){ mobRender(m); mobRenderSummary(m); } });
-  }
+  else { mobRender(mobGetActiveMonth()); mobRenderSummary(mobGetActiveMonth()); }
 }
 
 // ══════════════════════════════════
@@ -642,47 +600,8 @@ function renderAll(){
 // ══════════════════════════════════
 const isPC = () => window.innerWidth >= 900;
 
-function getCurMonLabel(){
-  // 현재 달 → initData/db 키 반환 (jan,feb,...,dec)
-  const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-  return labels[new Date().getMonth()];
-}
-function getNxtMonLabel(){
-  const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-  return labels[(new Date().getMonth()+1)%12];
-}
-function updateMonthLabels(){
-  const now=new Date();
-  const cm=now.getMonth()+1,cy=now.getFullYear();
-  const nm=cm===12?1:cm+1,ny=cm===12?cy+1:cy;
-  const curLabel=getCurMonLabel(),nxtLabel=getNxtMonLabel();
-  // 탭 텍스트 + onclick 업데이트
-  const t1=document.getElementById('mobTab1');
-  const t2=document.getElementById('mobTab2');
-  const b1=document.getElementById('pcBtn1');
-  const b2=document.getElementById('pcBtn2');
-  if(t1){t1.textContent=cm+'월';t1.onclick=()=>mobSwitchTab(curLabel,t1);}
-  if(t2){t2.textContent=nm+'월(예정)';t2.onclick=()=>mobSwitchTab(nxtLabel,t2);}
-  if(b1){b1.textContent=cm+'월';b1.onclick=()=>pcSwitchMonth(curLabel,b1);}
-  if(b2){b2.textContent=nm+'월(예정)';b2.onclick=()=>pcSwitchMonth(nxtLabel,b2);}
-  window._curMonLabel=curLabel;
-  window._nxtMonLabel=nxtLabel;
-  // 현재 달 패널을 on으로 설정 (jul이 현재달이 아니면 aug로 전환)
-  if(curLabel!=='jul'){
-    const pJul=document.getElementById('panel-jul');
-    const pAug=document.getElementById('panel-aug');
-    const tJul=document.getElementById('mobTab1');
-    const tAug=document.getElementById('mobTab2');
-    if(pJul)pJul.classList.remove('on');
-    if(pAug)pAug.classList.add('on');
-    if(tJul)tJul.classList.remove('on');
-    if(tAug)tAug.classList.add('on');
-  }
-}
 function init(){
-  updateMonthLabels();
   if(isPC()){
-    pcMonth=getCurMonLabel(); // 현재 달로 초기화
     document.body.className='pc';
     document.getElementById('app-mob').style.display='none';
     document.getElementById('app-pc').style.display='flex';
@@ -693,33 +612,18 @@ function init(){
     document.body.className='mob';
     document.getElementById('app-pc').style.display='none';
     document.getElementById('app-mob').style.display='block';
-    // 현재 달 패널 활성화
-    const _cur=getCurMonLabel(),_nxt=getNxtMonLabel();
-    const _pJul=document.getElementById('panel-jul');
-    const _pAug=document.getElementById('panel-aug');
-    const _tJul=document.getElementById('mobTab1');
-    const _tAug=document.getElementById('mobTab2');
-    if(_cur==='aug'){
-      // 8월이 현재달: panel-aug 활성화
-      if(_pJul){_pJul.classList.remove('on');}
-      if(_pAug){_pAug.classList.add('on');}
-      if(_tJul){_tJul.classList.remove('on');}
-      if(_tAug){_tAug.classList.add('on');}
-      document.getElementById('list-aug').innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">불러오는 중...</div>';
-    } else {
-      document.getElementById('list-jul').innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">불러오는 중...</div>';
-    }
+    document.getElementById('list-jul').innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">불러오는 중...</div>';
     window.addEventListener('scroll',()=>{
       const btn=document.getElementById('topBtn');
       if(btn) btn.classList.toggle('show', window.scrollY>200);
     });
   }
+  // Firebase 먼저 불러온 후 렌더 (syncFromFirebase 안에서 renderAll 호출)
   // 헤더 날짜 동적 설정
   const now=new Date();const sub=document.getElementById('hdrSub');if(sub)sub.textContent=`${now.getFullYear()}년 ${now.getMonth()+1}월`;
-  // Firebase 로드 후 렌더
-  syncFromFirebase().then(()=>{
-    setInterval(syncFromFirebase, 30000);
-  });
+  syncFromFirebase();
+  // 30초마다 자동 업데이트 (schedule 변경사항 반영)
+  setInterval(syncFromFirebase, 30000);
 }
 
 // ══════════════════════════════════
@@ -728,13 +632,7 @@ function init(){
 let mobFilter = {jul:'all', aug:'all'};
 let mobSearchQ = '';
 
-function mobGetActiveMonth(){
-  const isAugOn=document.getElementById('panel-aug')?.classList.contains('on');
-  const cur=window._curMonLabel||getCurMonLabel();
-  const nxt=window._nxtMonLabel||getNxtMonLabel();
-  // panel-aug가 on이면 nxt, 아니면 cur
-  return isAugOn?nxt:cur;
-}
+function mobGetActiveMonth(){ return document.getElementById('panel-aug')?.classList.contains('on')?'aug':'jul'; }
 function mobOnSearch(v){ mobSearchQ=v.trim().toLowerCase(); document.getElementById('searchClear').style.display=v?'block':'none'; mobRender(mobGetActiveMonth()); }
 function mobClearSearch(){ document.getElementById('mobSearchInput').value=''; document.getElementById('searchClear').style.display='none'; mobSearchQ=''; mobRender(mobGetActiveMonth()); }
 function mobSwitchTab(month,el){
@@ -742,11 +640,7 @@ function mobSwitchTab(month,el){
   document.querySelectorAll('#app-mob .panel').forEach(p=>p.classList.remove('on'));
   el.classList.add('on'); document.getElementById('panel-'+month).classList.add('on');
   mobRenderSummary(month);
-  const now2=new Date();
-  const curM=now2.getMonth()+1,curY=now2.getFullYear();
-  const nxtM=curM===12?1:curM+1,nxtY=curM===12?curY+1:curY;
-  const _cur=window._curMonLabel||'jul',_nxt=window._nxtMonLabel||'aug';
-  document.getElementById('hdrSub').textContent=month===_cur?(curY+'년 '+curM+'월'):(nxtY+'년 '+nxtM+'월 (예정)');
+  document.getElementById('hdrSub').textContent=month==='jul'?'2026년 7월':'2026년 8월 (예정)';
 }
 function mobFilterCls(month,cls,btn){
   mobFilter[month]=cls;
@@ -757,13 +651,11 @@ function mobRender(month){
   const filter=mobFilter[month];
   const list=document.getElementById('list-'+month); if(!list) return;
   list.innerHTML='';
-  if(!db[month]||!Array.isArray(db[month])){ list.innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">데이터 없음</div>'; return; }
-  if(!db[month]||!Array.isArray(db[month])){ list.innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">불러오는 중...</div>'; return; }
   const items=db[month].filter(s=>{
     if(s.amount===0&&s.remain==null&&!s.fixed) return false;
     if(mobSearchQ&&!s.name.toLowerCase().includes(mobSearchQ)) return false;
     if(filter==='all') return true;
-    if(filter==='미납'){ return !s.paid&&s.amount>0; }
+    if(filter==='미납'){ const today=new Date(),cut=month==='jul'?new Date(2026,6,10):new Date(2026,7,10); if(today<cut)return false; return !s.paid&&s.amount>0; }
     return s.cls===filter;
   });
   const groups={}; items.forEach(s=>{ if(!groups[s.cls])groups[s.cls]=[]; groups[s.cls].push(s); });
@@ -829,7 +721,7 @@ function mobSaveEdit(id,month){
 function mobRenderSummary(month){
   const items=(db[month]||[]).filter(s=>s.amount>0||s.remain!=null); if(!items.length) return;
   const total=items.reduce((a,s)=>a+(s.amount||0),0);
-  const paid=items.filter(s=>s.paid).reduce((a,s)=>a+(s.amount||0),0);
+  const paid=(db[month]||[]).filter(s=>s.paid).reduce((a,s)=>a+(s.amount||0),0);
   const clsList=['입시반','예비반','중등반','취미반'];
   const clsSums={}; clsList.forEach(c=>clsSums[c]=0); items.forEach(s=>{ if(clsSums[s.cls]!==undefined) clsSums[s.cls]+=s.amount; });
   const box=document.getElementById('summaryBox'); if(!box) return;
@@ -845,12 +737,11 @@ function mobRenderSummary(month){
 function openUnpaid(){
   const isMobile=!isPC();
   const ul=document.getElementById(isMobile?'mobUnpaidList':'pcUnpaidList'); ul.innerHTML=''; let total=0;
-  const MON_LABEL2={jan:'1월',feb:'2월',mar:'3월',apr:'4월',may:'5월',jun:'6월',jul:'7월',aug:'8월',sep:'9월',oct:'10월',nov:'11월',dec:'12월'};
-  Object.keys(db).forEach(month=>{
-    if(!db[month]||!Array.isArray(db[month]))return;
+  ['jul','aug'].forEach(month=>{
+    const today=new Date(),cut=month==='jul'?new Date(2026,6,10):new Date(2026,7,10); if(today<cut)return;
     db[month].filter(s=>!s.paid&&s.amount>0).forEach(s=>{
       total+=s.amount;
-      const label=MON_LABEL2[month]||month;
+      const label=month==='jul'?'7월':'8월';
       if(isMobile) ul.innerHTML+=`<div class="unpaid-item"><div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--text3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div><div class="unpaid-amt">${fmt(s.amount)}</div></div>`;
       else ul.innerHTML+=`<div class="unpaid-row"><div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--text3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div><div class="unpaid-amt">${fmt(s.amount)}</div></div>`;
     });
@@ -865,7 +756,7 @@ function closePcUnpaid(){ document.getElementById('pcUnpaidOverlay').classList.r
 // ══════════════════════════════════
 // PC 로직
 // ══════════════════════════════════
-let pcMonth=getCurMonLabel(), pcFilter='all', pcStudent=null, pcMsgTab=0, pcSearchQ='', pcEditing=false;
+let pcMonth='jul', pcFilter='all', pcStudent=null, pcMsgTab=0, pcSearchQ='', pcEditing=false;
 
 function pcSwitchMonth(m,el){
   pcMonth=m; pcStudent=null;
@@ -888,7 +779,7 @@ function pcRenderSidebar(){
     if(s.amount===0&&s.remain==null&&!s.fixed) return false;
     if(pcSearchQ&&!s.name.includes(pcSearchQ)) return false;
     if(pcFilter==='all') return true;
-    if(pcFilter==='미납'){ return !s.paid&&s.amount>0; }
+    if(pcFilter==='미납'){ const today=new Date(),cut=pcMonth==='jul'?new Date(2026,6,10):new Date(2026,7,10); if(today<cut)return false; return !s.paid&&s.amount>0; }
     return s.cls===pcFilter;
   });
   const groups={}; ['입시반','예비반','중등반','취미반'].forEach(c=>groups[c]=[]);
@@ -930,10 +821,7 @@ function pcTogglePaid(e,id){ e.stopPropagation(); ['jul','aug'].forEach(m=>{ con
 
 // ── 문자 생성 ──
 function msgFeeNormal(s,month){
-  const now3=new Date();const _cm=now3.getMonth()+1,_cy=now3.getFullYear();
-  const _nm=_cm===12?1:_cm+1;
-  const _cur2=window._curMonLabel||'jul';
-  const mon=month===_cur2?(_cm+'월'):(_nm+'월');
+  const mon=month==='jul'?'7월':'8월';
   if(s.remain!=null) return `[수강 현황 안내 - ${s.name} 학생 (${s.cls})]\n안녕하세요. 화강암플러스미술학원입니다.\n\n■ 잔여 타임\n${s.remain}T 남음\n\n■ 문의\n${CONTACT}\n감사합니다.`;
   let body=`■ 수업 일정\n${s.schedule}`;
   if(s.days) body+=`\n\n■ 수업 일자 / 시수\n${s.days}`;
