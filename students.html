@@ -512,11 +512,17 @@ function remapDB(db){
 }
 function getDB(){
   const saved=loadDB();
-  ['jul','aug'].forEach(m=>{
-    initData[m].forEach(init=>{ if(!saved[m].find(s=>s.id===init.id)) saved[m].push(JSON.parse(JSON.stringify(init))); });
-    saved[m].forEach(s=>{ if(!s.tags)s.tags=[]; if(s.remain===undefined)s.remain=null; });
+  // saved 데이터 기본값 보정
+  Object.keys(saved).forEach(m=>{
+    if(saved[m]&&Array.isArray(saved[m])){
+      saved[m].forEach(s=>{ if(!s.tags)s.tags=[]; if(s.remain===undefined)s.remain=null; });
+    }
   });
-  return saved;
+  // 현재달/다음달 없으면 추가
+  const _c=getCurMonLabel(),_n=getNxtMonLabel();
+  if(!saved[_c])saved[_c]=[];
+  if(!saved[_n])saved[_n]=[];
+  return remapDB(saved);
 }
 let db = getDB();
 const fmt = n => n===0?'0원':n.toLocaleString('ko-KR')+'원';
