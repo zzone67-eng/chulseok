@@ -286,21 +286,12 @@ body{font-family:-apple-system,'Noto Sans KR',sans-serif;background:var(--bg);co
 </div>
 
 <script>
-const SCHOOL={"박민지":"중앙여고졸","김나연":"계성여고3","박선영":"검정고시","김나현":"사대부고졸","김도훈":"내성고1","박하영":"사직고1","안시연":"해화여중3","한지유":"초연중3","조제우":"초읍중3","전서빈":"연일중3","권해원":"부산예중3","김현준":"부곡중3","최주연":"온천중3","나은솔":"사직여중2","김건휘":"여명중2","김예진":"사직여중1","최다윤":"만덕중2","신유나":"사직중2","최현우":"동인고1","감윤재":"여명중1","김가람":"사직여중1","이지아":"거제여중1","명지민":"사직여중1"};
+let SCHOOL={}; // Firebase students_info에서 로드
 const TIMES=["1타임","2타임","3타임"],TR={"1타임":"10:00~13:30","2타임":"14:00~17:30","3타임":"18:30~22:00"};
 const CLS=["입시반","예비반","중등반","취미반"],CC={"입시반":"#ff7c5c","예비반":"#26de81","중등반":"#45aaf2","취미반":"#ffd32a"};
 const TC={"1타임":"#ff9f43","2타임":"#5cc8ff","3타임":"#a29bfe"},DW=["일","월","화","수","목","금","토"];
 const SCHEDULE_UPDATED='2026-07-02'; // 시간표 최종 업데이트
-const PHONE={
-  "김도훈":"010-7353-0136","박하영":"010-2898-8344","안시연":"010-8216-8117",
-  "한지유":"010-9578-0308","조제우":"010-6626-8931","전서빈":"010-4517-8515",
-  "권해원":"010-4887-7547","김현준":"010-6238-6980","최주연":"010-4519-2704",
-  "나은솔":"010-7644-2874","김건휘":"010-4241-6027","김예진":"010-3214-6306",
-  "최다윤":"010-3469-1228","신유나":"010-4588-9122","최현우":"010-8295-7408",
-  "감윤재":"010-3201-3014","김가람":"010-5604-6864","이지아":"010-8753-1302",
-  "명지민":"010-3405-3398","박민지":"010-7205-8450","김나현":"010-5845-1531","김동현":"010-9376-9824","김윤재":"010-3201-3014","조서연":"010-2784-3055",
-  "박선영":"010-2209-8850","김나연":"010-3771-7981","김소윤":"010-4492-0312"
-};
+let PHONE={}; // Firebase students_info에서 로드
 const TAGS=["병결","사고결석","시험공부","개인사정","여행","기타"];
 let S = {}; // Firebase에서 로드
 
@@ -370,7 +361,17 @@ function launch(){
   }
   if(isMob()||isTab()) document.getElementById('main-mob').style.display='block';
   else                   document.getElementById('main-pc').style.display='grid';
-  cur=toKey(new Date());loadTimetable().then(()=>{buildNav();load(cur);});
+  cur=toKey(new Date());
+  // Firebase에서 학생 정보(학교/연락처) 로드
+  fetch(DB+'/students_info.json?_='+Date.now())
+    .then(r=>r.ok?r.json():null)
+    .then(d=>{
+      if(d&&typeof d==='object'){
+        if(d.school) SCHOOL=d.school;
+        if(d.phone) PHONE=d.phone;
+      }
+    }).catch(()=>{});
+  loadTimetable().then(()=>{buildNav();load(cur);});
   ['prevMonBtn','prevMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(-1);});
   ['nextMonBtn','nextMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(1);});
   // 월 이동 버튼 이벤트
@@ -519,6 +520,18 @@ function tgMakeup(ti,n){
 }
 
 // ── 네비게이션 ────────────────────────────────────────
+// 학생 정보를 Firebase에 저장 (학교/연락처 업데이트용)
+async function saveStudentsInfo(){
+  const data={school:SCHOOL, phone:PHONE};
+  await fetch(DB+'/students_info.json',{method:'PUT',body:JSON.stringify(data),headers:{'Content-Type':'application/json'}});
+  console.log('학생 정보 저장 완료');
+}
+// 학생 정보를 Firebase에 저장
+async function saveStudentsInfo(){
+  const data={school:SCHOOL, phone:PHONE};
+  await fetch(DB+'/students_info.json',{method:'PUT',body:JSON.stringify(data),headers:{'Content-Type':'application/json'}});
+  alert('학생 정보 저장 완료');
+}
 function moveMonth(dir){
   const d=new Date(cur+'T12:00:00');
   d.setMonth(d.getMonth()+dir);
