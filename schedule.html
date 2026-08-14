@@ -775,7 +775,7 @@ function removeStudent(cls,name){
 }
 function saveStudents(){
   const stuData={};
-  Object.entries(STUDENTS).forEach(([cls,stus])=>{stuData[cls]=stus.map(s=>({name:s.name,days:s.days}));});
+  Object.entries(STUDENTS).forEach(([cls,stus])=>{stuData[cls]=stus.map(s=>({name:s.name,days:s.days||[]}));});
   fetch(DB+'/students_list.json',{method:'PUT',body:JSON.stringify(stuData),headers:{'Content-Type':'application/json'}}).catch(()=>{});
 }
 async function loadStudents(){
@@ -786,8 +786,8 @@ async function loadStudents(){
     if(!data||typeof data!=='object')return;
     Object.entries(data).forEach(([cls,stus])=>{
       if(!Array.isArray(stus))return;
-      const valid=stus.filter(s=>s&&s.name&&Array.isArray(s.days)&&s.days.length>0);
-      if(valid.length>0) STUDENTS[cls]=valid.map(s=>({name:s.name,days:s.days}));
+      const valid=stus.filter(s=>s&&s.name); // days 없어도 유효
+      if(valid.length>0) STUDENTS[cls]=valid.map(s=>({name:s.name,days:s.days||[]}));
     });
     console.log('학생 목록 로드 완료');
   }catch(e){console.log('학생 목록 로드 실패',e);}
