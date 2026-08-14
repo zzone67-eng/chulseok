@@ -7,26 +7,32 @@
 <title>화강암플러스 수강생 관리</title>
 <style>
 :root {
-  --bg:#F5F4F1; --surface:#fff; --border:#E6E4DF;
-  --text:#1A1917; --text2:#6B6860; --text3:#9B9890;
-  --red:#C0392B; --blue:#2C5F8A; --green:#1A7A45;
-  --yellow:#E8A020; --purple:#5B3FA0;
-  --radius:14px; --radius-sm:8px; --sidebar:280px;
+  --bg:#111114; --surface:#1C1C20; --surface2:#252529;
+  --border:#2E2E34; --border2:#3A3A42;
+  --text:#E2E0DA; --text2:#8A8880; --text3:#46464E;
+  --red:#C0392B; --blue:#4A90D0; --green:#2A9A52;
+  --yellow:#C88010; --purple:#7B5EA7;
+  --radius:12px; --radius-sm:8px; --sidebar:280px;
+  /* alias for compatibility */
+  --bg:#111114; --sf:#1C1C20; --sf2:#252529;
+  --bd:#2E2E34; --bd2:#3A3A42;
+  --tx:#E2E0DA; --tx2:#8A8880; --tx3:#46464E;
+  --acc:#4A90D0;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;}
 
 /* ── 공통 ── */
 .tag{font-size:10px;padding:2px 7px;border-radius:999px;font-weight:500;}
-.tag-re{background:#FCECEA;color:#8B2020;}
-.tag-dis{background:#E6F4EE;color:#1A5C3A;}
-.tag-ex{background:#FEF3E2;color:#7A4A00;}
-.tag-bo{background:#E8F0FA;color:#1A3D6B;}
-.tag-fix{background:#F0EEFA;color:#3A2080;}
-.tag-pause{background:#F5F0E8;color:#7A6A40;}
-.tag-new{background:#FFF8E6;color:#7A5A00;}
-.tag-special{background:#F0EEFA;color:#3A2080;}
-.remain-badge{display:inline-block;background:#FEF3E2;color:#7A4A00;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600;margin-top:2px;}
+.tag-re{background:#2A1515;color:#E06060;}
+.tag-dis{background:#152A1E;color:#4AB874;}
+.tag-ex{background:#2A1F0A;color:#C88010;}
+.tag-bo{background:#0E1E35;color:#4A90D0;}
+.tag-fix{background:#1A1530;color:#9B7AE0;}
+.tag-pause{background:#1E1A0E;color:#A09060;}
+.tag-new{background:#231A06;color:#C8A030;}
+.tag-special{background:#1A1530;color:#9B7AE0;}
+.remain-badge{display:inline-block;background:#2A1F0A;color:#C88010;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600;margin-top:2px;}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;}
 .overlay.on{display:flex;}
 
@@ -36,7 +42,7 @@ html,body{margin:0;padding:0;}
 #app-mob{display:block;}
 #app-pc{display:none;}
 
-#app-mob{background:var(--bg);color:var(--text);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;}
+#app-mob{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;min-height:100vh;padding-bottom:80px;}
 
 /* 모바일 헤더 */
 #app-mob .sticky-wrap{position:sticky;top:0;z-index:200;}
@@ -50,18 +56,18 @@ html,body{margin:0;padding:0;}
 #app-mob .sum-box.full{background:rgba(255,255,255,.1);}
 #app-mob .sum-lbl{color:rgba(255,255,255,.65);font-size:10px;}
 #app-mob .sum-val{color:#fff;font-size:13px;font-weight:700;}
-#app-mob .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;}
+#app-mob .tabs{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto;}
 #app-mob .tabs::-webkit-scrollbar{display:none;}
-#app-mob .tab{flex:1;min-width:70px;padding:11px 6px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);border-bottom:2.5px solid transparent;cursor:pointer;}
+#app-mob .tab{flex:1;min-width:70px;padding:11px 6px;text-align:center;font-size:13px;font-weight:500;color:var(--tx2);border-bottom:2.5px solid transparent;cursor:pointer;}
 #app-mob .tab.on{color:var(--red);border-bottom-color:var(--red);font-weight:700;}
 #app-mob .filters{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;}
 #app-mob .filters::-webkit-scrollbar{display:none;}
-#app-mob .fbtn{padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;}
-#app-mob .fbtn.on{background:var(--text);color:#fff;border-color:var(--text);}
+#app-mob .fbtn{padding:5px 12px;border-radius:999px;border:1px solid var(--bd);background:var(--sf);font-size:12px;color:var(--tx2);cursor:pointer;white-space:nowrap;}
+#app-mob .fbtn.on{background:var(--text);color:#fff;border-color:var(--tx);}
 #app-mob .panel{display:none;padding:0 14px 20px;}
 #app-mob .panel.on{display:block;}
-#app-mob .sec-hdr{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.07em;padding:14px 0 6px;}
-#app-mob .card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:8px;overflow:hidden;}
+#app-mob .sec-hdr{font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.07em;padding:14px 0 6px;}
+#app-mob .card{background:var(--sf);border-radius:var(--radius);border:1px solid var(--bd);margin-bottom:8px;overflow:hidden;}
 #app-mob .card.paid{border-color:#A8DBC0;}
 #app-mob .card.unpaid{border-color:#F5C0BB;}
 #app-mob .card-top{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;}
@@ -70,51 +76,51 @@ html,body{margin:0;padding:0;}
 #app-mob .card-check.done::after{content:'✓';color:#fff;font-size:12px;font-weight:700;}
 #app-mob .card-info{flex:1;min-width:0;}
 #app-mob .card-name{font-size:15px;font-weight:600;}
-#app-mob .card-cls{font-size:12px;color:var(--text2);margin-top:1px;}
+#app-mob .card-cls{font-size:12px;color:var(--tx2);margin-top:1px;}
 #app-mob .card-right{text-align:right;flex-shrink:0;}
 #app-mob .card-amt{font-size:15px;font-weight:700;color:var(--blue);}
-#app-mob .card-amt.zero{color:var(--text3);}
-#app-mob .card-t{font-size:11px;color:var(--text2);margin-top:1px;}
+#app-mob .card-amt.zero{color:var(--tx3);}
+#app-mob .card-t{font-size:11px;color:var(--tx2);margin-top:1px;}
 #app-mob .tags{display:flex;flex-wrap:wrap;gap:4px;padding:0 14px 10px;}
-#app-mob .detail{display:none;border-top:1px solid var(--border);padding:12px 14px;}
+#app-mob .detail{display:none;border-top:1px solid var(--bd);padding:12px 14px;}
 #app-mob .detail.on{display:block;}
 #app-mob .d-row{display:flex;justify-content:space-between;align-items:flex-start;padding:4px 0;font-size:13px;border-bottom:1px dashed var(--border);}
 #app-mob .d-row:last-of-type{border-bottom:none;}
-#app-mob .d-lbl{color:var(--text2);flex-shrink:0;margin-right:8px;}
+#app-mob .d-lbl{color:var(--tx2);flex-shrink:0;margin-right:8px;}
 #app-mob .d-val{font-weight:500;text-align:right;word-break:break-all;}
-#app-mob .d-dates{font-size:11px;color:var(--text2);line-height:1.7;margin-top:6px;background:var(--bg);padding:8px 10px;border-radius:var(--radius-sm);}
-#app-mob .edit-btn{display:inline-flex;align-items:center;gap:4px;margin-top:10px;padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);font-size:12px;color:var(--text2);cursor:pointer;}
+#app-mob .d-dates{font-size:11px;color:var(--tx2);line-height:1.7;margin-top:6px;background:var(--bg);padding:8px 10px;border-radius:var(--radius-sm);}
+#app-mob .edit-btn{display:inline-flex;align-items:center;gap:4px;margin-top:10px;padding:7px 14px;border:1px solid var(--bd);border-radius:var(--radius-sm);background:var(--bg);font-size:12px;color:var(--tx2);cursor:pointer;}
 #app-mob .save-btn{display:inline-flex;align-items:center;gap:4px;margin-top:10px;margin-left:6px;padding:7px 14px;border:none;border-radius:var(--radius-sm);background:var(--blue);font-size:12px;color:#fff;cursor:pointer;}
 #app-mob .edit-form{margin-top:10px;display:none;}
 #app-mob .edit-form.on{display:block;}
-#app-mob .ef-label{font-size:11px;color:var(--text2);margin-bottom:4px;font-weight:600;}
-#app-mob .ef-input{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;font-family:inherit;margin-bottom:10px;background:var(--bg);}
+#app-mob .ef-label{font-size:11px;color:var(--tx2);margin-bottom:4px;font-weight:600;}
+#app-mob .ef-input{width:100%;border:1px solid var(--bd);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;font-family:inherit;margin-bottom:10px;background:var(--bg);}
 #app-mob .ef-input:focus{outline:none;border-color:var(--blue);}
 textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
 #app-mob .search-wrap{padding:8px 14px 2px;position:sticky;top:52px;z-index:198;background:var(--bg);}
-#app-mob .search-input{width:100%;padding:9px 14px;border:1px solid var(--border);border-radius:999px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;}
+#app-mob .search-input{width:100%;padding:9px 14px;border:1px solid var(--bd);border-radius:999px;font-size:14px;font-family:inherit;background:var(--sf);color:var(--tx);outline:none;}
 #app-mob .search-input:focus{border-color:var(--blue);}
 #app-mob .search-wrap-inner{position:relative;}
-#app-mob .search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:18px;cursor:pointer;display:none;}
+#app-mob .search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:18px;cursor:pointer;display:none;}
 #app-mob .top-btn{position:fixed;bottom:24px;right:16px;width:44px;height:44px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:20px;cursor:pointer;z-index:299;box-shadow:0 4px 14px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;}
 #app-mob .top-btn.show{display:flex;}
 /* 모바일 미납 모달 */
 #app-mob .overlay{align-items:flex-end;}
-#app-mob .modal{background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px 40px;width:100%;max-height:80vh;overflow-y:auto;}
+#app-mob .modal{background:var(--sf);border-radius:20px 20px 0 0;padding:20px 16px 40px;width:100%;max-height:80vh;overflow-y:auto;}
 #app-mob .modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
 #app-mob .modal-title{font-size:16px;font-weight:700;}
-#app-mob .modal-close{font-size:22px;color:var(--text2);cursor:pointer;padding:0 4px;}
-#app-mob .unpaid-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+#app-mob .modal-close{font-size:22px;color:var(--tx2);cursor:pointer;padding:0 4px;}
+#app-mob .unpaid-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd);}
 #app-mob .unpaid-item:last-child{border-bottom:none;}
 #app-mob .unpaid-name{font-size:14px;font-weight:600;}
-#app-mob .unpaid-cls{font-size:12px;color:var(--text2);}
+#app-mob .unpaid-cls{font-size:12px;color:var(--tx2);}
 #app-mob .unpaid-amt{font-size:14px;font-weight:700;color:var(--red);}
 #app-mob .unpaid-total{display:flex;justify-content:space-between;padding:12px 0 0;margin-top:4px;}
 
 /* ════════════════════════
    PC 레이아웃 (≥ 900px)
    ════════════════════════ */
-#app-pc{font-family:-apple-system,'Segoe UI',sans-serif;height:100vh;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--text);}
+#app-pc{font-family:-apple-system,'Segoe UI',sans-serif;height:100vh;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--tx);}
 #app-pc .topbar{background:var(--red);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 #app-pc .topbar-title{color:#fff;font-size:17px;font-weight:700;}
 #app-pc .topbar-right{display:flex;align-items:center;gap:10px;position:relative;}
@@ -132,18 +138,18 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
 #app-pc .s-val.remain{color:#FFB3AE;}
 #app-pc .unpaid-btn{background:rgba(0,0,0,.2);color:#fff;border:1px solid rgba(255,255,255,.15);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;}
 #app-pc .main{display:flex;flex:1;overflow:hidden;}
-#app-pc .sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
-#app-pc .sidebar-month{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);}
-#app-pc .sm-btn{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);border:1px solid var(--border);background:transparent;cursor:pointer;border-radius:8px;}
+#app-pc .sidebar{width:var(--sidebar);background:var(--sf);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+#app-pc .sidebar-month{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--bd);}
+#app-pc .sm-btn{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;color:var(--tx2);border:1px solid var(--bd);background:transparent;cursor:pointer;border-radius:8px;}
 #app-pc .sm-btn.on{background:var(--red);color:#fff;border-color:var(--red);font-weight:700;}
 #app-pc .sidebar-search{padding:12px 12px 8px;}
-#app-pc .search-input{width:100%;padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:var(--bg);outline:none;}
+#app-pc .search-input{width:100%;padding:7px 12px;border:1px solid var(--bd);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:var(--bg);outline:none;}
 #app-pc .search-input:focus{border-color:var(--blue);}
 #app-pc .class-filters{display:flex;flex-wrap:wrap;gap:4px;padding:0 12px 8px;}
-#app-pc .cf-btn{padding:3px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;font-size:11px;color:var(--text2);cursor:pointer;}
-#app-pc .cf-btn.on{background:var(--text);color:#fff;border-color:var(--text);}
+#app-pc .cf-btn{padding:3px 10px;border-radius:999px;border:1px solid var(--bd);background:transparent;font-size:11px;color:var(--tx2);cursor:pointer;}
+#app-pc .cf-btn.on{background:var(--text);color:#fff;border-color:var(--tx);}
 #app-pc .student-list{flex:1;overflow-y:auto;padding:4px 8px 12px;}
-#app-pc .sec-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;padding:10px 6px 4px;text-transform:uppercase;}
+#app-pc .sec-label{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.07em;padding:10px 6px 4px;text-transform:uppercase;}
 #app-pc .s-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--radius-sm);cursor:pointer;margin-bottom:2px;}
 #app-pc .s-item:hover{background:var(--bg);}
 #app-pc .s-item.active{background:#EBF1F8;}
@@ -151,17 +157,17 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
 #app-pc .s-check.done{background:var(--green);border-color:var(--green);}
 #app-pc .s-info{flex:1;min-width:0;}
 #app-pc .s-name{font-size:13px;font-weight:600;}
-#app-pc .s-cls{font-size:11px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#app-pc .s-cls{font-size:11px;color:var(--tx2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #app-pc .s-amt{font-size:12px;font-weight:700;color:var(--blue);white-space:nowrap;flex-shrink:0;}
-#app-pc .s-amt.zero{color:var(--text3);}
+#app-pc .s-amt.zero{color:var(--tx3);}
 #app-pc .content{flex:1;overflow-y:auto;padding:24px;}
-#app-pc .no-select{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:15px;}
+#app-pc .no-select{display:flex;align-items:center;justify-content:center;height:100%;color:var(--tx3);font-size:15px;}
 #app-pc .detail-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px;}
-#app-pc .dcard{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px;margin-bottom:16px;}
-#app-pc .dcard-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em;}
+#app-pc .dcard{background:var(--sf);border-radius:var(--radius);border:1px solid var(--bd);padding:20px;margin-bottom:16px;}
+#app-pc .dcard-title{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em;}
 #app-pc .drow{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--bg);}
 #app-pc .drow:last-child{border-bottom:none;}
-#app-pc .dlbl{font-size:13px;color:var(--text2);flex-shrink:0;margin-right:12px;}
+#app-pc .dlbl{font-size:13px;color:var(--tx2);flex-shrink:0;margin-right:12px;}
 #app-pc .dval{font-size:13px;font-weight:500;text-align:right;word-break:break-word;}
 #app-pc .dval.amount{color:var(--blue);font-size:16px;font-weight:700;}
 #app-pc .dval.red{color:var(--red);}
@@ -172,31 +178,31 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
 #app-pc .paid-toggle-btn.paid{background:#E6F4EE;color:var(--green);}
 #app-pc .edit-inline{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
 #app-pc .ei-row{display:flex;gap:8px;align-items:center;}
-#app-pc .ei-label{font-size:12px;color:var(--text2);width:80px;flex-shrink:0;}
-#app-pc .ei-input,#app-pc .ei-textarea{flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:var(--bg);outline:none;}
+#app-pc .ei-label{font-size:12px;color:var(--tx2);width:80px;flex-shrink:0;}
+#app-pc .ei-input,#app-pc .ei-textarea{flex:1;padding:6px 10px;border:1px solid var(--bd);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:var(--bg);outline:none;}
 #app-pc .ei-textarea{resize:vertical;min-height:60px;}
 #app-pc .ei-input:focus,#app-pc .ei-textarea:focus{border-color:var(--blue);}
 #app-pc .btn-row{display:flex;gap:8px;margin-top:8px;}
 #app-pc .btn{padding:7px 16px;border-radius:var(--radius-sm);border:none;font-size:13px;font-weight:600;cursor:pointer;}
 #app-pc .btn-blue{background:var(--blue);color:#fff;}
-#app-pc .btn-gray{background:var(--border);color:var(--text);}
-#app-pc .msg-panel{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);display:flex;flex-direction:column;}
-#app-pc .msg-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 16px;gap:4px;flex-wrap:wrap;}
-#app-pc .msg-tab{padding:10px 12px;font-size:12px;font-weight:500;color:var(--text2);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;}
+#app-pc .btn-gray{background:var(--border);color:var(--tx);}
+#app-pc .msg-panel{background:var(--sf);border-radius:var(--radius);border:1px solid var(--bd);display:flex;flex-direction:column;}
+#app-pc .msg-tabs{display:flex;border-bottom:1px solid var(--bd);padding:0 16px;gap:4px;flex-wrap:wrap;}
+#app-pc .msg-tab{padding:10px 12px;font-size:12px;font-weight:500;color:var(--tx2);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;}
 #app-pc .msg-tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:700;}
 #app-pc .msg-body{flex:1;padding:16px;overflow-y:auto;min-height:300px;}
-#app-pc .msg-text{font-size:13px;line-height:1.85;white-space:pre-wrap;color:var(--text);background:var(--bg);padding:14px;border-radius:var(--radius-sm);}
+#app-pc .msg-text{font-size:13px;line-height:1.85;white-space:pre-wrap;color:var(--tx);background:var(--bg);padding:14px;border-radius:var(--radius-sm);}
 #app-pc .msg-copy-btn{margin:12px 16px 16px;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;}
-#app-pc .msg-empty{color:var(--text3);font-size:13px;text-align:center;padding:40px 16px;}
+#app-pc .msg-empty{color:var(--tx3);font-size:13px;text-align:center;padding:40px 16px;}
 /* PC 미납 모달 */
 #app-pc .overlay{align-items:center;}
-#app-pc .modal{background:var(--surface);border-radius:var(--radius);padding:24px;width:400px;max-height:80vh;overflow-y:auto;}
+#app-pc .modal{background:var(--sf);border-radius:var(--radius);padding:24px;width:400px;max-height:80vh;overflow-y:auto;}
 #app-pc .modal-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
-#app-pc .modal-close{font-size:20px;cursor:pointer;color:var(--text2);}
-#app-pc .unpaid-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+#app-pc .modal-close{font-size:20px;cursor:pointer;color:var(--tx2);}
+#app-pc .unpaid-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd);}
 #app-pc .unpaid-row:last-child{border-bottom:none;}
 #app-pc .unpaid-name{font-size:14px;font-weight:600;}
-#app-pc .unpaid-cls{font-size:12px;color:var(--text2);}
+#app-pc .unpaid-cls{font-size:12px;color:var(--tx2);}
 #app-pc .unpaid-amt{font-size:14px;font-weight:700;color:var(--red);}
 #app-pc .unpaid-total-row{display:flex;justify-content:space-between;padding:14px 0 0;margin-top:8px;border-top:2px solid var(--border);}
 </style>
@@ -315,86 +321,9 @@ const BANK = '부산은행 101-2092-8547-06 (예금주: 화강암플러스미술
 const CONTACT = '학원: 051-553-3698\n원장: 010-7701-6594 (문자 문의 가능)';
 const FOOTER = `\n■ 납부 방법\n${BANK}\n카드결제 시 아이편으로 보내주시면 결제 도와드리겠습니다.\n\n■ 문의\n${CONTACT}\n감사합니다.`;
 
-const initData = {
-  jul: [
-    { id:'jul_박선영', name:'박선영', cls:'입시반', tags:['fix:월고정'],
-      schedule:'수,목,금,토1,토2 주5회 (3수)', days:'', absence:0, totalT:0,
-      amount:312500, fixed:true, paid:false, memo:'3수생 고정 312,500원/월', remain:null },
-    { id:'jul_박민지', name:'박민지', cls:'입시반', tags:['pause:수능까지휴식'],
-      schedule:'수,목,금,토1,토2 주5회', days:'', absence:0, totalT:0, regularT:12, specialT:14,
-      amount:0, fixed:false, paid:true, memo:'수능까지 수강 없음. 잔여타임만 기록.', remain:13 },
-    { id:'jul_김나연', name:'김나연', cls:'입시반', tags:['re:전월결석1'],
-      schedule:'수,목,금,토1,토2 주5회', days:'정규 12T / 특강 14T', absence:1, totalT:26, regularT:12, specialT:14,
-      amount:812500, fixed:false, paid:false, memo:'22/23결제 (전월결석 1T 차감)', remain:null },
-    { id:'jul_김나현', name:'김나현', cls:'입시반', tags:['dis:재수50%할인'],
-      schedule:'수,목,금,토2 주4회', days:'정규 12T(50%할인) / 특강 14T', absence:0, totalT:26, regularT:12, specialT:14,
-      amount:625000, fixed:false, paid:false, memo:'정규 50%할인+특강 정가 합산', remain:null },
-    { id:'jul_박하영', name:'박하영', cls:'예비반', tags:['fix:월고정'],
-      schedule:'수,목,금 주3회', days:'', absence:0, totalT:0,
-      amount:250000, fixed:true, paid:false, memo:'고1 고정 250,000원/월', remain:null },
-    { id:'jul_안시연', name:'안시연', cls:'중등반', tags:['re:전월결석5'],
-      schedule:'토1,토2,일1,일2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2,일1,일2 중 선택',
-      days:'정규 12T / 특강 10T', absence:9, totalT:13, regularT:12, specialT:10,
-      amount:406250, fixed:false, paid:false, memo:'특강 최대 10T 기준. 요일확정 후 변동가능.',
-      schoolInfo:{ name:'혜화여중', exam:'6/29(월) ~ 7/1(수)', vacStart:'7/22(수)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
-    { id:'jul_한지유', name:'한지유', cls:'중등반', tags:[],
-      schedule:'토,일 주2회\n특강: 선택타임', days:'정규 6T / 특강 10T', absence:0, totalT:16, regularT:6, specialT:10,
-      amount:500000, fixed:false, paid:false, memo:'특강 최대 10T 기준.',
-      schoolInfo:{ name:'초연중', exam:'6/24(수) ~ 6/26(금)', vacStart:'7/21(화)', vacEnd:'8/17(월) 추정', openDay:'8/18(화) 추정' } },
-    { id:'jul_조제우', name:'조제우', cls:'중등반', tags:[],
-      schedule:'수,금,토 주3회\n특강: 선택타임', days:'정규 8T / 특강 8T', absence:0, totalT:16, regularT:8, specialT:8,
-      amount:500000, fixed:false, paid:false, memo:'',
-      schoolInfo:{ name:'초읍중', exam:'7/1(수) ~ 7/3(금)', vacStart:'7/24(목)', vacEnd:'8/13(목)', openDay:'8/14(금)' } },
-    { id:'jul_전서빈', name:'전서빈', cls:'중등반', tags:['re:전월결석6'],
-      schedule:'목,토1,토2 주3회\n특강: 선택타임', days:'정규 10T / 특강 10T', absence:6, totalT:14, regularT:10, specialT:10,
-      amount:437500, fixed:false, paid:false, memo:'7/2까지 시험기간 포함 정산',
-      schoolInfo:{ name:'연일중', exam:'7/1(수) ~ 7/3(금)', vacStart:'7/22(수)', vacEnd:'8/23(일)', openDay:'8/24(월)' } },
-    { id:'jul_권해원', name:'권해원', cls:'중등반', tags:['re:전월결석10'],
-      schedule:'목,토1,토2 주3회\n특강: 선택타임', days:'정규 10T / 특강 10T', absence:10, totalT:10, regularT:10, specialT:10,
-      amount:312500, fixed:false, paid:false, memo:'',
-      schoolInfo:{ name:'부산예술중', exam:'6/25(목) ~ 6/29(월)', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
-    { id:'jul_김현준', name:'김현준', cls:'중등반', tags:['re:전월결석4'],
-      schedule:'수,토,일 주3회', days:'정규 9T / 특강 3T', absence:4, totalT:8,
-      amount:250000, fixed:false, paid:false, memo:'6/28까지 포함 정산',
-      schoolInfo:{ name:'부곡중', exam:'6/29(월) ~ 7/1(수)', vacStart:'7/17(금)', vacEnd:'8/16(일)', openDay:'8/17(월)' } },
-    { id:'jul_최주연', name:'최주연', cls:'중등반', tags:['re:전월결석10'],
-      schedule:'토1,토2,일 주3회\n특강: 선택타임', days:'정규 9T / 특강 10T', absence:10, totalT:9, regularT:9, specialT:10,
-      amount:281250, fixed:false, paid:false, memo:'7/28까지 정산',
-      schoolInfo:{ name:'온천중', exam:'7/1(수) ~ 7/3(금)', vacStart:'7/22(수)', vacEnd:'8/18(화)', openDay:'8/19(수)' } },
-    { id:'jul_나은솔', name:'나은솔', cls:'취미반', tags:['re:전월결석1'], schedule:'토1 주1회', days:'', absence:1, totalT:3, amount:75000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_김건휘', name:'김건휘', cls:'취미반', tags:['re:전월결석1'], schedule:'일1 주1회', days:'', absence:1, totalT:3, amount:75000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_김예진', name:'김예진', cls:'취미반', tags:['re:전월결석1'], schedule:'목,토 주2회', days:'', absence:1, totalT:7, amount:175000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_최다윤', name:'최다윤', cls:'취미반', tags:['re:전월결석2'], schedule:'일1 주1회', days:'', absence:2, totalT:2, amount:50000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_최현우', name:'최현우', cls:'취미반', tags:['bo:보강예정'], schedule:'토2 주1회', days:'', absence:1, totalT:4, amount:100000, fixed:false, paid:false, memo:'전월결석1회 보강예정', remain:null },
-    { id:'jul_김윤재', name:'김윤재', cls:'취미반', tags:[], schedule:'토1,일2 주2회', days:'', absence:0, totalT:8, amount:200000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_이지아', name:'이지아', cls:'취미반', tags:['new:수업시작'], schedule:'토1 주1회', days:'수업시작 5/20', absence:0, totalT:4, amount:50000, fixed:false, paid:false, memo:'전달 정상결제분 50,000원 차감', remain:null },
-    { id:'jul_명지민', name:'명지민', cls:'취미반', tags:[], schedule:'토2 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'', remain:null },
-    { id:'jul_김가람', name:'김가람', cls:'취미반', tags:['new:신규'], schedule:'토2,일2 주2회', days:'', absence:0, totalT:8, amount:200000, fixed:false, paid:false, memo:'', remain:null },
-  ],
-  aug: [
-    { id:'aug_박선영', name:'박선영', cls:'입시반', tags:['fix:월고정'], schedule:'수,목,금,토1,토2 주5회 (3수)', days:'', absence:0, totalT:0, amount:312500, fixed:true, paid:false, memo:'3수생 고정 312,500원/월', remain:null },
-    { id:'aug_박민지', name:'박민지', cls:'입시반', tags:['pause:수능까지휴식'], schedule:'수,목,금,토1,토2 주5회', days:'', absence:0, totalT:0, amount:0, fixed:false, paid:true, memo:'수능까지 수강 없음. 잔여타임 기록.', remain:13 },
-    { id:'aug_김나연', name:'김나연', cls:'입시반', tags:['special:특강'], schedule:'수,목,금,토1,토2 주5회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2', days:'정규 10T / 특강 26T = 총 36T', absence:0, totalT:36, regularT:10, specialT:26, amount:1125000, fixed:false, paid:false, memo:'8월 예상' },
-    { id:'aug_김나현', name:'김나현', cls:'입시반', tags:['dis:재수50%','special:특강'], schedule:'수,목,금,토2 주4회\n특강: 수1,수2,목1,목2,금1,금2,토1,토2', days:'정규 8T / 특강 26T = 총 34T', absence:0, totalT:34, regularT:8, specialT:26, amount:937500, fixed:false, paid:false, memo:'8월 예상. 정규50%+특강정가' },
-    { id:'aug_박하영', name:'박하영', cls:'예비반', tags:['fix:월고정'], schedule:'수,목,금 주3회', days:'', absence:0, totalT:0, amount:250000, fixed:true, paid:false, memo:'고1 고정 250,000원/월', remain:null },
-    { id:'aug_안시연', name:'안시연', cls:'중등반', tags:['special:특강'], schedule:'토1,토2,일1,일2 주4회\n특강: 선택타임', days:'정규 12T / 특강 20T = 총 32T', absence:0, totalT:32, regularT:12, specialT:20, amount:1000000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'혜화여중', vacStart:'7/22(수)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
-    { id:'aug_한지유', name:'한지유', cls:'중등반', tags:['special:특강'], schedule:'토,일 주2회\n특강: 선택타임', days:'정규 6T / 특강 20T = 총 26T', absence:0, totalT:26, regularT:6, specialT:20, amount:812500, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'초연중', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
-    { id:'aug_조제우', name:'조제우', cls:'중등반', tags:['special:특강'], schedule:'수,금,토 주3회\n특강: 선택타임', days:'정규 8T / 특강 16T = 총 24T', absence:0, totalT:24, regularT:8, specialT:16, amount:750000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'초읍중', vacStart:'7/24(목)', vacEnd:'8/13(목)', openDay:'8/14(금)' } },
-    { id:'aug_전서빈', name:'전서빈', cls:'중등반', tags:['special:특강'], schedule:'목,토1,토2 주3회\n특강: 선택타임', days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28, regularT:8, specialT:20, amount:875000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'연일중', vacStart:'7/22(수)', vacEnd:'8/23(일)', openDay:'8/24(월)' } },
-    { id:'aug_권해원', name:'권해원', cls:'중등반', tags:['special:특강'], schedule:'목,토1,토2 주3회\n특강: 선택타임', days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28, regularT:8, specialT:20, amount:875000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'부산예술중', vacStart:'7/21(화)', vacEnd:'8/17(월)', openDay:'8/18(화)' } },
-    { id:'aug_김현준', name:'김현준', cls:'중등반', tags:['special:특강'], schedule:'수,토,일 주3회\n특강: 선택타임', days:'정규 8T / 특강 20T = 총 28T', absence:0, totalT:28, regularT:8, specialT:20, amount:875000, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'부곡중', vacStart:'7/17(금)', vacEnd:'8/16(일)', openDay:'8/17(월)' } },
-    { id:'aug_최주연', name:'최주연', cls:'중등반', tags:['special:특강'], schedule:'토1,토2,일 주3회\n특강: 선택타임', days:'정규 9T / 특강 20T = 총 29T', absence:0, totalT:29, regularT:9, specialT:20, amount:906250, fixed:false, paid:false, memo:'8월 예상', schoolInfo:{ name:'온천중', vacStart:'7/22(수)', vacEnd:'8/18(화)', openDay:'8/19(수)' } },
-    { id:'aug_나은솔', name:'나은솔', cls:'취미반', tags:[], schedule:'토1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
-    { id:'aug_김건휘', name:'김건휘', cls:'취미반', tags:[], schedule:'일1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
-    { id:'aug_김예진', name:'김예진', cls:'취미반', tags:[], schedule:'목,토 주2회', days:'', absence:0, totalT:8, amount:200000, fixed:false, paid:false, memo:'' },
-    { id:'aug_최다윤', name:'최다윤', cls:'취미반', tags:[], schedule:'일1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
-    { id:'aug_최현우', name:'최현우', cls:'취미반', tags:[], schedule:'토2 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
-    { id:'aug_김윤재', name:'김윤재', cls:'취미반', tags:[], schedule:'토1,일2 주2회', days:'', absence:0, totalT:8, amount:200000, fixed:false, paid:false, memo:'' },
-    { id:'aug_이지아', name:'이지아', cls:'취미반', tags:[], schedule:'토1 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
-    { id:'aug_명지민', name:'명지민', cls:'취미반', tags:[], schedule:'토2 주1회', days:'', absence:0, totalT:4, amount:100000, fixed:false, paid:false, memo:'' },
-    { id:'aug_김가람', name:'김가람', cls:'취미반', tags:[], schedule:'토2,일2 주2회', days:'', absence:0, totalT:8, amount:200000, fixed:false, paid:false, memo:'' },
-  ]
-};
+// initData 제거 - Firebase students_list에서 동적 로드
+const initData = {}; // 더 이상 사용 안함
+
 
 // ── 스토리지 ──
 function loadDB(){ return JSON.parse(JSON.stringify(initData)); }
@@ -407,20 +336,19 @@ function saveEdits(){
   // 편집된 학생 데이터(수강료, 메모, 수업일자 등) Firebase에 저장
   const edits={};
   ['jul','aug'].forEach(m=>{ if(db[m]) db[m].forEach(s=>{
-    const init=initData[m]?.find(x=>x.id===s.id);
+    // 자동계산 학생: memo/absence만 저장
+    // 고정/취미/할인: amount도 저장
+    const RATE_MAP_FIX=['박선영','박하영','박민지'];
+    const isFixed=RATE_MAP_FIX.includes(s.name)||s.cls==='취미반'||s.tags?.some?.(t=>t.startsWith('pause:'));
     const changed={};
-    // initData에 없는 신규 학생은 모든 편집값 저장
-    if(!init){
-      edits[s.id]={amount:s.amount,totalT:s.totalT,days:s.days,schedule:s.schedule,memo:s.memo,absence:s.absence,remain:s.remain};
-      return;
+    if(isFixed){
+      if(s.amount!==0)changed.amount=s.amount;
+      if(s.totalT)changed.totalT=s.totalT;
+      if(s.days)changed.days=s.days;
     }
-    if(s.amount!==init.amount)changed.amount=s.amount;
-    if(s.totalT!==init.totalT)changed.totalT=s.totalT;
-    if(s.days!==init.days)changed.days=s.days;
-    if(s.schedule!==init.schedule)changed.schedule=s.schedule;
-    if(s.memo!==init.memo)changed.memo=s.memo;
-    if(s.absence!==init.absence)changed.absence=s.absence;
-    if(s.remain!==init.remain)changed.remain=s.remain;
+    if(s.memo)changed.memo=s.memo;
+    if(s.absence)changed.absence=s.absence;
+    if(s.remain!=null)changed.remain=s.remain;
     if(Object.keys(changed).length>0)edits[s.id]=changed;
   });});
   console.log('saveEdits 저장:', JSON.stringify(edits));
@@ -637,7 +565,7 @@ function init(){
     document.getElementById('app-pc').style.display='flex';
     pcRenderFilters();
     // 로딩 표시
-    document.getElementById('studentList').innerHTML='<div style="padding:20px;color:var(--text3);text-align:center;font-size:13px">불러오는 중...</div>';
+    document.getElementById('studentList').innerHTML='<div style="padding:20px;color:var(--tx3);text-align:center;font-size:13px">불러오는 중...</div>';
   } else {
     document.body.className='mob';
     document.getElementById('app-pc').style.display='none';
@@ -777,11 +705,11 @@ function openUnpaid(){
     db[month].filter(s=>!s.paid&&s.amount>0).forEach(s=>{
       total+=s.amount;
       const label=month==='jul'?'7월':'8월';
-      if(isMobile) ul.innerHTML+=`<div class="unpaid-item"><div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--text3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div><div class="unpaid-amt">${fmt(s.amount)}</div></div>`;
-      else ul.innerHTML+=`<div class="unpaid-row"><div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--text3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div><div class="unpaid-amt">${fmt(s.amount)}</div></div>`;
+      if(isMobile) ul.innerHTML+=`<div class="unpaid-item"><div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--tx3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div><div class="unpaid-amt">${fmt(s.amount)}</div></div>`;
+      else ul.innerHTML+=`<div class="unpaid-row"><div><div class="unpaid-name">${s.name} <span style="font-size:11px;color:var(--tx3)">${label}</span></div><div class="unpaid-cls">${s.cls}</div></div><div class="unpaid-amt">${fmt(s.amount)}</div></div>`;
     });
   });
-  if(!ul.innerHTML) ul.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">미납 없음</div>';
+  if(!ul.innerHTML) ul.innerHTML='<div style="text-align:center;padding:20px;color:var(--tx3)">미납 없음</div>';
   document.getElementById(isMobile?'mobUnpaidTotal':'pcUnpaidTotal').textContent=fmt(total);
   document.getElementById(isMobile?'mobUnpaidOverlay':'pcUnpaidOverlay').classList.add('on');
 }
