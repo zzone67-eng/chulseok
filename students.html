@@ -326,10 +326,10 @@ const initData = {}; // 더 이상 사용 안함
 
 
 // ── 스토리지 ──
-function loadDB(){ return JSON.parse(JSON.stringify(initData)); }
+function loadDB(){ return {}; } // initData 제거됨 - Firebase에서 동적 로드
 function saveDB(d){
   const paidMap = {};
-  ['jul','aug'].forEach(m=>{ if(d[m]) d[m].forEach(s=>{ paidMap[s.id]=s.paid; }); });
+  Object.keys(d).forEach(m=>{ if(d[m]&&Array.isArray(d[m])) d[m].forEach(s=>{ paidMap[s.id]=s.paid; }); });
   fetch(`${FB_URL}/paid.json`,{method:'PUT',body:JSON.stringify(paidMap),headers:{'Content-Type':'application/json'}}).catch(()=>{});
 }
 function saveEdits(){
@@ -557,11 +557,15 @@ function getNxtMonLabel(){
 }
 function remapDB(db){
   const cur=getCurMonLabel(), nxt=getNxtMonLabel();
-  if(cur==='jul'&&nxt==='aug') return db;
   const remapped={};
+  // jul/aug 키가 있으면 현재달/다음달로 리매핑
   if(db['jul']) remapped[cur]=db['jul'];
   if(db['aug']) remapped[nxt]=db['aug'];
+  // 나머지 키는 그대로
   Object.keys(db).forEach(k=>{ if(k!=='jul'&&k!=='aug') remapped[k]=db[k]; });
+  // 현재달/다음달 없으면 빈 배열 생성
+  if(!remapped[cur]) remapped[cur]=[];
+  if(!remapped[nxt]) remapped[nxt]=[];
   return remapped;
 }
 function getDB(){
@@ -572,10 +576,6 @@ function getDB(){
       saved[m].forEach(s=>{ if(!s.tags)s.tags=[]; if(s.remain===undefined)s.remain=null; });
     }
   });
-  // 현재달/다음달 없으면 추가
-  const _c=getCurMonLabel(),_n=getNxtMonLabel();
-  if(!saved[_c])saved[_c]=[];
-  if(!saved[_n])saved[_n]=[];
   return remapDB(saved);
 }
 let db = getDB();
