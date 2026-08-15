@@ -174,8 +174,8 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
 #app-pc .dval.green{color:var(--green);}
 #app-pc .paid-toggle{display:flex;align-items:center;gap:8px;margin-top:12px;}
 #app-pc .paid-toggle-btn{padding:7px 20px;border-radius:999px;border:none;font-size:13px;font-weight:600;cursor:pointer;}
-#app-pc .paid-toggle-btn.unpaid{background:#FCECEA;color:var(--red);}
-#app-pc .paid-toggle-btn.paid{background:#E6F4EE;color:var(--green);}
+#app-pc .paid-toggle-btn.unpaid{background:#2A1515;color:var(--red);}
+#app-pc .paid-toggle-btn.paid{background:#152A1E;color:var(--green);}
 #app-pc .edit-inline{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
 #app-pc .ei-row{display:flex;gap:8px;align-items:center;}
 #app-pc .ei-label{font-size:12px;color:var(--tx2);width:80px;flex-shrink:0;}
@@ -451,7 +451,8 @@ async function syncFromFirebase(){
             const absT=sdata.abs||s.absence||0;
 
             if(s.cls==='취미반'){
-              // 취미반: 실타임 기반 주당 횟수 판단
+              // 취미반: 실타임 기반 주당 횟수 판단 (데이터 없으면 건너뜀)
+              if(regT===0&&spT===0){return;} // 시간표 체크 없으면 0원 유지
               const weeklyCount=regT>0?Math.round(regT/5):1;
               const isW2=weeklyCount>=2;
               const wRate=isW2?50000:25000;
@@ -790,7 +791,7 @@ function pcRenderSummary(){
 }
 function pcToggleCls(){ const p=document.getElementById('clsPanel'),b=document.getElementById('clsToggleBtn'); if(!p)return; p.classList.toggle('open'); b.textContent=p.classList.contains('open')?'‹':'›'; }
 function pcSelectStudent(id){ const s=db[pcMonth].find(x=>x.id===id); if(!s)return; pcStudent=s; pcMsgTab=0; pcEditing=false; pcRenderSidebar(); pcRenderDetail(); }
-function pcTogglePaid(e,id){ e.stopPropagation(); ['jul','aug'].forEach(m=>{ const s=db[m].find(x=>x.id===id); if(s)s.paid=!s.paid; }); saveDB(db); pcRenderSidebar(); pcRenderSummary(); if(pcStudent?.id===id){pcStudent=db[pcMonth].find(x=>x.id===id);pcRenderDetail();} }
+function pcTogglePaid(e,id){ e.stopPropagation(); Object.keys(db).forEach(m=>{ const s=db[m]?.find(x=>x.id===id); if(s)s.paid=!s.paid; }); saveDB(db); pcRenderSidebar(); pcRenderSummary(); if(pcStudent?.id===id){pcStudent=db[pcMonth]?.find(x=>x.id===id);pcRenderDetail();} }
 
 // ── 문자 생성 ──
 function msgFeeNormal(s,month){
