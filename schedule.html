@@ -549,7 +549,7 @@ function onExtraFeeDesc(){
 }
 function onExtraFee(){
   if(!curStu)return;
-  const v=parseInt(document.getElementById('extraFeeIn')?.value||'0')||0;
+  const v=parseInt((document.getElementById('extraFeeIn')?.value||'0').replace(/,/g,'').replace(/[^0-9]/g,''))||0;
   const desc=document.getElementById('extraFeeDescIn')?.value||'';
   if(v>0){
     localStorage.setItem('extraFee_'+curCls+'_'+curStu+'_'+mon, String(v));
@@ -589,7 +589,7 @@ function clearExtraFee(){
   if(!_fv&&!drR&&!drS) clearFixedFeeFromFirebase(sid);
   else saveFixedFeeToFirebase(sid, c2.fee);
 }
-function getExtraFee(){ return parseInt(localStorage.getItem('extraFee_'+curCls+'_'+curStu+'_'+mon)||'0')||0; }
+function getExtraFee(){ return parseInt((localStorage.getItem('extraFee_'+curCls+'_'+curStu+'_'+mon)||'0').replace(/,/g,''))||0; }
 function getExtraFeeDesc(){ return localStorage.getItem('extraFeeDesc_'+curCls+'_'+curStu+'_'+mon)||''; }
 function loadExtraFee(){
   const el=document.getElementById('extraFeeIn');
