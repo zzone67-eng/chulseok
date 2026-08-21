@@ -495,7 +495,15 @@ async function syncFromFirebase(){
     });
 
     if(isPC()){pcRenderFilters();pcRenderSidebar();pcRenderSummary();}
-    else{Object.keys(db).forEach(m=>{if(db[m]&&Array.isArray(db[m])){mobRender(m);mobRenderSummary(m);}});}
+    else{
+      // panel-jul=현재달, panel-aug=다음달로 렌더
+      const _c=window._curMonLabel||getCurMonLabel();
+      const _n=window._nxtMonLabel||getNxtMonLabel();
+      if(db[_c])mobRender(_c);
+      if(db[_n])mobRender(_n);
+      if(db[_c])mobRenderSummary(_c);
+      if(db[_n])mobRenderSummary(_n);
+    }
     if(statusEl)statusEl.textContent='';
   }catch(e){if(statusEl)statusEl.textContent='연결 실패';console.error(e);}
 }
@@ -561,10 +569,11 @@ function updateMonthLabels(){
   window._curMonLabel=cur; window._nxtMonLabel=nxt;
   // 현재달이 aug가 아니면 panel 상태도 교정
   if(cur!=='jul'){
-    document.getElementById('panel-jul')?.classList.remove('on');
-    document.getElementById('panel-aug')?.classList.add('on');
-    document.getElementById('mobTab1')?.classList.remove('on');
-    document.getElementById('mobTab2')?.classList.add('on');
+    // cur이 jul이 아닌 경우: panel-jul을 현재달로 사용 (list-jul에 cur 데이터 렌더링)
+    // panel-aug는 다음달(sep 등)용
+    // 탭만 업데이트, 패널은 기본 panel-jul(on) 유지
+    document.getElementById('mobTab1')?.classList.add('on');
+    document.getElementById('mobTab2')?.classList.remove('on');
   }
 }
 function init(){
@@ -603,7 +612,9 @@ let mobSearchQ = '';
 
 function mobGetActiveMonth(){
   const isAugOn=document.getElementById('panel-aug')?.classList.contains('on');
-  return isAugOn?(window._nxtMonLabel||getNxtMonLabel()):(window._curMonLabel||getCurMonLabel());
+  const cur=window._curMonLabel||getCurMonLabel();
+  const nxt=window._nxtMonLabel||getNxtMonLabel();
+  return isAugOn?nxt:cur;
 }
 function mobOnSearch(v){ mobSearchQ=v.trim().toLowerCase(); document.getElementById('searchClear').style.display=v?'block':'none'; mobRender(mobGetActiveMonth()); }
 function mobClearSearch(){ document.getElementById('mobSearchInput').value=''; document.getElementById('searchClear').style.display='none'; mobSearchQ=''; mobRender(mobGetActiveMonth()); }
