@@ -623,7 +623,11 @@ function mobFilterCls(month,cls,btn){
 }
 function mobRender(month){
   const filter=getMobFilter(month);
-  const list=document.getElementById('list-'+month); if(!list) return;
+  // db 키(aug,sep)를 패널 ID(jul=현재달, aug=다음달)로 매핑
+  const cur=window._curMonLabel||getCurMonLabel();
+  const nxt=window._nxtMonLabel||getNxtMonLabel();
+  const listId=month===cur?'list-jul':month===nxt?'list-aug':'list-'+month;
+  const list=document.getElementById(listId); if(!list) return;
   list.innerHTML='';
   const items=db[month].filter(s=>{
     if(s.amount===0&&s.remain==null&&!s.fixed) return false;
