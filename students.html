@@ -455,7 +455,7 @@ async function syncFromFirebase(){
               if(regT===0&&spT===0){return;} // 시간표 체크 없으면 0원 유지
               const weeklyCount=regT>0?Math.round(regT/5):1;
               const isW2=weeklyCount>=2;
-              const wRate=isW2?50000:25000;
+              const wRate=25000; // 타임당 단가 (주1회/2회 무관)
               const baseAmt=isW2?200000:100000;
               if(absT===0&&spT===0){
                 s.amount=baseAmt;s.days='주'+(isW2?2:1)+'회';
