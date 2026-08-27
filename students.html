@@ -611,11 +611,15 @@ function mobClearSearch(){ document.getElementById('mobSearchInput').value=''; d
 function mobSwitchTab(month,el){
   document.querySelectorAll('#app-mob .tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('#app-mob .panel').forEach(p=>p.classList.remove('on'));
-  el.classList.add('on'); document.getElementById('panel-'+month).classList.add('on');
+  el.classList.add('on');
+  const cur=window._curMonLabel||getCurMonLabel();
+  const panelId=month===cur?'panel-cur':'panel-nxt';
+  const panel=document.getElementById(panelId);
+  if(panel) panel.classList.add('on');
+  mobRender(month);
   mobRenderSummary(month);
   const now2=new Date();const cm2=now2.getMonth()+1,cy2=now2.getFullYear();const nm2=cm2===12?1:cm2+1,ny2=cm2===12?cy2+1:cy2;
-  const _cur=window._curMonLabel||getCurMonLabel();
-  document.getElementById('hdrSub').textContent=month===_cur?(cy2+'년 '+cm2+'월'):(ny2+'년 '+nm2+'월 (예정)');
+  document.getElementById('hdrSub').textContent=month===cur?(cy2+'년 '+cm2+'월'):(ny2+'년 '+nm2+'월 (예정)');
 }
 function mobFilterCls(month,cls,btn){
   mobFilter[month]=cls;
