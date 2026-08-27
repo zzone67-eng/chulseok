@@ -579,7 +579,7 @@ function init(){
     document.body.className='mob';
     document.getElementById('app-pc').style.display='none';
     document.getElementById('app-mob').style.display='block';
-    document.getElementById('list-jul').innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">불러오는 중...</div>';
+    const _lc=document.getElementById('list-cur'); if(_lc) _lc.innerHTML='<div style="padding:20px;color:#999;text-align:center;font-size:13px">불러오는 중...</div>';
     window.addEventListener('scroll',()=>{
       const btn=document.getElementById('topBtn');
       if(btn) btn.classList.toggle('show', window.scrollY>200);
