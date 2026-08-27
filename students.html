@@ -223,10 +223,7 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
     </div>
     <div class="summary" id="summaryBox" style="min-height:20px;color:white;font-size:12px">로딩중...</div>
   </div>
-  <div class="tabs">
-    <div class="tab on" onclick="mobSwitchTab('jul',this)" id="mobTab1">7월</div>
-    <div class="tab" onclick="mobSwitchTab('aug',this)" id="mobTab2">8월(예정)</div>
-  </div>
+  <div class="tabs" id="mobTabs"></div>
 </div>
 <div class="search-wrap">
   <div class="search-wrap-inner">
@@ -235,27 +232,7 @@ textarea#app-mob .ef-input{resize:vertical;min-height:70px;}
   </div>
 </div>
 <button class="top-btn" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
-<div class="panel on" id="panel-jul">
-  <div class="filters">
-    <button class="fbtn on" onclick="mobFilterCls('jul','all',this)">전체</button>
-    <button class="fbtn" onclick="mobFilterCls('jul','입시반',this)">입시반</button>
-    <button class="fbtn" onclick="mobFilterCls('jul','예비반',this)">예비반</button>
-    <button class="fbtn" onclick="mobFilterCls('jul','중등반',this)">중등반</button>
-    <button class="fbtn" onclick="mobFilterCls('jul','취미반',this)">취미반</button>
-    <button class="fbtn" onclick="mobFilterCls('jul','미납',this)">미납</button>
-  </div>
-  <div id="list-jul"></div>
-</div>
-<div class="panel" id="panel-aug">
-  <div class="filters">
-    <button class="fbtn on" onclick="mobFilterCls('aug','all',this)">전체</button>
-    <button class="fbtn" onclick="mobFilterCls('aug','입시반',this)">입시반</button>
-    <button class="fbtn" onclick="mobFilterCls('aug','예비반',this)">예비반</button>
-    <button class="fbtn" onclick="mobFilterCls('aug','중등반',this)">중등반</button>
-    <button class="fbtn" onclick="mobFilterCls('aug','취미반',this)">취미반</button>
-  </div>
-  <div id="list-aug"></div>
-</div>
+<div id="mobPanels"></div>
 <!-- 모바일 미납 모달 -->
 <div class="overlay" id="mobUnpaidOverlay" onclick="if(event.target===this)closeMobUnpaid()">
   <div class="modal">
@@ -611,10 +588,10 @@ function getMobFilter(mon){ return mobFilter[mon]||'all'; }
 let mobSearchQ = '';
 
 function mobGetActiveMonth(){
-  const isAugOn=document.getElementById('panel-aug')?.classList.contains('on');
+  const isNxtOn=document.getElementById('panel-nxt')?.classList.contains('on');
   const cur=window._curMonLabel||getCurMonLabel();
   const nxt=window._nxtMonLabel||getNxtMonLabel();
-  return isAugOn?nxt:cur;
+  return isNxtOn?nxt:cur;
 }
 function mobOnSearch(v){ mobSearchQ=v.trim().toLowerCase(); document.getElementById('searchClear').style.display=v?'block':'none'; mobRender(mobGetActiveMonth()); }
 function mobClearSearch(){ document.getElementById('mobSearchInput').value=''; document.getElementById('searchClear').style.display='none'; mobSearchQ=''; mobRender(mobGetActiveMonth()); }
@@ -634,10 +611,10 @@ function mobFilterCls(month,cls,btn){
 }
 function mobRender(month){
   const filter=getMobFilter(month);
-  // db 키(aug,sep)를 패널 ID(jul=현재달, aug=다음달)로 매핑
   const cur=window._curMonLabel||getCurMonLabel();
   const nxt=window._nxtMonLabel||getNxtMonLabel();
-  const listId=month===cur?'list-jul':month===nxt?'list-aug':'list-'+month;
+  // panel-cur=현재달, panel-nxt=다음달
+  const listId=month===cur?'list-cur':month===nxt?'list-nxt':'list-cur';
   const list=document.getElementById(listId); if(!list) return;
   list.innerHTML='';
   const items=db[month].filter(s=>{
