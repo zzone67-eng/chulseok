@@ -537,11 +537,15 @@ function updateMonthLabels(){
   const cur=getCurMonLabel(), nxt=getNxtMonLabel();
   window._curMonLabel=cur; window._nxtMonLabel=nxt;
 
-  // 모바일 탭 이벤트
-  const t1=document.getElementById('mobTab1');
-  const t2=document.getElementById('mobTab2');
-  if(t1){t1.textContent=cm+'월'; t1.onclick=()=>mobSwitchTab(cur,t1);}
-  if(t2){t2.textContent=nm+'월(예정)'; t2.onclick=()=>mobSwitchTab(nxt,t2);}
+  // 모바일 탭 동적 생성
+  const tabsEl=document.getElementById('mobTabs');
+  if(tabsEl){
+    tabsEl.innerHTML=`
+      <div class="tab on" id="mobTab1">${cm}월</div>
+      <div class="tab" id="mobTab2">${nm}월(예정)</div>`;
+    document.getElementById('mobTab1').onclick=function(){mobSwitchTab(cur,this);};
+    document.getElementById('mobTab2').onclick=function(){mobSwitchTab(nxt,this);};
+  }
 
   // 모바일 패널 동적 생성
   const panels=document.getElementById('mobPanels');
