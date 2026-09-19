@@ -175,8 +175,82 @@ function updateNoticePreview(){document.getElementById('noticePreviewTitle').tex
 function previewDemoPhotos(e){demoFiles=[...e.target.files].slice(0,3);const p=document.getElementById('demoPreview');p.innerHTML='';document.getElementById('photoEmpty').style.display=demoFiles.length?'none':'block';demoFiles.forEach((f,i)=>{const u=URL.createObjectURL(f);p.insertAdjacentHTML('beforeend',`<div class="photo-thumb"><img src="${u}"><span class="photo-n">${i+1}</span></div>`)})}
 async function compress(file){const img=await new Promise((res,rej)=>{const im=new Image,u=URL.createObjectURL(file);im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=rej;im.src=u});let w=img.width,h=img.height,max=1400;if(Math.max(w,h)>max){const r=max/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r)}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);return await new Promise(res=>c.toBlob(res,'image/jpeg',.78))}
 function newId(p='x'){return p+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
-async function publishDemo(){if(!teacher)return;const title=document.getElementById('demoTitle').value.trim(),body=document.getElementById('demoBody').value.trim(),btn=document.getElementById('demoPublishBtn');if(!title){toast('시범 제목을 입력해주세요');return}if(!demoFiles.length){toast('시범 사진을 1장 이상 선택해주세요');return}btn.disabled=true;btn.textContent='업로드 중…';const id=newId('demo');try{const urls=[],paths=[];for(let i=0;i<demoFiles.length;i++){const blob=await compress(demoFiles[i]);const path=`teacher_demos/${teacher.uid}/${id}/${i+1}.jpg`;const ref=storage.ref(path);await ref.put(blob,{contentType:'image/jpeg'});urls.push(await ref.getDownloadURL());paths.push(path)}const data={id,teacherUid:teacher.uid,teacherName,cls:demoClass,title,body,images:urls,imagePaths:paths,active:true,createdAt:new Date().toISOString()};await db.ref('teacher_demos/'+id).set(data);document.getElementById('demoTitle').value='';document.getElementById('demoBody').value='';document.getElementById('demoPhotos').value='';demoFiles=[];document.getElementById('demoPreview').innerHTML='';document.getElementById('photoEmpty').style.display='block';toast('시범이 게시됐어요');await loadAll()}catch(e){console.error(e);toast('게시 실패: '+(e.code||'오류'))}finally{btn.disabled=false;btn.textContent='학생에게 게시'}}
-async function publishNotice(){if(!teacher)return;const title=document.getElementById('noticeTitle').value.trim(),body=document.getElementById('noticeBody').value.trim(),btn=document.getElementById('noticePublishBtn');if(!title||!body){toast('제목과 내용을 입력해주세요');return}btn.disabled=true;try{const id=newId('notice');await db.ref('notices/'+id).set({title,body,cls:noticeClass,urgent,active:true,teacherUid:teacher.uid,teacherName,createdAt:new Date().toISOString()});document.getElementById('noticeTitle').value='';document.getElementById('noticeBody').value='';urgent=false;document.getElementById('urgentSwitch').classList.remove('on');updateNoticePreview();toast('공지가 게시됐어요');await loadAll()}catch(e){console.error(e);toast('공지 게시 실패')}finally{btn.disabled=false}}
+function teacherPublishError(e){
+  const c=e?.code||'';
+  if(c==='storage/unauthorized')return '사진 저장 권한이 없습니다. Storage 규칙을 확인해주세요.';
+  if(c==='storage/retry-limit-exceeded')return '사진 업로드 시간이 초과됐어요. 다시 시도해주세요.';
+  if(c==='storage/canceled')return '사진 업로드가 취소됐어요.';
+  if(c==='PERMISSION_DENIED'||c==='permission_denied')return '게시물 저장 권한이 없습니다. Realtime Database 규칙을 확인해주세요.';
+  if(c==='auth/network-request-failed')return '네트워크 연결을 확인해주세요.';
+  return '게시 실패: '+(c||e?.message||'알 수 없는 오류');
+}
+async function uploadTeacherDemoImage(blob,demoId,index){
+  const u=auth.currentUser;
+  if(!u)throw Object.assign(new Error('로그인 필요'),{code:'auth/no-current-user'});
+  // 정상 경로를 먼저 사용하고, 이전 Storage 규칙만 남아 있는 경우 현재 UID의 artworks 경로로 호환 재시도합니다.
+  const candidates=[
+    `teacher_demos/${u.uid}/${demoId}/${index}.jpg`,
+    `artworks/${u.uid}/teacher_demos/${demoId}/${index}.jpg`
+  ];
+  let lastErr=null;
+  for(const path of candidates){
+    try{
+      const ref=storage.ref(path);
+      await ref.put(blob,{contentType:'image/jpeg',cacheControl:'private,max-age=3600'});
+      return {url:await ref.getDownloadURL(),path};
+    }catch(e){
+      lastErr=e;
+      if(e?.code!=='storage/unauthorized')throw e;
+    }
+  }
+  throw lastErr||Object.assign(new Error('Storage 권한 없음'),{code:'storage/unauthorized'});
+}
+async function cleanupTeacherUploads(paths){
+  for(const path of paths||[]){
+    try{await storage.ref(path).delete();}
+    catch(e){if(e?.code!=='storage/object-not-found')console.warn('업로드 정리 실패',path,e);}
+  }
+}
+async function publishDemo(){
+  if(!teacher||!auth.currentUser){toast('로그인이 풀렸어요. 다시 로그인해주세요');return;}
+  // 앱에 기억한 사용자와 실제 Firebase 로그인 사용자가 다르면 잘못된 경로로 올리지 않습니다.
+  if(teacher.uid!==auth.currentUser.uid){teacher=auth.currentUser;}
+  const title=document.getElementById('demoTitle').value.trim(),body=document.getElementById('demoBody').value.trim(),btn=document.getElementById('demoPublishBtn');
+  if(!title){toast('시범 제목을 입력해주세요');return}
+  if(!demoFiles.length){toast('시범 사진을 1장 이상 선택해주세요');return}
+  btn.disabled=true;btn.textContent='사진 업로드 중…';
+  const id=newId('demo'),urls=[],paths=[];
+  try{
+    for(let i=0;i<demoFiles.length;i++){
+      const blob=await compress(demoFiles[i]);
+      const uploaded=await uploadTeacherDemoImage(blob,id,i+1);
+      urls.push(uploaded.url);paths.push(uploaded.path);
+    }
+    btn.textContent='게시 중…';
+    const data={id,teacherUid:auth.currentUser.uid,teacherName,cls:demoClass,title,body,images:urls,imagePaths:paths,active:true,createdAt:new Date().toISOString()};
+    try{await db.ref('teacher_demos/'+id).set(data);}catch(dbErr){await cleanupTeacherUploads(paths);throw dbErr;}
+    document.getElementById('demoTitle').value='';document.getElementById('demoBody').value='';document.getElementById('demoPhotos').value='';
+    demoFiles=[];document.getElementById('demoPreview').innerHTML='';document.getElementById('photoEmpty').style.display='flex';
+    toast('시범이 학생 앱에 게시됐어요');await loadAll();
+  }catch(e){
+    console.error('demo publish',e);
+    await cleanupTeacherUploads(paths);
+    toast(teacherPublishError(e));
+  }finally{btn.disabled=false;btn.textContent='학생에게 게시'}
+}
+async function publishNotice(){
+  if(!teacher||!auth.currentUser){toast('로그인이 풀렸어요. 다시 로그인해주세요');return;}
+  const title=document.getElementById('noticeTitle').value.trim(),body=document.getElementById('noticeBody').value.trim(),btn=document.getElementById('noticePublishBtn');
+  if(!title||!body){toast('제목과 내용을 입력해주세요');return}
+  btn.disabled=true;btn.textContent='게시 중…';
+  try{
+    const id=newId('notice');
+    await db.ref('notices/'+id).set({title,body,cls:noticeClass,urgent,active:true,teacherUid:auth.currentUser.uid,teacherName,createdAt:new Date().toISOString()});
+    document.getElementById('noticeTitle').value='';document.getElementById('noticeBody').value='';urgent=false;document.getElementById('urgentSwitch').classList.remove('on');updateNoticePreview();
+    toast('공지가 학생 앱에 게시됐어요');await loadAll();
+  }catch(e){console.error('notice publish',e);toast(teacherPublishError(e));}
+  finally{btn.disabled=false;btn.textContent='공지 게시'}
+}
 async function loadAll(){const [d,n]=await Promise.all([db.ref('teacher_demos').once('value'),db.ref('notices').once('value')]);demoData=d.val()||{};noticeData=n.val()||{};renderDemos();renderNotices();renderDash()}
 function renderDemos(){const arr=Object.entries(demoData).filter(([_,x])=>x.teacherUid===teacher.uid).sort((a,b)=>new Date(b[1].createdAt)-new Date(a[1].createdAt));document.getElementById('demoCount').textContent=arr.length?arr.length+'개':'';const el=document.getElementById('demoList');if(!arr.length){el.innerHTML='<div class="empty">아직 게시한 시범이 없습니다.</div>';return}el.innerHTML=arr.map(([id,x])=>`<div class="item"><div class="item-top">${x.images?.[0]?`<img class="item-cover" src="${x.images[0]}">`:'<div class="item-cover"></div>'}<div class="item-copy"><div class="badges"><span class="badge">${esc(x.cls||'전체')}</span><span class="badge ${x.active===false?'':'red'}">${x.active===false?'숨김':'공개'}</span></div><div class="item-title">${esc(x.title)}</div><div class="item-meta">${dt(x.createdAt)} · 사진 ${x.images?.length||0}장</div></div></div>${x.body?`<div class="item-body">${esc(x.body)}</div>`:''}<div class="item-actions"><button class="mini" onclick="toggleDemo('${id}')">${x.active===false?'다시 공개':'숨기기'}</button><button class="mini danger" onclick="deleteDemo('${id}')">삭제</button></div></div>`).join('')}
 function renderNotices(){const arr=Object.entries(noticeData).filter(([_,x])=>x.teacherUid===teacher.uid).sort((a,b)=>new Date(b[1].createdAt)-new Date(a[1].createdAt));document.getElementById('noticeCount').textContent=arr.length?arr.length+'개':'';const el=document.getElementById('noticeList');if(!arr.length){el.innerHTML='<div class="empty">아직 작성한 공지가 없습니다.</div>';return}el.innerHTML=arr.map(([id,x])=>`<div class="item"><div class="badges"><span class="badge">${esc(x.cls||'전체')}</span>${x.urgent?'<span class="badge red">긴급</span>':''}<span class="badge">${x.active===false?'숨김':'공개'}</span></div><div class="item-title">${esc(x.title)}</div><div class="item-meta">${dt(x.createdAt)} · ${esc(x.teacherName||'')}</div><div class="item-body">${esc(x.body||'')}</div><div class="item-actions"><button class="mini" onclick="toggleNotice('${id}')">${x.active===false?'다시 공개':'숨기기'}</button><button class="mini danger" onclick="deleteNotice('${id}')">삭제</button></div></div>`).join('')}
