@@ -353,7 +353,7 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 @media(max-width:380px){.pv-photo-wrap{max-height:62vh}.pv-bottom{padding-left:15px;padding-right:15px}.pv-arrow.prev{left:17px}.pv-arrow.next{right:17px}}
 
 
-/* ── v18 CLOUD SYNC ── */
+/* ── v19 CLOUD SYNC + AUTH FIX ── */
 .cloud-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:#F2F1ED;color:var(--tx2);font-size:9px;font-weight:900;white-space:nowrap}.cloud-pill:before{content:"";width:6px;height:6px;border-radius:50%;background:#A7A7A0}.cloud-pill.on{background:#ECF8F0;color:#2E7D50}.cloud-pill.on:before{background:#2E9B62}.cloud-pill.syncing{background:#FFF6E8;color:#A56B0E}.cloud-pill.syncing:before{background:#D18C16;animation:cloudPulse 1s ease infinite}.cloud-pill.err{background:#FFF0F0;color:var(--red)}.cloud-pill.err:before{background:var(--red)}
 .process-cloud-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 16px 10px}.process-cloud-note{font-size:9px;color:var(--tx3);line-height:1.45}
 @keyframes cloudPulse{50%{opacity:.3;transform:scale(.75)}}
@@ -387,7 +387,7 @@ body{background:#EAE7E1}.app{background:var(--bg)}
     <div class="field"><label>반</label>
       <select id="sCls"><option value="">반 선택</option><option>입시반</option><option>예비반</option><option>중등반</option><option>취미반</option></select>
     </div>
-    <div class="field"><label>비밀번호 (4자 이상)</label><input type="password" id="sPw" placeholder="••••"></div>
+    <div class="field"><label>비밀번호 (4자 이상)</label><input type="password" id="sPw" placeholder="••••"></div><div style="font-size:10px;color:var(--tx3);line-height:1.55;margin:-5px 2px 12px">가입 후 관리자 승인이 완료되면 로그인할 수 있어요.</div>
     <div class="field"><label>비밀번호 확인</label><input type="password" id="sPw2" placeholder="••••" onkeydown="if(event.key==='Enter')doSignup()"></div>
     <button class="auth-btn" onclick="doSignup()">가입 신청</button>
     <button class="auth-link" onclick="showAuth('vLogin')">이미 계정이 있어요</button>
@@ -399,7 +399,7 @@ body{background:#EAE7E1}.app{background:var(--bg)}
   <div class="pend-wrap">
     <div style="font-size:52px;margin-bottom:16px">⏳</div>
     <div style="font-size:20px;font-weight:800;margin-bottom:8px">승인 대기 중</div>
-    <div style="font-size:14px;color:var(--tx2);line-height:1.7;margin-bottom:28px">원장님이 승인하면<br>자동으로 로그인됩니다</div>
+    <div style="font-size:14px;color:var(--tx2);line-height:1.7;margin-bottom:28px">원장님 승인 후<br>같은 이름과 비밀번호로 로그인해주세요</div>
     <button class="auth-btn" style="max-width:220px" onclick="checkApproval()">승인 확인</button>
     <button class="auth-link" onclick="doLogout()">다른 계정으로</button>
   </div>
@@ -590,6 +590,7 @@ const firebaseConfig={
 };
 firebase.initializeApp(firebaseConfig);
 const fbAuth=firebase.auth();
+fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
 const fbStorage=firebase.storage();
 const fbRtdb=firebase.database();
 const DB='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
@@ -666,21 +667,47 @@ function showAuth(id){document.querySelectorAll('.auth').forEach(v=>v.classList.
 async function hashPw(pw,name){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw+name+'hwagangam2024'));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 function mkUid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function authEmailFor(uid){return `student.${String(uid).replace(/[^a-zA-Z0-9._-]/g,'')}@hwa1.app`;}
+// Firebase Auth는 기본적으로 6자 이상의 비밀번호가 필요합니다.
+// 학원 앱의 기존 4자 비밀번호 정책은 그대로 두고, Firebase 내부에서만 안전한 접두어를 붙여 사용합니다.
+function firebasePasswordFor(pw){return `Hwa1!${String(pw)}`;}
 function waitForAuthReady(){return new Promise(resolve=>{const unsub=fbAuth.onAuthStateChanged(u=>{unsub();resolve(u);},()=>resolve(null));});}
+function firebaseAuthMessage(err){
+  const code=err?.code||'';
+  if(code==='auth/network-request-failed') return 'Firebase 연결에 실패했습니다. 인터넷 연결을 확인해주세요.';
+  if(code==='auth/operation-not-allowed') return 'Firebase에서 이메일/비밀번호 로그인이 활성화되지 않았습니다.';
+  if(code==='auth/too-many-requests') return '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+  if(code==='auth/invalid-api-key') return 'Firebase 웹 설정값을 확인해주세요.';
+  if(code==='auth/unauthorized-domain') return '현재 실행 주소가 Firebase에서 허용되지 않았습니다.';
+  if(code==='cloud-auth-mismatch') return err.message;
+  return `클라우드 로그인 오류${code?` (${code})`:''}`;
+}
 async function ensureFirebaseAuth(uid,pw){
   const email=authEmailFor(uid);
+  const cloudPw=firebasePasswordFor(pw);
+
+  // v19 방식 계정으로 먼저 로그인
   try{
-    const cred=await fbAuth.signInWithEmailAndPassword(email,pw);
+    const cred=await fbAuth.signInWithEmailAndPassword(email,cloudPw);
     return cred.user;
   }catch(firstErr){
+    // v18에서 6자 이상 비밀번호로 이미 만들어진 계정이 있다면 기존 raw 비밀번호로 한 번 호환 로그인 후 이전
     try{
-      const cred=await fbAuth.createUserWithEmailAndPassword(email,pw);
-      return cred.user;
-    }catch(createErr){
-      if(createErr?.code==='auth/email-already-in-use' || createErr?.code==='auth/invalid-credential' || firstErr?.code==='auth/wrong-password'){
-        const e=new Error('클라우드 계정 비밀번호가 일치하지 않습니다. 관리자에게 문의해주세요.');e.code='cloud-auth-mismatch';throw e;
+      const legacy=await fbAuth.signInWithEmailAndPassword(email,pw);
+      try{await legacy.user.updatePassword(cloudPw);}catch(_e){}
+      return legacy.user;
+    }catch(legacyErr){
+      // 계정이 아직 없다면 내부용 비밀번호로 새 Firebase 계정 생성
+      try{
+        const cred=await fbAuth.createUserWithEmailAndPassword(email,cloudPw);
+        return cred.user;
+      }catch(createErr){
+        if(createErr?.code==='auth/email-already-in-use' || firstErr?.code==='auth/invalid-credential' || legacyErr?.code==='auth/invalid-credential' || legacyErr?.code==='auth/wrong-password'){
+          const e=new Error('기존 클라우드 계정과 비밀번호가 맞지 않습니다. Authentication 사용자에서 해당 학생 계정을 삭제한 뒤 다시 로그인해주세요.');
+          e.code='cloud-auth-mismatch';
+          throw e;
+        }
+        throw createErr;
       }
-      throw createErr;
     }
   }
 }
@@ -719,7 +746,7 @@ async function doLogin(){
     const authUser=await ensureFirebaseAuth(found.uid,pw);
     me={uid:found.uid,name:found.name,cls:found.cls,authUid:authUser.uid};
     localStorage.setItem('hwa_user',JSON.stringify(me));msg.style.display='none';await enterApp();
-  }catch(e){console.error(e);msg.className='auth-msg err';msg.textContent=e?.code==='cloud-auth-mismatch'?e.message:'로그인 중 오류가 발생했습니다.';}
+  }catch(e){console.error('LOGIN_ERROR',e);msg.className='auth-msg err';msg.textContent=firebaseAuthMessage(e);}
 }
 
 async function doSignup(){
@@ -742,7 +769,7 @@ async function doSignup(){
 async function checkApproval(){
   if(!me)return;
   const r=await fetch(`${DB}/approved_users/${me.uid}.json`);const d=await r.json();
-  if(d&&d.name===me.name){localStorage.removeItem('hwa_user');me=null;showAuth('vLogin');const msg=document.getElementById('loginMsg');msg.className='auth-msg err';msg.textContent='승인이 완료됐어요. 클라우드 연결을 위해 다시 로그인해주세요.';}
+  if(d&&d.name===me.name){localStorage.removeItem('hwa_user');me=null;showAuth('vLogin');const msg=document.getElementById('loginMsg');msg.className='auth-msg err';msg.textContent='승인이 완료됐어요. 가입할 때 입력한 비밀번호로 로그인해주세요.';}
   else alert('아직 승인 대기 중입니다.');
 }
 async function doLogout(){try{await fbAuth.signOut();}catch(e){}localStorage.removeItem('hwa_user');me=null;location.reload();}
