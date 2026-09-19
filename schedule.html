@@ -193,6 +193,9 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
   <div class="tb-accent"></div>
   <div class="tb-title">화강암+ 스케줄</div>
   <button class="sync-btn" id="syncBtn" onclick="syncFB()">Firebase 동기화</button>
+  <button class="sync-btn" onclick="openApproval()" style="background:#1a2a1a;color:#3AA86A;border-color:#3AA86A;position:relative" id="approvalBtn">
+    승인 관리 <span id="pendingBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#C94040;color:#fff;border-radius:999px;font-size:10px;padding:1px 5px;"></span>
+  </button>
   <button class="sync-btn" onclick="resetLocal()" style="background:#3a1a1a;color:#ff6b6b;border-color:#ff6b6b;font-size:11px">로컬 초기화</button>
 </div>
 
@@ -338,6 +341,28 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
     </div>
   </div>
 
+</div>
+
+<!-- 승인 관리 모달 -->
+<div class="modal-overlay" id="approvalModal" onclick="closeApproval()">
+  <div class="modal-box" onclick="event.stopPropagation()" style="width:420px;max-height:80vh;overflow-y:auto">
+    <div class="modal-title">가입 승인 관리</div>
+    <div id="pendingList" style="margin-bottom:12px">불러오는 중...</div>
+    <div class="modal-btns">
+      <button type="button" class="modal-btn cancel" onclick="closeApproval()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 승인 관리 모달 -->
+<div class="modal-overlay" id="approvalModal" onclick="closeApproval()">
+  <div class="modal-box" onclick="event.stopPropagation()" style="width:420px;max-height:80vh;overflow-y:auto">
+    <div class="modal-title">가입 승인 관리</div>
+    <div id="pendingList" style="margin-bottom:12px">불러오는 중...</div>
+    <div class="modal-btns">
+      <button type="button" class="modal-btn cancel" onclick="closeApproval()">닫기</button>
+    </div>
+  </div>
 </div>
 
 <!-- 특이사항 모달 -->
@@ -493,6 +518,117 @@ const fmt=n=>n.toLocaleString('ko-KR')+'원';
 let _addingCls='';
 
 // ── 고정수강료 ──
+// ── 승인 관리 ──
+async function openApproval(){
+  document.getElementById('approvalModal').classList.add('on');
+  const list=document.getElementById('pendingList');
+  list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0">불러오는 중...</div>';
+  try{
+    const r=await fetch(DB+'/pending_users.json?_='+Date.now());
+    const data=await r.json();
+    if(!data||!Object.keys(data).length){
+      list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0">대기 중인 가입 신청이 없습니다</div>';
+      document.getElementById('pendingBadge').style.display='none';
+      return;
+    }
+    const entries=Object.entries(data);
+    document.getElementById('pendingBadge').textContent=entries.length;
+    document.getElementById('pendingBadge').style.display='block';
+    list.innerHTML=entries.map(([uid,u])=>`
+      <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700">${u.name}</div>
+          <div style="font-size:12px;color:var(--tx2)">${u.cls} · ${new Date(u.createdAt).toLocaleDateString('ko')}</div>
+        </div>
+        <button onclick="approveUser('${uid}')" style="padding:6px 12px;border-radius:8px;border:none;background:#152A1E;color:var(--green);font-size:12px;font-weight:700;cursor:pointer">승인</button>
+        <button onclick="rejectUser('${uid}')" style="padding:6px 12px;border-radius:8px;border:none;background:#2A1515;color:var(--red);font-size:12px;font-weight:700;cursor:pointer">거절</button>
+      </div>`).join('');
+  }catch(e){list.innerHTML='<div style="color:var(--red);font-size:13px">오류가 발생했습니다</div>';}
+}
+function closeApproval(){ document.getElementById('approvalModal').classList.remove('on'); }
+
+async function approveUser(uid){
+  try{
+    const r=await fetch(DB+'/pending_users/'+uid+'.json');
+    const u=await r.json();
+    if(!u)return;
+    // approved_users로 이동
+    await fetch(DB+'/approved_users/'+uid+'.json',{method:'PUT',body:JSON.stringify(u),headers:{'Content-Type':'application/json'}});
+    await fetch(DB+'/pending_users/'+uid+'.json',{method:'DELETE'});
+    alert(u.name+' 학생 승인 완료!');
+    openApproval();
+  }catch(e){alert('오류가 발생했습니다.');}
+}
+async function rejectUser(uid){
+  if(!confirm('거절하면 해당 계정이 삭제됩니다. 계속할까요?'))return;
+  await fetch(DB+'/pending_users/'+uid+'.json',{method:'DELETE'});
+  openApproval();
+}
+
+// 페이지 로드 시 대기 건수 확인
+async function checkPendingCount(){
+  try{
+    const r=await fetch(DB+'/pending_users.json?_='+Date.now());
+    const data=await r.json();
+    const cnt=data?Object.keys(data).length:0;
+    const badge=document.getElementById('pendingBadge');
+    if(badge){badge.textContent=cnt;badge.style.display=cnt>0?'block':'none';}
+  }catch(e){}
+}
+
+// ── 승인 관리 ──
+async function openApproval(){
+  document.getElementById('approvalModal').classList.add('on');
+  const list=document.getElementById('pendingList');
+  list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0">불러오는 중...</div>';
+  try{
+    const r=await fetch(DB+'/pending_users.json?_='+Date.now());
+    const data=await r.json();
+    if(!data||!Object.keys(data).length){
+      list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0">대기 중인 가입 신청이 없습니다</div>';
+      document.getElementById('pendingBadge').style.display='none';
+      return;
+    }
+    const entries=Object.entries(data);
+    document.getElementById('pendingBadge').textContent=entries.length;
+    document.getElementById('pendingBadge').style.display='block';
+    list.innerHTML=entries.map(([uid,u])=>`
+      <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700">${u.name}</div>
+          <div style="font-size:12px;color:var(--tx2)">${u.cls} · ${new Date(u.createdAt).toLocaleDateString('ko')}</div>
+        </div>
+        <button onclick="approveUser('${uid}')" style="padding:6px 12px;border-radius:8px;border:none;background:#152A1E;color:var(--green);font-size:12px;font-weight:700;cursor:pointer">승인</button>
+        <button onclick="rejectUser('${uid}')" style="padding:6px 12px;border-radius:8px;border:none;background:#2A1515;color:var(--red);font-size:12px;font-weight:700;cursor:pointer">거절</button>
+      </div>`).join('');
+  }catch(e){list.innerHTML='<div style="color:var(--red);font-size:13px">오류가 발생했습니다</div>';}
+}
+function closeApproval(){ document.getElementById('approvalModal').classList.remove('on'); }
+async function approveUser(uid){
+  try{
+    const r=await fetch(DB+'/pending_users/'+uid+'.json');
+    const u=await r.json(); if(!u)return;
+    await fetch(DB+'/approved_users/'+uid+'.json',{method:'PUT',body:JSON.stringify(u),headers:{'Content-Type':'application/json'}});
+    await fetch(DB+'/pending_users/'+uid+'.json',{method:'DELETE'});
+    alert(u.name+' 학생 승인 완료!');
+    openApproval();
+  }catch(e){alert('오류가 발생했습니다.');}
+}
+async function rejectUser(uid){
+  if(!confirm('거절하면 해당 계정이 삭제됩니다. 계속할까요?'))return;
+  await fetch(DB+'/pending_users/'+uid+'.json',{method:'DELETE'});
+  openApproval();
+}
+async function checkPendingCount(){
+  try{
+    const r=await fetch(DB+'/pending_users.json?_='+Date.now());
+    const data=await r.json();
+    const cnt=data?Object.keys(data).length:0;
+    const badge=document.getElementById('pendingBadge');
+    if(badge){badge.textContent=cnt;badge.style.display=cnt>0?'block':'none';}
+  }catch(e){}
+}
+
 function monToLabel(m){
   const labels=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
   return labels[(m-1)%12]||'jul';
