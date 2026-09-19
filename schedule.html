@@ -699,7 +699,9 @@ function calcFeeRaw(){
   if(!s)return null;
   const abs=getAbs(),sp=d.special.length,actualReg=d.lessons.length;
   const use4wk=document.getElementById('use4wk')?.checked;
-  let reg=use4wk?s.days.length*4:actualReg;
+  // 4주 기준: 실제 타임수를 4주 기준으로 환산 (이번달 일수 기반)
+  const monthDays=getDays(mon);
+  let reg=use4wk?Math.round(actualReg/monthDays*28):actualReg;
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
@@ -891,7 +893,8 @@ function calcFee(){
   const abs=getAbs(),sp=d.special.length;
   const actualReg=d.lessons.length; // 실제 체크 시수
   const use4wk=document.getElementById('use4wk')?.checked;
-  let reg=use4wk ? (s.days?.length||1)*4 : actualReg; // 수강료 계산용
+  const monthDays2=getDays(mon);
+  let reg=use4wk?Math.round(actualReg/monthDays2*28):actualReg; // 수강료 계산용
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
@@ -943,7 +946,7 @@ function updateStats(){
   document.getElementById('sAmt').textContent=fmt(c.fee);
   // 우측 패널: 수강료 계산 기준
   const use4wk=document.getElementById('use4wk')?.checked;
-  document.getElementById('rpR').textContent=c.reg+'T'+(use4wk?' (4주)':'');
+  document.getElementById('rpR').textContent=c.reg+'T'+(use4wk?' (4주환산)':'');
   document.getElementById('rpS').textContent=c.sp+'T';
   document.getElementById('rpA').textContent=c.abs>0?'-'+c.abs+'T':'없음';
   document.getElementById('rpFee').textContent=fmt(c.fee);
