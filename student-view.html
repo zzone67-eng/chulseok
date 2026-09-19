@@ -352,6 +352,12 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 @keyframes pvFade{from{opacity:0}to{opacity:1}}
 @media(max-width:380px){.pv-photo-wrap{max-height:62vh}.pv-bottom{padding-left:15px;padding-right:15px}.pv-arrow.prev{left:17px}.pv-arrow.next{right:17px}}
 
+
+/* ── v18 CLOUD SYNC ── */
+.cloud-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:#F2F1ED;color:var(--tx2);font-size:9px;font-weight:900;white-space:nowrap}.cloud-pill:before{content:"";width:6px;height:6px;border-radius:50%;background:#A7A7A0}.cloud-pill.on{background:#ECF8F0;color:#2E7D50}.cloud-pill.on:before{background:#2E9B62}.cloud-pill.syncing{background:#FFF6E8;color:#A56B0E}.cloud-pill.syncing:before{background:#D18C16;animation:cloudPulse 1s ease infinite}.cloud-pill.err{background:#FFF0F0;color:var(--red)}.cloud-pill.err:before{background:var(--red)}
+.process-cloud-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 16px 10px}.process-cloud-note{font-size:9px;color:var(--tx3);line-height:1.45}
+@keyframes cloudPulse{50%{opacity:.3;transform:scale(.75)}}
+
 </style>
 </head>
 <body>
@@ -420,6 +426,7 @@ body{background:#EAE7E1}.app{background:var(--bg)}
         <div class="process-title">실기 과정 기록</div>
         <div class="process-desc">수업이 끝날 때 한 장씩 남겨보세요. 한 작품이 몇 타임 동안 어떻게 변했는지 과정이 쌓입니다.</div>
       </div>
+      <div class="process-cloud-row"><div class="process-cloud-note">사진과 과정 기록이 계정에 저장됩니다.</div><div class="cloud-pill" id="cloudStatus">클라우드 확인 중</div></div>
 
       <div class="process-today" id="processToday">
         <div class="process-today-top">
@@ -567,7 +574,24 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 
 <div class="lb" id="lb" onclick="closeLb()"><button class="lb-x" onclick="closeLb()">✕</button><img id="lbImg" src=""><div class="lb-cap" id="lbCap"></div></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script>
+const firebaseConfig={
+  apiKey:"AIzaSyAapYSwoLbqd74iQc6kZAr4_ba97l_gcO0",
+  authDomain:"hwa1-c1ad9.firebaseapp.com",
+  databaseURL:"https://hwa1-c1ad9-default-rtdb.firebaseio.com",
+  projectId:"hwa1-c1ad9",
+  storageBucket:"hwa1-c1ad9.firebasestorage.app",
+  messagingSenderId:"737331992451",
+  appId:"1:737331992451:web:5cd2f5df1ea49ab0ea08b6"
+};
+firebase.initializeApp(firebaseConfig);
+const fbAuth=firebase.auth();
+const fbStorage=firebase.storage();
+const fbRtdb=firebase.database();
 const DB='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
 const TM={'1':'10:00~13:30','2':'14:00~17:30','3':'18:30~22:00'};
 const DY=['일','월','화','수','목','금','토'];
@@ -641,21 +665,40 @@ const missionPools={
 function showAuth(id){document.querySelectorAll('.auth').forEach(v=>v.classList.remove('on'));document.getElementById(id).classList.add('on');}
 async function hashPw(pw,name){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw+name+'hwagangam2024'));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 function mkUid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function authEmailFor(uid){return `student.${String(uid).replace(/[^a-zA-Z0-9._-]/g,'')}@hwa1.app`;}
+function waitForAuthReady(){return new Promise(resolve=>{const unsub=fbAuth.onAuthStateChanged(u=>{unsub();resolve(u);},()=>resolve(null));});}
+async function ensureFirebaseAuth(uid,pw){
+  const email=authEmailFor(uid);
+  try{
+    const cred=await fbAuth.signInWithEmailAndPassword(email,pw);
+    return cred.user;
+  }catch(firstErr){
+    try{
+      const cred=await fbAuth.createUserWithEmailAndPassword(email,pw);
+      return cred.user;
+    }catch(createErr){
+      if(createErr?.code==='auth/email-already-in-use' || createErr?.code==='auth/invalid-credential' || firstErr?.code==='auth/wrong-password'){
+        const e=new Error('클라우드 계정 비밀번호가 일치하지 않습니다. 관리자에게 문의해주세요.');e.code='cloud-auth-mismatch';throw e;
+      }
+      throw createErr;
+    }
+  }
+}
 
 async function init(){
   const s=localStorage.getItem('hwa_user');if(!s)return;
   try{
     const u=JSON.parse(s);
-    const r=await fetch(`${DB}/approved_users/${u.uid}.json`);
+    const [r,authUser]=await Promise.all([fetch(`${DB}/approved_users/${u.uid}.json`),waitForAuthReady()]);
     const d=await r.json();
-    if(d&&d.name===u.name){me=u;enterApp();}
+    if(d&&d.name===u.name&&authUser){me={...u,authUid:authUser.uid};localStorage.setItem('hwa_user',JSON.stringify(me));await enterApp();}
+    else if(d&&d.name===u.name&&!authUser){localStorage.removeItem('hwa_user');const msg=document.getElementById('loginMsg');msg.className='auth-msg err';msg.textContent='클라우드 기록 연결을 위해 한 번 다시 로그인해주세요.';showAuth('vLogin');}
     else{
-      const r2=await fetch(`${DB}/pending_users/${u.uid}.json`);
-      const p=await r2.json();
+      const r2=await fetch(`${DB}/pending_users/${u.uid}.json`);const p=await r2.json();
       if(p&&p.name===u.name){me=u;showAuth('vPending');}
       else{localStorage.removeItem('hwa_user');}
     }
-  }catch(e){}
+  }catch(e){console.warn(e);}
 }
 
 async function doLogin(){
@@ -672,9 +715,11 @@ async function doLogin(){
     let found=null;
     for(const [id,u] of entries){if(u.pw===await hashPw(pw,name)){found={uid:id,...u};break;}}
     if(!found){msg.className='auth-msg err';msg.textContent='비밀번호가 틀렸습니다.';return;}
-    me={uid:found.uid,name:found.name,cls:found.cls};
-    localStorage.setItem('hwa_user',JSON.stringify(me));enterApp();
-  }catch(e){msg.className='auth-msg err';msg.textContent='오류가 발생했습니다.';}
+    msg.className='auth-msg';msg.textContent='클라우드 계정 연결 중…';msg.style.display='block';
+    const authUser=await ensureFirebaseAuth(found.uid,pw);
+    me={uid:found.uid,name:found.name,cls:found.cls,authUid:authUser.uid};
+    localStorage.setItem('hwa_user',JSON.stringify(me));msg.style.display='none';await enterApp();
+  }catch(e){console.error(e);msg.className='auth-msg err';msg.textContent=e?.code==='cloud-auth-mismatch'?e.message:'로그인 중 오류가 발생했습니다.';}
 }
 
 async function doSignup(){
@@ -696,11 +741,11 @@ async function doSignup(){
 
 async function checkApproval(){
   if(!me)return;
-  const r=await fetch(`${DB}/approved_users/${me.uid}.json`);
-  const d=await r.json();
-  if(d&&d.name===me.name)enterApp();else alert('아직 승인 대기 중입니다.');
+  const r=await fetch(`${DB}/approved_users/${me.uid}.json`);const d=await r.json();
+  if(d&&d.name===me.name){localStorage.removeItem('hwa_user');me=null;showAuth('vLogin');const msg=document.getElementById('loginMsg');msg.className='auth-msg err';msg.textContent='승인이 완료됐어요. 클라우드 연결을 위해 다시 로그인해주세요.';}
+  else alert('아직 승인 대기 중입니다.');
 }
-function doLogout(){localStorage.removeItem('hwa_user');me=null;location.reload();}
+async function doLogout(){try{await fbAuth.signOut();}catch(e){}localStorage.removeItem('hwa_user');me=null;location.reload();}
 
 // ── 앱 진입 ──
 async function enterApp(){
@@ -713,6 +758,7 @@ async function enterApp(){
   if(ht) ht.innerHTML=`${me.name} <span class="title-accent">${me.cls}</span>`;
   const r=await fetch(`${DB}/schedule_backup.json?_=${Date.now()}`);
   sch=r.ok?(await r.json()||{}):{};
+  await loadPracticeStoreFromCloud();
   renderHome();
   renderSchTab();
   loadNotices();
@@ -730,7 +776,7 @@ function switchTab(name,btn){
   if(btn)btn.classList.add('on');
   else document.querySelectorAll('.tbtn').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+name+"'"))b.classList.add('on');});
   document.getElementById('mainScr').scrollTop=0;
-  if(name==='home')loadPracticeTracker();
+  if(name==='home'){if(!practiceCloudReady)loadPracticeStoreFromCloud().then(loadPracticeTracker);else loadPracticeTracker();}
   if(name==='routine'){loadRoutine();switchToolView('timer',document.getElementById('toolTabTimer'));}
 }
 
@@ -789,11 +835,20 @@ function toggleTodayAccordion(){
 // ── 실기 과정 기록 ──
 let practiceSheetMode='add', practiceProjectId='', practiceSelectedT=1, practicePendingFile=null, practicePreviewUrl='';
 let practiceObjectUrls=[];
+let practiceCache={projects:[]};
+let practiceCloudReady=false;
 function practiceStoreKey(){return 'hwa_practice_process_'+(me?.uid||'guest');}
-function getPracticeStore(){
-  try{const s=JSON.parse(localStorage.getItem(practiceStoreKey())||'{"projects":[]}');if(!Array.isArray(s.projects))s.projects=[];return s;}catch(e){return {projects:[]};}
+function readLocalPracticeStore(){try{const s=JSON.parse(localStorage.getItem(practiceStoreKey())||'{"projects":[]}');if(!Array.isArray(s.projects))s.projects=[];return s;}catch(e){return {projects:[]};}}
+function getPracticeStore(){return practiceCache&&Array.isArray(practiceCache.projects)?practiceCache:{projects:[]};}
+function practiceCloudRef(){const u=fbAuth.currentUser;if(!u)return null;return fbRtdb.ref(`practice_artworks/${u.uid}`);}
+function setCloudStatus(state,text){const el=document.getElementById('cloudStatus');if(!el)return;el.className='cloud-pill'+(state?' '+state:'');el.textContent=text||'클라우드';}
+async function savePracticeStore(s){
+  practiceCache=s;localStorage.setItem(practiceStoreKey(),JSON.stringify(s));
+  const ref=practiceCloudRef();if(!ref)return;
+  setCloudStatus('syncing','저장 중');
+  try{await ref.set(s);practiceCloudReady=true;setCloudStatus('on','클라우드 저장됨');}
+  catch(e){console.error(e);setCloudStatus('err','동기화 오류');throw e;}
 }
-function savePracticeStore(s){localStorage.setItem(practiceStoreKey(),JSON.stringify(s));}
 function practiceId(prefix='p'){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);}
 function escPractice(v=''){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function practiceDayKey(v){const d=new Date(v);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -804,22 +859,61 @@ function practiceDb(){
     const req=indexedDB.open('hwa_practice_images',1);
     req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('images'))db.createObjectStore('images',{keyPath:'id'});};
     req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
-  });
-  return practiceDb._p;
+  });return practiceDb._p;
 }
 async function putPracticeImage(id,blob){const db=await practiceDb();return new Promise((resolve,reject)=>{const tx=db.transaction('images','readwrite');tx.objectStore('images').put({id,blob});tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
 async function getPracticeImage(id){if(!id)return null;try{const db=await practiceDb();return await new Promise((resolve,reject)=>{const tx=db.transaction('images','readonly');const r=tx.objectStore('images').get(id);r.onsuccess=()=>resolve(r.result?.blob||null);r.onerror=()=>reject(r.error);});}catch(e){return null;}}
-function clearPracticeObjectUrls(){practiceObjectUrls.forEach(u=>URL.revokeObjectURL(u));practiceObjectUrls=[];}
-async function imageUrlFor(id){const b=await getPracticeImage(id);if(!b)return '';const u=URL.createObjectURL(b);practiceObjectUrls.push(u);return u;}
+function clearPracticeObjectUrls(){practiceObjectUrls.forEach(u=>{if(String(u).startsWith('blob:'))URL.revokeObjectURL(u)});practiceObjectUrls=[];}
+async function storageUrl(path){if(!path)return '';try{return await fbStorage.ref(path).getDownloadURL();}catch(e){console.warn('storage url',e);return '';}}
+async function imageUrlFor(ref){
+  if(!ref)return '';
+  if(typeof ref==='object'&&ref.imagePath)return await storageUrl(ref.imagePath);
+  const id=typeof ref==='object'?ref.imageId:ref;
+  const b=await getPracticeImage(id);if(!b)return '';const u=URL.createObjectURL(b);practiceObjectUrls.push(u);return u;
+}
+async function uploadPracticeBlob(blob,projectId,sessionId){
+  const u=fbAuth.currentUser;if(!u)throw new Error('Firebase 로그인 필요');
+  const path=`artworks/${u.uid}/${projectId}/${sessionId}.jpg`;
+  const ref=fbStorage.ref(path);
+  await ref.put(blob,{contentType:'image/jpeg',cacheControl:'private,max-age=3600'});
+  return path;
+}
+async function migrateLocalPracticeToCloud(local){
+  if(!fbAuth.currentUser||!local?.projects?.length)return local;
+  setCloudStatus('syncing','기존 기록 이전 중');
+  for(const p of local.projects){
+    for(const s of (p.sessions||[])){
+      if(s.imagePath)continue;
+      const blob=await getPracticeImage(s.imageId||s.id);if(!blob)continue;
+      const sid=s.id||practiceId('shot');s.id=sid;s.imageId=s.imageId||sid;
+      s.imagePath=await uploadPracticeBlob(blob,p.id,sid);
+    }
+  }
+  return local;
+}
+async function loadPracticeStoreFromCloud(){
+  const local=readLocalPracticeStore();practiceCache=local;
+  const ref=practiceCloudRef();
+  if(!ref){setCloudStatus('err','로그인 필요');return local;}
+  setCloudStatus('syncing','동기화 중');
+  try{
+    const snap=await ref.once('value');const cloud=snap.val();
+    if(cloud&&Array.isArray(cloud.projects))practiceCache=cloud;
+    else if(local.projects.length){practiceCache=await migrateLocalPracticeToCloud(local);await ref.set(practiceCache);}
+    else practiceCache={projects:[]};
+    localStorage.setItem(practiceStoreKey(),JSON.stringify(practiceCache));practiceCloudReady=true;setCloudStatus('on','클라우드 저장됨');return practiceCache;
+  }catch(e){console.error(e);practiceCache=local;setCloudStatus('err','동기화 오류');return local;}
+}
 async function compressPracticeImage(file){
-  const maxSide=960,quality=.72;
-  let img,src='';
+  const maxSide=1200,target=420*1024;let img,src='';
   try{
     src=URL.createObjectURL(file);img=new Image();img.decoding='async';img.src=src;await img.decode();
     const scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
     const w=Math.max(1,Math.round(img.naturalWidth*scale)),h=Math.max(1,Math.round(img.naturalHeight*scale));
     const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.drawImage(img,0,0,w,h);
-    return await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(new Error('압축 실패')),'image/jpeg',quality));
+    let q=.78,blob=null;
+    for(let i=0;i<5;i++){blob=await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(new Error('압축 실패')),'image/jpeg',q));if(blob.size<=target||q<=.5)break;q-=.08;}
+    return blob;
   }finally{if(src)URL.revokeObjectURL(src);}
 }
 function setPracticeT(v,btn){practiceSelectedT=v;document.querySelectorAll('#practiceTChoice .t-chip').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');haptic('light');}
@@ -863,7 +957,8 @@ function handlePracticePhoto(e){
 }
 async function savePracticeRecord(){
   if(!practicePendingFile){showToast('현재 과정 사진을 한 장 남겨주세요','info');return;}
-  const btn=document.getElementById('practiceSaveBtn');btn.disabled=true;btn.textContent='저장 중…';
+  if(!fbAuth.currentUser){showToast('클라우드 연결이 필요해요. 다시 로그인해주세요.','info');return;}
+  const btn=document.getElementById('practiceSaveBtn');btn.disabled=true;btn.textContent='업로드 중…';
   try{
     const s=getPracticeStore();let p;
     if(practiceSheetMode==='new'){
@@ -871,19 +966,25 @@ async function savePracticeRecord(){
       p={id:practiceId('work'),title,status:'active',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),sessions:[]};s.projects.unshift(p);
     }else p=s.projects.find(x=>x.id===practiceProjectId);
     if(!p)throw new Error('작품 없음');
-    const sessionId=practiceId('shot'),blob=await compressPracticeImage(practicePendingFile);await putPracticeImage(sessionId,blob);
+    const sessionId=practiceId('shot'),blob=await compressPracticeImage(practicePendingFile);
+    setCloudStatus('syncing','사진 업로드 중');
+    const imagePath=await uploadPracticeBlob(blob,p.id,sessionId);
+    await putPracticeImage(sessionId,blob).catch(()=>{});
     const note=document.getElementById('practiceSessionNote').value.trim();
-    p.sessions=p.sessions||[];p.sessions.push({id:sessionId,imageId:sessionId,createdAt:new Date().toISOString(),t:practiceSelectedT,note});p.updatedAt=new Date().toISOString();
-    savePracticeStore(s);closePracticeSheet();await loadPracticeTracker();haptic('medium');showToast(`${practiceSelectedT}T 과정 기록을 저장했어요`,'ok');
-  }catch(e){console.error(e);showToast('사진을 저장하지 못했어요. 다른 사진으로 다시 시도해주세요.','info');}
+    p.sessions=p.sessions||[];p.sessions.push({id:sessionId,imageId:sessionId,imagePath,createdAt:new Date().toISOString(),t:practiceSelectedT,note});p.updatedAt=new Date().toISOString();
+    await savePracticeStore(s);closePracticeSheet();await loadPracticeTracker();haptic('medium');showToast(`${practiceSelectedT}T 과정 기록을 클라우드에 저장했어요`,'ok');
+  }catch(e){console.error(e);setCloudStatus('err','업로드 오류');showToast('사진 업로드에 실패했어요. 인터넷 연결을 확인해주세요.','info');}
   finally{btn.disabled=false;btn.textContent='기록 저장';}
 }
-function completePracticeProject(id){
+async function completePracticeProject(id){
   const s=getPracticeStore(),p=s.projects.find(x=>x.id===id);if(!p)return;if(!(p.sessions||[]).length){showToast('과정 사진을 먼저 기록해주세요','info');return;}
-  if(!confirm(`“${p.title}” 작품을 완료할까요?`))return;p.status='done';p.completedAt=new Date().toISOString();p.updatedAt=p.completedAt;savePracticeStore(s);loadPracticeTracker();haptic('medium');showToast(`총 ${projectTotalT(p)}T 작업으로 완료했어요`,'ok');
+  if(!confirm(`“${p.title}” 작품을 완료할까요?`))return;
+  p.status='done';p.completedAt=new Date().toISOString();p.updatedAt=p.completedAt;
+  try{await savePracticeStore(s);await loadPracticeTracker();haptic('medium');showToast(`총 ${projectTotalT(p)}T 작업으로 완료했어요`,'ok');}
+  catch(e){showToast('완료 상태를 저장하지 못했어요','info');}
 }
 async function openPracticeImage(imageId,caption=''){
-  const b=await getPracticeImage(imageId);if(!b)return;const u=URL.createObjectURL(b);const lb=document.getElementById('lb');document.getElementById('lbImg').src=u;document.getElementById('lbCap').textContent=caption;lb.classList.add('on');lb.dataset.tempUrl=u;
+  const u=await imageUrlFor(typeof imageId==='object'?imageId:{imageId});if(!u)return;const lb=document.getElementById('lb');document.getElementById('lbImg').src=u;document.getElementById('lbCap').textContent=caption;lb.classList.add('on');lb.dataset.tempUrl=u;
 }
 const _oldCloseLb=typeof closeLb==='function'?closeLb:null;
 function closePracticeLbUrl(){const lb=document.getElementById('lb');const u=lb?.dataset?.tempUrl;if(u){URL.revokeObjectURL(u);delete lb.dataset.tempUrl;}}
@@ -896,7 +997,7 @@ async function openProjectProcess(projectId,startIndex=0){
   const p=getPracticeStore().projects.find(x=>x.id===projectId);if(!p||(p.sessions||[]).length===0){showToast('아직 과정 사진이 없어요','info');return;}
   clearProcessViewerUrls();processViewerProject=p;processViewerIndex=Math.max(0,Math.min(Number(startIndex)||0,p.sessions.length-1));
   const track=document.getElementById('pvTrack');track.innerHTML='';
-  for(const s of p.sessions){const b=await getPracticeImage(s.imageId);if(!b){processViewerUrls.push('');continue;}const u=URL.createObjectURL(b);processViewerUrls.push(u);const slide=document.createElement('div');slide.className='pv-slide';slide.innerHTML=`<div class="pv-photo-wrap"><img class="pv-photo" src="${u}" alt="${escPractice(p.title)} 과정"></div>`;track.appendChild(slide);}
+  for(const s of p.sessions){const u=await imageUrlFor(s);if(!u){processViewerUrls.push('');continue;}processViewerUrls.push(u);const slide=document.createElement('div');slide.className='pv-slide';slide.innerHTML=`<div class="pv-photo-wrap"><img class="pv-photo" src="${u}" alt="${escPractice(p.title)} 과정"></div>`;track.appendChild(slide);}
   if(!track.children.length){clearProcessViewerUrls();showToast('과정 사진을 불러오지 못했어요','info');return;}
   document.getElementById('pvTitle').textContent=p.title;document.getElementById('pvKicker').textContent=p.status==='done'?'COMPLETED PROCESS':'WORK IN PROGRESS';
   document.getElementById('pvProgress').innerHTML=p.sessions.map((_,i)=>`<span class="pv-dot${i===processViewerIndex?' on':''}" onclick="goProcessViewer(${i})"></span>`).join('');
@@ -920,12 +1021,12 @@ setTimeout(initProcessViewerSwipe,0);
 
 async function renderPracticeProjectCard(p){
   const sessions=p.sessions||[],last=sessions[sessions.length-1],total=projectTotalT(p);
-  const latestUrl=last?await imageUrlFor(last.imageId):'';
-  const thumbs=[];for(const [i,s] of sessions.entries()){const u=await imageUrlFor(s.imageId);thumbs.push(`<div class="project-step" onclick="event.stopPropagation();openProjectProcess('${p.id}',${i})"><div class="project-thumb">${u?`<img src="${u}" alt="${escPractice(p.title)} ${i+1}회 과정">`:''}<span class="project-thumb-num">${s.t}T</span></div><div class="project-step-label">${i+1}회</div></div>`);}
+  const latestUrl=last?await imageUrlFor(last):'';
+  const thumbs=[];for(const [i,s] of sessions.entries()){const u=await imageUrlFor(s);thumbs.push(`<div class="project-step" onclick="event.stopPropagation();openProjectProcess('${p.id}',${i})"><div class="project-thumb">${u?`<img src="${u}" alt="${escPractice(p.title)} ${i+1}회 과정">`:''}<span class="project-thumb-num">${s.t}T</span></div><div class="project-step-label">${i+1}회</div></div>`);}
   return `<div class="project-card"><div class="project-visual${latestUrl?'':' empty'}" ${sessions.length?`onclick="openProjectProcess('${p.id}',${sessions.length-1})"`:''}>${latestUrl?`<img src="${latestUrl}" alt="${escPractice(p.title)} 현재 과정">`:`<svg viewBox="0 0 24 24"><path d="M4 7h4l1.5-2h5L16 7h4v12H4Z"/><circle cx="12" cy="13" r="3.5"/></svg>`}<span class="project-badge">진행 중 · ${sessions.length}회</span></div><div class="project-info"><div class="project-top"><div><div class="project-title">${escPractice(p.title)}</div><div class="project-meta">${sessions.length?`${fmtShortDate(sessions[0].createdAt)} 시작 · 최근 ${fmtShortDate(last.createdAt)}`:'아직 과정 기록 없음'}</div></div><div class="project-total">${total}T<span>누적</span></div></div>${thumbs.length?`<div class="project-timeline">${thumbs.join('')}</div><div class="project-process-hint">사진을 눌러 과정을 슬라이드로 보기</div>`:''}<div class="project-actions"><button class="project-add" type="button" onclick="openPracticeSheet('add','${p.id}')">+ 오늘 과정 추가</button><button class="project-done" type="button" onclick="completePracticeProject('${p.id}')">완료</button></div></div></div>`;
 }
 async function renderCompletedPractice(p){
-  const sessions=p.sessions||[],last=sessions[sessions.length-1],u=last?await imageUrlFor(last.imageId):'';
+  const sessions=p.sessions||[],last=sessions[sessions.length-1],u=last?await imageUrlFor(last):'';
   return `<div class="completed-item" onclick="openProjectProcess('${p.id}',${Math.max(0,sessions.length-1)})"><div class="completed-thumb">${u?`<img src="${u}" alt="${escPractice(p.title)} 완료 이미지">`:''}</div><div class="completed-copy"><div class="completed-title">${escPractice(p.title)}</div><div class="completed-meta">${sessions.length}회 과정 · ${p.completedAt?fmtShortDate(p.completedAt):''}</div></div><div class="completed-total">${projectTotalT(p)}T</div><div class="completed-open">›</div></div>`;
 }
 async function loadPracticeTracker(){
@@ -1604,6 +1705,10 @@ function initNtcCards(){
 
 
 
+
+// ── 클라우드 연결 상태 ──
+window.addEventListener('online',()=>{if(me&&fbAuth.currentUser)loadPracticeStoreFromCloud().then(loadPracticeTracker);});
+window.addEventListener('offline',()=>setCloudStatus('err','오프라인'));
 
 // ── 초기화 ──
 window.addEventListener('DOMContentLoaded',()=>{
