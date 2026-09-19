@@ -358,6 +358,34 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 .process-cloud-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 16px 10px}.process-cloud-note{font-size:9px;color:var(--tx3);line-height:1.45}
 @keyframes cloudPulse{50%{opacity:.3;transform:scale(.75)}}
 
+
+/* v20 delete controls */
+.pv-actions{display:flex;align-items:center;gap:7px}.pv-delete{width:38px;height:38px;border:0;border-radius:13px;background:rgba(255,255,255,.09);color:#fff;display:grid;place-items:center;font-size:14px}.pv-delete:active{transform:scale(.93)}
+.project-menu{width:38px;height:38px;border:1px solid var(--bd);background:#fff;border-radius:12px;font-size:17px;color:var(--tx2);display:grid;place-items:center;flex:none}.project-menu:active{transform:scale(.94)}
+.completed-delete{width:34px;height:34px;border:0;border-radius:11px;background:var(--sf2);color:var(--tx3);display:grid;place-items:center;font-size:13px;flex:none}.completed-delete:active{transform:scale(.94)}
+
+
+/* v21 alignment + navigation polish */
+.photo-picker{position:relative;display:block}
+.photo-picker-copy{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;margin:0;padding:0;width:100%;height:100%;z-index:2}
+.photo-picker-copy svg{display:block;margin:0 auto;flex:none}
+.photo-picker-copy span{display:block;width:100%;text-align:center;line-height:1.35}
+.photo-picker.has-photo .photo-picker-copy{display:none}
+
+.tabbar{left:0;right:0;bottom:0;padding:9px 14px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 68%,rgba(246,244,240,0));overflow:visible}
+.tabbar-pill{height:64px;border-radius:999px!important;padding:5px!important;background:rgba(255,255,255,.94);border:1px solid rgba(20,20,20,.07);box-shadow:0 14px 36px rgba(20,20,20,.12);overflow:hidden;isolation:isolate}
+.tbtn{border-radius:999px!important;overflow:hidden;min-width:0}
+.tbtn.on{border-radius:999px!important;background:#151515}
+@media(min-width:560px){.tabbar{border-radius:0!important}.tabbar-pill{border-radius:999px!important}.tbtn,.tbtn.on{border-radius:999px!important}}
+
+
+/* v22 teacher feed */
+.academy-updates{margin:0 14px 14px;background:#fff;border:1px solid var(--bd);border-radius:24px;padding:16px;box-shadow:0 7px 22px rgba(20,20,20,.035)}
+.au-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}.au-title{font-size:15px;font-weight:950;letter-spacing:-.4px}.au-new{font-size:8px;font-weight:950;letter-spacing:.08em;color:#fff;background:var(--red);padding:4px 7px;border-radius:999px}
+.au-notice{border-radius:17px;background:#F7F6F2;padding:12px 13px;cursor:pointer;margin-bottom:10px;transition:.18s}.au-notice:active{transform:scale(.99)}.au-notice-top{display:flex;align-items:center;gap:6px}.au-badge{font-size:8px;font-weight:950;padding:4px 7px;border-radius:999px;background:#ECEAE5;color:var(--tx2)}.au-badge.hot{background:#FFF0EF;color:var(--red)}.au-notice-title{font-size:12px;font-weight:950;letter-spacing:-.2px;margin-top:7px}.au-notice-body{font-size:10px;line-height:1.55;color:var(--tx2);max-height:0;overflow:hidden;opacity:0;transition:.2s}.au-notice.open .au-notice-body{max-height:120px;opacity:1;margin-top:6px}
+.demo-strip{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:2px;scrollbar-width:none}.demo-strip::-webkit-scrollbar{display:none}.demo-card{min-width:154px;width:154px;scroll-snap-align:start;border:1px solid var(--bd);border-radius:18px;overflow:hidden;background:#fff;cursor:pointer;transition:.16s}.demo-card:active{transform:scale(.98)}.demo-cover{height:105px;background:#ECEAE5;position:relative;overflow:hidden}.demo-cover img{width:100%;height:100%;object-fit:cover}.demo-cover .demo-count{position:absolute;right:7px;bottom:7px;background:rgba(0,0,0,.7);color:#fff;font-size:8px;font-weight:900;padding:4px 6px;border-radius:999px}.demo-copy{padding:10px}.demo-meta{font-size:8px;font-weight:900;color:var(--red);margin-bottom:4px}.demo-title{font-size:11px;font-weight:950;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.demo-teacher{font-size:8px;color:var(--tx3);margin-top:5px}
+.teacher-demo-sheet{max-height:88dvh;overflow:auto}.tds-top{margin-bottom:12px}.tds-kicker{font-size:9px;font-weight:950;letter-spacing:.1em;color:var(--red)}.tds-title{font-size:22px;font-weight:950;letter-spacing:-.7px;margin-top:4px}.tds-meta{font-size:10px;color:var(--tx3);margin-top:5px}.tds-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:9px;margin:0 -20px;padding:0 20px 6px;scrollbar-width:none}.tds-gallery::-webkit-scrollbar{display:none}.tds-slide{min-width:100%;scroll-snap-align:center;border-radius:20px;overflow:hidden;background:#ECEAE5;aspect-ratio:4/3}.tds-slide img{width:100%;height:100%;object-fit:contain;background:#EFEDE8}.tds-body{font-size:12px;line-height:1.65;color:var(--tx2);padding:13px 1px 4px}
+
 </style>
 </head>
 <body>
@@ -427,6 +455,12 @@ body{background:#EAE7E1}.app{background:var(--bg)}
         <div class="process-desc">수업이 끝날 때 한 장씩 남겨보세요. 한 작품이 몇 타임 동안 어떻게 변했는지 과정이 쌓입니다.</div>
       </div>
       <div class="process-cloud-row"><div class="process-cloud-note">사진과 과정 기록이 계정에 저장됩니다.</div><div class="cloud-pill" id="cloudStatus">클라우드 확인 중</div></div>
+
+      <div class="academy-updates" id="academyUpdates" style="display:none">
+        <div class="au-head"><div class="au-title">학원에서</div><div class="au-new">NEW</div></div>
+        <div class="au-notice" id="teacherNoticeMini" style="display:none" onclick="this.classList.toggle('open')"><div class="au-notice-top"><span class="au-badge" id="teacherNoticeClass">전체</span><span class="au-badge hot" id="teacherNoticeUrgent" style="display:none">긴급</span></div><div class="au-notice-title" id="teacherNoticeTitle"></div><div class="au-notice-body" id="teacherNoticeBody"></div></div>
+        <div class="demo-strip" id="teacherDemoStrip"></div>
+      </div>
 
       <div class="process-today" id="processToday">
         <div class="process-today-top">
@@ -558,7 +592,7 @@ body{background:#EAE7E1}.app{background:var(--bg)}
   <div class="pv-top">
     <button class="pv-close" type="button" onclick="closeProcessViewer()" aria-label="닫기">✕</button>
     <div class="pv-head"><div class="pv-kicker" id="pvKicker">PROCESS</div><div class="pv-title" id="pvTitle"></div></div>
-    <div class="pv-count" id="pvCount">1/1</div>
+    <div class="pv-actions"><div class="pv-count" id="pvCount">1/1</div><button class="pv-delete" type="button" onclick="deleteCurrentPracticeSession()" aria-label="현재 과정 삭제">⌫</button></div>
   </div>
   <div class="pv-stage" id="pvStage">
     <div class="pv-track" id="pvTrack"></div>
@@ -574,6 +608,8 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 
 <div class="lb" id="lb" onclick="closeLb()"><button class="lb-x" onclick="closeLb()">✕</button><img id="lbImg" src=""><div class="lb-cap" id="lbCap"></div></div>
 
+
+<div class="bottom-sheet" id="teacherDemoSheet"><div class="bs-bg" onclick="closeTeacherDemoSheet()"></div><div class="bs-card teacher-demo-sheet"><div class="bs-handle"></div><div class="tds-top"><div class="tds-kicker" id="tdsClass">시범</div><div class="tds-title" id="tdsTitle"></div><div class="tds-meta" id="tdsMeta"></div></div><div class="tds-gallery" id="tdsGallery"></div><div class="tds-body" id="tdsBody"></div></div></div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
@@ -789,6 +825,8 @@ async function enterApp(){
   renderHome();
   renderSchTab();
   loadNotices();
+  loadTeacherFeed();
+  initTeacherFeedRealtime();
   loadGoalPin();
   loadMission();
   loadRoutine();
@@ -890,6 +928,7 @@ function practiceDb(){
 }
 async function putPracticeImage(id,blob){const db=await practiceDb();return new Promise((resolve,reject)=>{const tx=db.transaction('images','readwrite');tx.objectStore('images').put({id,blob});tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
 async function getPracticeImage(id){if(!id)return null;try{const db=await practiceDb();return await new Promise((resolve,reject)=>{const tx=db.transaction('images','readonly');const r=tx.objectStore('images').get(id);r.onsuccess=()=>resolve(r.result?.blob||null);r.onerror=()=>reject(r.error);});}catch(e){return null;}}
+async function deletePracticeImageLocal(id){if(!id)return;try{const db=await practiceDb();await new Promise((resolve,reject)=>{const tx=db.transaction('images','readwrite');tx.objectStore('images').delete(id);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}catch(e){console.warn('local image delete',e);}}
 function clearPracticeObjectUrls(){practiceObjectUrls.forEach(u=>{if(String(u).startsWith('blob:'))URL.revokeObjectURL(u)});practiceObjectUrls=[];}
 async function storageUrl(path){if(!path)return '';try{return await fbStorage.ref(path).getDownloadURL();}catch(e){console.warn('storage url',e);return '';}}
 async function imageUrlFor(ref){
@@ -1010,6 +1049,27 @@ async function completePracticeProject(id){
   try{await savePracticeStore(s);await loadPracticeTracker();haptic('medium');showToast(`총 ${projectTotalT(p)}T 작업으로 완료했어요`,'ok');}
   catch(e){showToast('완료 상태를 저장하지 못했어요','info');}
 }
+async function deleteStoragePath(path){if(!path)return;try{await fbStorage.ref(path).delete();}catch(e){if(e?.code!=='storage/object-not-found')throw e;}}
+async function deletePracticeProject(id){
+  const s=getPracticeStore(),p=s.projects.find(x=>x.id===id);if(!p)return;
+  if(!confirm(`“${p.title}” 작품과 모든 과정 사진을 삭제할까요?\n삭제하면 앱에서 복구할 수 없습니다.`))return;
+  setCloudStatus('syncing','삭제 중');
+  try{
+    for(const shot of (p.sessions||[])){await deleteStoragePath(shot.imagePath);await deletePracticeImageLocal(shot.imageId||shot.id);}
+    s.projects=s.projects.filter(x=>x.id!==id);await savePracticeStore(s);closeProcessViewer();await loadPracticeTracker();haptic('medium');showToast('작품과 과정 사진을 삭제했어요','ok');
+  }catch(e){console.error(e);setCloudStatus('err','삭제 오류');showToast('삭제 중 오류가 발생했어요','info');}
+}
+async function deleteCurrentPracticeSession(){
+  const p=processViewerProject;if(!p)return;const shot=(p.sessions||[])[processViewerIndex];if(!shot)return;
+  if(!confirm(`${processViewerIndex+1}번째 과정 사진을 삭제할까요?\n이 기록의 ${Number(shot.t)||0}T도 함께 빠집니다.`))return;
+  setCloudStatus('syncing','삭제 중');
+  try{
+    await deleteStoragePath(shot.imagePath);await deletePracticeImageLocal(shot.imageId||shot.id);
+    const s=getPracticeStore(),live=s.projects.find(x=>x.id===p.id);if(!live)return;
+    live.sessions=(live.sessions||[]).filter(x=>x.id!==shot.id);live.updatedAt=new Date().toISOString();
+    await savePracticeStore(s);closeProcessViewer();await loadPracticeTracker();haptic('medium');showToast('과정 사진을 삭제했어요','ok');
+  }catch(e){console.error(e);setCloudStatus('err','삭제 오류');showToast('사진 삭제에 실패했어요','info');}
+}
 async function openPracticeImage(imageId,caption=''){
   const u=await imageUrlFor(typeof imageId==='object'?imageId:{imageId});if(!u)return;const lb=document.getElementById('lb');document.getElementById('lbImg').src=u;document.getElementById('lbCap').textContent=caption;lb.classList.add('on');lb.dataset.tempUrl=u;
 }
@@ -1050,11 +1110,11 @@ async function renderPracticeProjectCard(p){
   const sessions=p.sessions||[],last=sessions[sessions.length-1],total=projectTotalT(p);
   const latestUrl=last?await imageUrlFor(last):'';
   const thumbs=[];for(const [i,s] of sessions.entries()){const u=await imageUrlFor(s);thumbs.push(`<div class="project-step" onclick="event.stopPropagation();openProjectProcess('${p.id}',${i})"><div class="project-thumb">${u?`<img src="${u}" alt="${escPractice(p.title)} ${i+1}회 과정">`:''}<span class="project-thumb-num">${s.t}T</span></div><div class="project-step-label">${i+1}회</div></div>`);}
-  return `<div class="project-card"><div class="project-visual${latestUrl?'':' empty'}" ${sessions.length?`onclick="openProjectProcess('${p.id}',${sessions.length-1})"`:''}>${latestUrl?`<img src="${latestUrl}" alt="${escPractice(p.title)} 현재 과정">`:`<svg viewBox="0 0 24 24"><path d="M4 7h4l1.5-2h5L16 7h4v12H4Z"/><circle cx="12" cy="13" r="3.5"/></svg>`}<span class="project-badge">진행 중 · ${sessions.length}회</span></div><div class="project-info"><div class="project-top"><div><div class="project-title">${escPractice(p.title)}</div><div class="project-meta">${sessions.length?`${fmtShortDate(sessions[0].createdAt)} 시작 · 최근 ${fmtShortDate(last.createdAt)}`:'아직 과정 기록 없음'}</div></div><div class="project-total">${total}T<span>누적</span></div></div>${thumbs.length?`<div class="project-timeline">${thumbs.join('')}</div><div class="project-process-hint">사진을 눌러 과정을 슬라이드로 보기</div>`:''}<div class="project-actions"><button class="project-add" type="button" onclick="openPracticeSheet('add','${p.id}')">+ 오늘 과정 추가</button><button class="project-done" type="button" onclick="completePracticeProject('${p.id}')">완료</button></div></div></div>`;
+  return `<div class="project-card"><div class="project-visual${latestUrl?'':' empty'}" ${sessions.length?`onclick="openProjectProcess('${p.id}',${sessions.length-1})"`:''}>${latestUrl?`<img src="${latestUrl}" alt="${escPractice(p.title)} 현재 과정">`:`<svg viewBox="0 0 24 24"><path d="M4 7h4l1.5-2h5L16 7h4v12H4Z"/><circle cx="12" cy="13" r="3.5"/></svg>`}<span class="project-badge">진행 중 · ${sessions.length}회</span></div><div class="project-info"><div class="project-top"><div><div class="project-title">${escPractice(p.title)}</div><div class="project-meta">${sessions.length?`${fmtShortDate(sessions[0].createdAt)} 시작 · 최근 ${fmtShortDate(last.createdAt)}`:'아직 과정 기록 없음'}</div></div><div class="project-total">${total}T<span>누적</span></div></div>${thumbs.length?`<div class="project-timeline">${thumbs.join('')}</div><div class="project-process-hint">사진을 눌러 과정을 슬라이드로 보기</div>`:''}<div class="project-actions"><button class="project-add" type="button" onclick="openPracticeSheet('add','${p.id}')">+ 오늘 과정 추가</button><button class="project-done" type="button" onclick="completePracticeProject('${p.id}')">완료</button><button class="project-menu" type="button" onclick="deletePracticeProject('${p.id}')" aria-label="작품 삭제">···</button></div></div></div>`;
 }
 async function renderCompletedPractice(p){
   const sessions=p.sessions||[],last=sessions[sessions.length-1],u=last?await imageUrlFor(last):'';
-  return `<div class="completed-item" onclick="openProjectProcess('${p.id}',${Math.max(0,sessions.length-1)})"><div class="completed-thumb">${u?`<img src="${u}" alt="${escPractice(p.title)} 완료 이미지">`:''}</div><div class="completed-copy"><div class="completed-title">${escPractice(p.title)}</div><div class="completed-meta">${sessions.length}회 과정 · ${p.completedAt?fmtShortDate(p.completedAt):''}</div></div><div class="completed-total">${projectTotalT(p)}T</div><div class="completed-open">›</div></div>`;
+  return `<div class="completed-item" onclick="openProjectProcess('${p.id}',${Math.max(0,sessions.length-1)})"><div class="completed-thumb">${u?`<img src="${u}" alt="${escPractice(p.title)} 완료 이미지">`:''}</div><div class="completed-copy"><div class="completed-title">${escPractice(p.title)}</div><div class="completed-meta">${sessions.length}회 과정 · ${p.completedAt?fmtShortDate(p.completedAt):''}</div></div><div class="completed-total">${projectTotalT(p)}T</div><button class="completed-delete" type="button" onclick="event.stopPropagation();deletePracticeProject('${p.id}')" aria-label="완료 작품 삭제">⌫</button><div class="completed-open">›</div></div>`;
 }
 async function loadPracticeTracker(){
   if(!document.getElementById('activePracticeProjects')||!me)return;clearPracticeObjectUrls();const s=getPracticeStore(),projects=s.projects||[];const allSessions=projects.flatMap(p=>(p.sessions||[]).map(x=>({...x,projectId:p.id})));
@@ -1426,12 +1486,41 @@ function selectScheduleDay(day){schSelectedDay=day;renderScheduleSelectedDay(get
 function highlightScheduleDay(){const el=document.getElementById('schCalBody');if(!el)return;el.querySelectorAll('.cd').forEach(c=>c.classList.remove('selected'));if(!schSelectedDay)return;const cells=[...el.querySelectorAll('.cd')],first=new Date(schY,schM-1,1).getDay(),idx=first+schSelectedDay-1;if(cells[idx])cells[idx].classList.add('selected');}
 function moveSchMon(dir){schM+=dir;if(schM>12){schM=1;schY++;}if(schM<1){schM=12;schY--;}schSelectedDay=null;renderSchTab();}
 
+
+// ── 선생님 시범 · 공지 피드 ──
+let teacherDemoData={};
+let teacherFeedRealtimeStarted=false;
+function initTeacherFeedRealtime(){
+  if(teacherFeedRealtimeStarted||!window.fbRtdb)return;teacherFeedRealtimeStarted=true;
+  fbRtdb.ref('teacher_demos').on('value',()=>loadTeacherFeed());
+  fbRtdb.ref('notices').on('value',()=>{loadTeacherFeed();loadNotices();});
+}
+async function loadTeacherFeed(){
+  if(!me)return;
+  try{
+    const [dr,nr]=await Promise.all([fetch(`${DB}/teacher_demos.json?_=${Date.now()}`),fetch(`${DB}/notices.json?_=${Date.now()}`)]);
+    teacherDemoData=dr.ok?(await dr.json()||{}):{};
+    const notices=nr.ok?(await nr.json()||{}):{};
+    const demos=Object.entries(teacherDemoData).filter(([_,d])=>d.active!==false&&(!d.cls||d.cls==='전체'||d.cls===me.cls)).sort((a,b)=>new Date(b[1].createdAt)-new Date(a[1].createdAt));
+    const myNotices=Object.entries(notices).filter(([_,n])=>n.active!==false&&(!n.cls||n.cls==='전체'||n.cls===me.cls)).sort((a,b)=>new Date(b[1].createdAt)-new Date(a[1].createdAt));
+    const sec=document.getElementById('academyUpdates'),strip=document.getElementById('teacherDemoStrip');
+    if(!sec||!strip)return;
+    const nbox=document.getElementById('teacherNoticeMini');
+    if(myNotices.length){const n=myNotices[0][1];nbox.style.display='block';document.getElementById('teacherNoticeClass').textContent=n.cls||'전체';document.getElementById('teacherNoticeUrgent').style.display=n.urgent?'inline-flex':'none';document.getElementById('teacherNoticeTitle').textContent=n.title||'';document.getElementById('teacherNoticeBody').textContent=n.body||'';}else nbox.style.display='none';
+    strip.innerHTML=demos.slice(0,8).map(([id,d])=>`<div class="demo-card" onclick="openTeacherDemo('${id}')"><div class="demo-cover">${d.images?.[0]?`<img src="${d.images[0]}" alt="${escapeHtml(d.title||'시범')}">`:''}<span class="demo-count">${d.images?.length||0}장</span></div><div class="demo-copy"><div class="demo-meta">${escapeHtml(d.cls||'전체')} · 시범</div><div class="demo-title">${escapeHtml(d.title||'시범 자료')}</div><div class="demo-teacher">${escapeHtml(d.teacherName||'선생님')}</div></div></div>`).join('');
+    sec.style.display=(demos.length||myNotices.length)?'block':'none';
+  }catch(e){console.warn('teacher feed',e);}
+}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function openTeacherDemo(id){const d=teacherDemoData[id];if(!d)return;document.getElementById('tdsClass').textContent=(d.cls||'전체')+' · DEMO';document.getElementById('tdsTitle').textContent=d.title||'시범 자료';const date=d.createdAt?new Date(d.createdAt).toLocaleDateString('ko-KR',{month:'long',day:'numeric'}):'';document.getElementById('tdsMeta').textContent=`${d.teacherName||'선생님'} · ${date}`;document.getElementById('tdsGallery').innerHTML=(d.images||[]).map((u,i)=>`<div class="tds-slide"><img src="${u}" alt="시범 ${i+1}"></div>`).join('');document.getElementById('tdsBody').textContent=d.body||'';document.getElementById('teacherDemoSheet').classList.add('on');haptic('light');}
+function closeTeacherDemoSheet(){document.getElementById('teacherDemoSheet').classList.remove('on');}
+
 // ── 공지 ──
 async function loadNotices(){
   const [nr,ar]=await Promise.all([fetch(`${DB}/notices.json?_=${Date.now()}`),fetch(`${DB}/assignments.json?_=${Date.now()}`)]);
   ntcData=nr.ok?(await nr.json()||{}):{};
   asnData=ar.ok?(await ar.json()||{}):{};
-  const myN=Object.entries(ntcData).filter(([_,n])=>!n.cls||n.cls===me.cls||n.cls==='전체').sort((a,b)=>new Date(b[1].createdAt)-new Date(a[1].createdAt));
+  const myN=Object.entries(ntcData).filter(([_,n])=>n.active!==false&&(!n.cls||n.cls===me.cls||n.cls==='전체')).sort((a,b)=>new Date(b[1].createdAt)-new Date(a[1].createdAt));
   if(myN.length){
     const latest=myN[0][1];
     const bar=document.getElementById('noticeBanner');if(bar)bar.classList.add('show');
@@ -1447,7 +1536,7 @@ function filterNtc(type,btn){
   const cont=document.getElementById('ntcContent');
   let html='';
   if(type==='all'||type==='notice'){
-    const notices=Object.entries(ntcData).filter(([_,n])=>!n.cls||n.cls===me.cls||n.cls==='전체').sort((a,b)=>new Date(b[1].createdAt)-new Date(a[1].createdAt));
+    const notices=Object.entries(ntcData).filter(([_,n])=>n.active!==false&&(!n.cls||n.cls===me.cls||n.cls==='전체')).sort((a,b)=>new Date(b[1].createdAt)-new Date(a[1].createdAt));
     if(type==='all'&&notices.length)html+=`<div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.07em;margin-bottom:8px">공지사항</div>`;
     html+=notices.map(([id,n])=>{
       const bc=n.urgent?'nb-hot':n.cls&&n.cls!=='전체'?'nb-cls':'nb-all';
