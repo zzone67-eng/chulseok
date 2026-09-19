@@ -291,6 +291,42 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 .tool-dday-card{padding:0;overflow:hidden}.dday-hero{padding:21px 19px 19px;background:#fff}.dday-label{font-size:9px;letter-spacing:.13em;font-weight:950;color:var(--tx3)}.dday-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:10px}.dday-target{font-size:21px;font-weight:950;letter-spacing:-.65px;line-height:1.25;min-width:0}.dday-target.empty{color:var(--tx3)}.dday-number{font-size:29px;font-weight:950;letter-spacing:-1px;color:var(--red);white-space:nowrap}.dday-edit{width:100%;border:0;border-top:1px solid var(--bd);background:var(--sf2);padding:13px;font-size:11px;font-weight:900;color:var(--tx)}
 @media(max-width:380px){.home-today-main{font-size:28px}.tool-timer-card .timer-display{font-size:49px}.tool-tabs{gap:3px}.tool-tab{font-size:9px}}
 
+
+/* v15 — PRACTICE FIRST HOME */
+#pane-home{padding:8px 0 26px}
+.practice-head{padding:16px 20px 14px}
+.practice-kicker{font-size:9px;font-weight:950;letter-spacing:.15em;color:var(--tx3)}
+.practice-title{font-size:30px;font-weight:950;letter-spacing:-1.2px;line-height:1.05;margin-top:5px}
+.practice-desc{font-size:12px;color:var(--tx2);line-height:1.6;margin-top:7px;max-width:320px}
+.practice-hero{margin:0 14px}
+.practice-hero .mission-card{height:auto;min-height:208px;border:0;border-radius:30px;padding:20px;background:#151515;color:#fff;box-shadow:0 18px 38px rgba(20,20,20,.13)}
+.practice-hero .mission-card:after{content:"";position:absolute;width:250px;height:250px;right:-145px;top:-150px;border-radius:50%;background:radial-gradient(circle,rgba(255,91,82,.5),rgba(255,91,82,0) 70%);pointer-events:none}
+.practice-hero .mission-card.done{background:#151515;color:#fff;border:0;box-shadow:0 18px 38px rgba(20,20,20,.13)}
+.practice-hero .mission-card.done:after{width:250px;height:250px;right:-145px;top:-150px;background:radial-gradient(circle,rgba(255,91,82,.52),rgba(255,91,82,0) 70%)}
+.practice-hero .mission-label{font-size:9px;letter-spacing:.08em;color:rgba(255,255,255,.5)}
+.practice-hero .mission-streak{font-size:9px;padding:5px 8px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.08);color:#fff}
+.practice-hero .mission-more{background:rgba(255,255,255,.1);color:#fff}
+.practice-hero .mission-title{font-size:26px;line-height:1.18;letter-spacing:-.9px;margin-top:20px;max-width:86%}
+.practice-hero .mission-desc{font-size:12px;line-height:1.7;color:rgba(255,255,255,.68);max-width:92%}
+.practice-hero .mission-card.peek{height:auto;min-height:256px}
+.practice-hero .mission-foot{margin-top:24px;justify-content:flex-end}
+.practice-hero .mission-btn{font-size:11px;padding:10px 15px;border:0;border-radius:13px;background:#fff;color:#111}
+.practice-hero .mission-btn.done{background:#fff;color:#111}
+.practice-week{margin:12px 14px 0;background:#fff;border:1px solid var(--bd);border-radius:24px;padding:18px 17px;box-shadow:0 7px 22px rgba(20,20,20,.035);cursor:pointer;transition:transform .16s,box-shadow .2s}
+.practice-week:active{transform:scale(.99)}
+.practice-week-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.practice-week-kicker{font-size:9px;font-weight:950;letter-spacing:.12em;color:var(--tx3)}
+.practice-week-title{font-size:18px;font-weight:950;letter-spacing:-.55px;margin-top:4px}
+.practice-week-count{font-size:24px;font-weight:950;letter-spacing:-.9px;color:var(--red)}
+.practice-week .week-bars{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:17px}
+.practice-week .week-bar{height:8px;border-radius:99px;background:#ECEBE7}
+.practice-week .week-bar.on{background:#151515}
+.practice-week .week-message{display:block;font-size:11px;color:var(--tx2);line-height:1.5;margin-top:10px}
+.practice-tip{margin:12px 14px 0;padding:15px 16px;border-radius:20px;background:#ECEAE6;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.practice-tip-copy{min-width:0}.practice-tip-label{font-size:9px;font-weight:950;letter-spacing:.11em;color:var(--tx3)}.practice-tip-text{font-size:12px;font-weight:850;letter-spacing:-.2px;margin-top:4px;color:var(--tx);line-height:1.45}
+.practice-tip-dot{width:34px;height:34px;border-radius:12px;background:#fff;display:grid;place-items:center;font-size:16px;flex:none}
+@media(max-width:380px){.practice-title{font-size:27px}.practice-hero .mission-title{font-size:23px}.practice-hero .mission-card{min-height:198px}}
+
 </style>
 </head>
 <body>
@@ -354,26 +390,32 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 
   <main class="scr" id="mainScr">
     <section class="pane on" id="pane-home">
-      <div class="home-schedule-head">
-        <div><div class="home-schedule-kicker">MY SCHEDULE</div><div class="home-schedule-title">오늘 시간표</div></div>
-        <div class="home-month-meta" id="homeMonthMeta"></div>
+      <div class="practice-head">
+        <div class="practice-kicker">PRACTICE</div>
+        <div class="practice-title">실기</div>
+        <div class="practice-desc">오늘 한 가지를 정해서 짧게라도 손을 움직여보세요.</div>
       </div>
 
-      <div class="home-today-wrap"><div id="todayCard"></div></div>
-
-      <div class="home-calendar-section">
-        <div class="cal-head"><div class="cal-title" id="calTitle"></div><div class="cal-navs"><button class="cal-nb" onclick="moveCal(-1)">‹</button><button class="cal-nb" onclick="moveCal(1)">›</button></div></div>
-        <div class="cal-grid"><div class="cal-dh"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="cal-body" id="calBody"></div></div>
-      </div>
-
-      <div class="home-section-row"><h3>다음 수업</h3><span>UP NEXT</span></div>
-      <div class="home-next-list" id="nextList"></div>
-
-      <div class="home-notice-wrap">
-        <div class="notice-bar" id="noticeBanner" onclick="toggleNoticeBanner()">
-          <div class="nb-icon"><svg viewBox="0 0 24 24"><path d="M5 10v4h3l7 4V6l-7 4H5Z" stroke="currentColor" fill="none" stroke-linejoin="round"/><path d="M18 9c1.2 1.5 1.2 4.5 0 6" stroke="currentColor" fill="none" stroke-linecap="round"/></svg></div>
-          <div class="nb-copy"><div class="nb-txt" id="nbTxt"></div><div class="nb-body" id="nbBody"></div></div><div class="nb-arr">›</div>
+      <div class="practice-hero">
+        <div class="mission-card" id="missionCard" onclick="toggleMissionDetail(event)">
+          <div class="mission-top">
+            <div class="mission-label" id="missionLabel">오늘의 실기</div>
+            <div class="mission-top-right"><div class="mission-streak" id="missionStreak">🔥 0일</div><button class="mission-more" type="button" aria-label="과제 설명 펼치기">⌄</button></div>
+          </div>
+          <div class="mission-title" id="missionTitle">오늘의 실기를 불러오는 중입니다.</div>
+          <div class="mission-desc" id="missionDesc"></div>
+          <div class="mission-foot"><button class="mission-btn" id="missionBtn" onclick="event.stopPropagation();completeMission()">완료</button></div>
+          <div class="mission-complete-flash" id="missionFlash">✓</div>
         </div>
+      </div>
+
+      <div class="practice-week" id="weekMotive" onclick="showWeekMotivation()">
+        <div class="practice-week-top"><div><div class="practice-week-kicker">THIS WEEK</div><div class="practice-week-title">이번 주 실기</div></div><div class="practice-week-count" id="weekCount">0/5</div></div>
+        <div class="week-bars" id="weekBars"></div><div class="week-message" id="weekMessage"></div>
+      </div>
+
+      <div class="practice-tip">
+        <div class="practice-tip-copy"><div class="practice-tip-label">HOW TO USE</div><div class="practice-tip-text">과제를 눌러 설명을 보고, 끝냈을 때만 완료를 체크하세요.</div></div><div class="practice-tip-dot">✦</div>
       </div>
     </section>
 
@@ -439,9 +481,9 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 
   <nav class="tabbar">
     <div class="tabbar-pill">
-      <button class="tbtn on" onclick="switchTab('home',this)" id="tab-home"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20h-6v-6h-4v6H4z"/></svg><span>오늘</span></button>
+      <button class="tbtn on" onclick="switchTab('home',this)" id="tab-home"><svg viewBox="0 0 24 24"><path d="M5 19l3.5-.8L18 8.7 15.3 6 5.8 15.5 5 19Z"/><path d="M13.8 7.5l2.7 2.7M5 21h14"/></svg><span>실기</span></button>
       <button class="tbtn" onclick="switchTab('schedule',this)" id="tab-schedule"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span>시간표</span></button>
-      <button class="tbtn" onclick="switchTab('routine',this)" id="tab-routine"><svg viewBox="0 0 24 24"><path d="M5 19l3.5-.8L18 8.7 15.3 6 5.8 15.5 5 19Z"/><path d="M13.8 7.5l2.7 2.7M5 21h14"/></svg><span>도구</span></button>
+      <button class="tbtn" onclick="switchTab('routine',this)" id="tab-routine"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M8 4v6M16 14v6"/></svg><span>도구</span></button>
     </div>
   </nav>
 </div>
@@ -656,34 +698,9 @@ function renderCal(y,m,bodyId){
   document.getElementById(bodyId).innerHTML=h;
 }
 
-// ── 홈 ──
+// ── 실기 홈 ──
 function renderHome(){
-  const now=new Date(),m=now.getMonth()+1,d=now.getDate(),y=now.getFullYear();
-  const dw=DY[now.getDay()],sd=myD(y,m);
-  const allReg=sd.lessons||[],allSp=sd.special||[];
-  const reg=allReg.filter(l=>l.day===d),sp=allSp.filter(l=>l.day===d);
-  const tims=[...new Set([...reg.map(l=>l.tim),...sp.map(l=>l.tim)])].sort();
-  const tc=document.getElementById('todayCard');
-  if(tc){
-    const rows=tims.map(t=>{const isSp=sp.some(l=>l.tim===t)&&!reg.some(l=>l.tim===t);return `<div class="home-time-row"><div class="home-time-t">${t}타임</div><div class="home-time-range">${TM[String(t)]}</div>${isSp?'<div class="home-time-special">특강</div>':''}</div>`;}).join('');
-    tc.innerHTML=`<div class="home-today-card" onclick="switchTab('schedule')"><div class="home-today-top"><div><div class="home-today-label">TODAY · ${dw}</div><div class="home-today-main">${tims.length?`오늘 ${tims.length}T`:'오늘 수업 없음'}</div></div><div class="home-today-date">${m}.${d}</div></div>${tims.length?`<div class="home-today-times">${rows}</div>`:'<div class="home-today-empty">오늘은 등록된 정규·특강 수업이 없습니다.</div>'}<div class="home-today-foot"><span>전체 시간표 보기</span><span class="home-today-arrow">›</span></div></div>`;
-  }
-  const meta=document.getElementById('homeMonthMeta');
-  if(meta)meta.textContent=`${m}월 정규 ${allReg.length}T${allSp.length?` · 특강 ${allSp.length}T`:''}`;
-  const ct=document.getElementById('calTitle');if(ct)ct.textContent=`${calY}년 ${calM}월`;
-  if(document.getElementById('calBody'))renderCal(calY,calM,'calBody');
-
-  const todayStr=ds(y,m,d),up=[];
-  for(let mi=0;mi<3;mi++){
-    const td=new Date(y,now.getMonth()+mi,1),ty=td.getFullYear(),tm=td.getMonth()+1,sd2=myD(ty,tm),bd={};
-    [...(sd2.lessons||[]),...(sd2.special||[])].forEach(l=>{if(!bd[l.day])bd[l.day]={r:[],s:[]};if((sd2.lessons||[]).some(x=>x.day===l.day&&x.tim===l.tim))bd[l.day].r.push(l.tim);else bd[l.day].s.push(l.tim);});
-    Object.keys(bd).map(Number).sort((a,b)=>a-b).forEach(dd=>{if(ds(ty,tm,dd)>todayStr)up.push({ty,tm,dd,...bd[dd]});});
-  }
-  const nl=document.getElementById('nextList');
-  if(nl){
-    if(!up.length)nl.innerHTML='<div class="empty">예정된 수업이 없습니다</div>';
-    else nl.innerHTML=up.slice(0,2).map(({ty,tm,dd,r,s})=>{const dw2=new Date(ty,tm-1,dd).getDay(),dwN=DY[dw2],dwC=dw2===0?' sun':dw2===6?' sat':'';const ts2=[...new Set([...r,...s])].sort();const rows=ts2.map(t=>{const isSp=s.includes(t)&&!r.includes(t);return `${t}타임 ${TM[String(t)]}${isSp?'<span class="sp-pip">특강</span>':''}`;}).join('<br>');return `<div class="next-item" onclick="switchTab('schedule')"><div class="ni-date-col"><div class="ni-day-num">${dd}</div><div class="ni-day-label${dwC}">${tm}/${dd}<br>${dwN}</div></div><div class="ni-sep"></div><div class="ni-times">${rows}</div></div>`;}).join('');
-  }
+  loadMission();
 }
 function moveCal(dir){
   haptic('light');
@@ -762,7 +779,7 @@ function renderWeeklyMotive(completed){
   document.getElementById('weekCount').textContent=`${count}/5`;
   document.getElementById('weekBars').innerHTML=Array.from({length:5},(_,i)=>`<span class="week-bar${i<count?' on':''}"></span>`).join('');
   const msg=document.getElementById('weekMessage');
-  if(msg)msg.textContent=count>=5?'이번 주 루틴 완료':`${5-count}번 더 하면 목표 달성`;
+  if(msg)msg.textContent=count>=5?'이번 주 실기 목표 완료':`${5-count}번 더 하면 이번 주 목표 달성`;
 }
 function toggleMissionDetail(e){
   if(e&&e.target.closest('.mission-btn'))return;
@@ -778,12 +795,12 @@ function showWeekMotivation(){
   if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');}
   haptic('light');
   const msgs=[
-    '이번 주 첫 작업부터 시작해봐요.',
+    '이번 주 첫 실기부터 시작해봐요.',
     '한 번 시작했습니다. 흐름을 이어가세요.',
     '2회 완료. 작업 리듬이 생기고 있어요.',
     '3회 완료. 이번 주 절반을 넘겼어요.',
     '4회 완료. 한 번만 더 하면 주간 목표 달성!',
-    '이번 주 5회 달성! 루틴 완료.'
+    '이번 주 5회 실기 완료!'
   ];
   showToast(msgs[count]||msgs[5], count>=5?'ok':'info');
 }
@@ -796,8 +813,7 @@ function loadMission(){
   const done=(store.completed||[]).includes(tk);
   const streak=calcStreak(store.completed||[]);
   renderWeeklyMotive(store.completed||[]);
-  loadNextCanvas();
-  document.getElementById('missionLabel').textContent='랜덤 과제';
+  document.getElementById('missionLabel').textContent=`${me?.cls||''} · 오늘의 실기`;
   document.getElementById('missionTitle').textContent=mission.title;
   document.getElementById('missionDesc').textContent=mission.desc;
   document.getElementById('missionStreak').textContent=`🔥 ${streak}일`;
@@ -830,7 +846,7 @@ function completeMission(){
   setTimeout(()=>{
     loadMission();
     const count=Math.min(getWeekMissionCount(getMissionStore().completed||[]),5);
-    showToast(count>=5?'이번 주 5회 달성! 🎯':'오늘 작업 완료 · 주간 기록 +1','ok');
+    showToast(count>=5?'이번 주 실기 5회 달성! 🎯':'오늘 실기 완료 · 주간 기록 +1','ok');
   },300);
 }
 
@@ -1074,8 +1090,8 @@ async function loadNotices(){
   const myN=Object.entries(ntcData).filter(([_,n])=>!n.cls||n.cls===me.cls||n.cls==='전체').sort((a,b)=>new Date(b[1].createdAt)-new Date(a[1].createdAt));
   if(myN.length){
     const latest=myN[0][1];
-    const bar=document.getElementById('noticeBanner');bar.classList.add('show');
-    document.getElementById('nbTxt').textContent=(latest.urgent?'🚨 ':'📢 ')+latest.title;
+    const bar=document.getElementById('noticeBanner');if(bar)bar.classList.add('show');
+    const nbTxt=document.getElementById('nbTxt');if(nbTxt)nbTxt.textContent=(latest.urgent?'🚨 ':'📢 ')+latest.title;
     const nbBody=document.getElementById('nbBody');if(nbBody)nbBody.textContent=latest.body||'';
   }
   const unread=myN.filter(([id])=>!localStorage.getItem('nr_'+id)).length;
