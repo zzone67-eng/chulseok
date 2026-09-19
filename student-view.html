@@ -221,9 +221,12 @@ async function doLogin(){
 
   try{
     // approved_users에서 이름으로 검색
-    const r=await fetch(`${DB}/approved_users.json?orderBy="name"&equalTo="${name}"&_=${Date.now()}`);
-    const data=await r.json();
-    if(!data){msg.className='msg err';msg.textContent='승인되지 않은 계정입니다.';return;}
+    const r=await fetch(`${DB}/approved_users.json?_=${Date.now()}`);
+    const allData=r.ok?(await r.json()||{}):null;
+    if(!allData){msg.className='msg err';msg.textContent='승인되지 않은 계정입니다.';return;}
+    // 이름으로 필터링
+    const data=Object.fromEntries(Object.entries(allData).filter(([_,u])=>u.name===name));
+    if(!Object.keys(data).length){msg.className='msg err';msg.textContent='승인되지 않은 계정입니다. 원장님께 문의하세요.';return;}
 
     // 비밀번호 확인
     const entries=Object.entries(data);
@@ -254,10 +257,17 @@ async function doSignup(){
   if(pw!==pw2){msg.className='msg err';msg.textContent='비밀번호가 일치하지 않습니다.';return;}
 
   try{
-    // 이미 가입됐는지 확인
-    const r=await fetch(`${DB}/approved_users.json?orderBy="name"&equalTo="${name}"&_=${Date.now()}`);
-    const existing=await r.json();
-    if(existing){msg.className='msg err';msg.textContent='이미 가입된 이름입니다.';return;}
+    // 이미 가입됐는지 확인 (approved + pending 모두 체크)
+    const [ar,pr]=await Promise.all([
+      fetch(`${DB}/approved_users.json?_=${Date.now()}`),
+      fetch(`${DB}/pending_users.json?_=${Date.now()}`)
+    ]);
+    const approved=ar.ok?(await ar.json()||{}):{};
+    const pending=pr.ok?(await pr.json()||{}):{};
+    const allUsers=[...Object.values(approved),...Object.values(pending)];
+    if(allUsers.some(u=>u.name===name)){
+      msg.className='msg err';msg.textContent='이미 가입된 이름입니다. 로그인해주세요.';return;
+    }
 
     const uid=makeUid(name,cls);
     const hash=await hashPw(pw,name);
