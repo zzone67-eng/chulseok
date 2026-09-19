@@ -647,6 +647,43 @@ async function hashPw(pw,name){const b=await crypto.subtle.digest('SHA-256',new 
 function mkUid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 
 async function init(){
+  // ?preview=1 이면 더미 데이터로 미리보기
+  if(new URLSearchParams(location.search).get('preview')==='1'){
+    me={uid:'preview',name:'홍길동',cls:'입시반'};
+    // 더미 시간표 데이터
+    const now=new Date(),m=now.getMonth()+1,nm=m===12?1:m+1;
+    sch[`입시반_홍길동_${m}`]={
+      lessons:[
+        {day:now.getDate(),tim:1},{day:now.getDate(),tim:2},{day:now.getDate(),tim:3},
+        ...Array.from({length:12},(_,i)=>({day:Math.min(now.getDate()+((i%4)+1)*7-((i%4)*5),28),tim:(i%3)+1}))
+      ],
+      special:[{day:Math.min(now.getDate()+5,28),tim:1}],
+      abs:1
+    };
+    sch[`입시반_홍길동_${nm}`]={
+      lessons:Array.from({length:12},(_,i)=>({day:(i*2)+1,tim:(i%3)+1})),
+      special:[],abs:0
+    };
+    document.querySelectorAll('.auth').forEach(v=>v.classList.remove('on'));
+    document.getElementById('vApp').classList.add('on');
+    document.getElementById('hdrUser').textContent='홍길동 · 입시반 (미리보기)';
+    try{document.getElementById('sideMenuName').textContent='홍길동 (미리보기)';}catch(e){}
+    try{document.getElementById('sideMenuCls').textContent='입시반';}catch(e){}
+    renderHome();renderSchTab();
+    // 더미 공지
+    const nb=document.getElementById('noticeBanner');
+    if(nb){nb.classList.add('show');document.getElementById('nbTxt').textContent='📢 10월 수업료 안내 - 납부 기한 10/5';}
+    // 더미 갤러리
+    setTimeout(()=>{
+      try{
+        const grid=document.getElementById('myGalGrid');
+        if(grid)grid.innerHTML='<div class="empty" style="grid-column:1/-1">+ 추가로 첫 작품을 올려보세요!</div>';
+        const ag=document.getElementById('galGrid');
+        if(ag)ag.innerHTML='<div class="empty" style="grid-column:1/-1">학원 갤러리가 비어있습니다</div>';
+      }catch(e){}
+    },100);
+    return;
+  }
   const s=localStorage.getItem('hwa_user');if(!s)return;
   try{
     const u=JSON.parse(s);
