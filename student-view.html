@@ -248,6 +248,49 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 @media(max-width:390px){.brief-focus{font-size:21px}.home-info-grid{grid-template-columns:1fr}.work-timer-card .timer-display{font-size:47px}}
 @media(prefers-reduced-motion:reduce){.work-view,.work-seg-btn,.work-timer-card{animation:none!important;transition:none!important}}
 
+
+/* ========================= v14 : schedule-first ========================= */
+#pane-home{padding:6px 0 18px}
+.home-schedule-head{padding:12px 18px 10px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.home-schedule-kicker,.tool-kicker{font-size:9px;font-weight:950;letter-spacing:.14em;color:var(--tx3)}
+.home-schedule-title{font-size:27px;font-weight:950;letter-spacing:-1px;line-height:1.05;margin-top:4px}
+.home-month-meta{font-size:10px;font-weight:850;color:var(--tx2);white-space:nowrap;padding-bottom:2px}
+.home-today-wrap{margin:0 14px 14px}
+.home-today-card{background:#151515;color:#fff;border-radius:28px;padding:19px 18px 17px;position:relative;overflow:hidden;box-shadow:0 16px 34px rgba(20,20,20,.12);cursor:pointer;transition:transform .18s,box-shadow .2s}
+.home-today-card:active{transform:scale(.99)}
+.home-today-card:after{content:"";position:absolute;width:220px;height:220px;right:-128px;top:-138px;border-radius:50%;background:radial-gradient(circle,rgba(255,91,82,.52),rgba(255,91,82,0) 70%);pointer-events:none}
+.home-today-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:relative;z-index:1}
+.home-today-label{font-size:9px;font-weight:950;letter-spacing:.13em;color:rgba(255,255,255,.5)}
+.home-today-main{font-size:31px;font-weight:950;letter-spacing:-1.1px;line-height:1.02;margin-top:5px}
+.home-today-date{font-size:10px;font-weight:800;color:rgba(255,255,255,.55);padding-top:2px}
+.home-today-times{display:grid;gap:6px;margin-top:16px;position:relative;z-index:1}
+.home-time-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:13px;background:rgba(255,255,255,.075)}
+.home-time-t{font-size:11px;font-weight:950;min-width:32px}.home-time-range{font-size:11px;color:rgba(255,255,255,.72);font-weight:700}.home-time-special{margin-left:auto;font-size:8px;font-weight:950;color:#FFD68B}
+.home-today-empty{font-size:12px;color:rgba(255,255,255,.6);margin-top:15px;position:relative;z-index:1}
+.home-today-foot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;position:relative;z-index:1;font-size:10px;font-weight:850;color:rgba(255,255,255,.72)}
+.home-today-arrow{font-size:18px;color:#fff}
+
+.home-calendar-section{margin:0 14px 14px;background:#fff;border:1px solid var(--bd);border-radius:25px;padding:5px 0 9px;box-shadow:0 8px 24px rgba(20,20,20,.035)}
+.home-calendar-section .cal-head{padding:12px 14px 7px}.home-calendar-section .cal-title{font-size:16px;font-weight:950}.home-calendar-section .cal-grid{padding:0 10px}.home-calendar-section .cd{height:38px;border-radius:11px;font-size:11px}
+.home-section-row{display:flex;align-items:flex-end;justify-content:space-between;margin:18px 18px 9px}.home-section-row h3{font-size:17px;font-weight:950;letter-spacing:-.45px}.home-section-row span{font-size:9px;font-weight:850;color:var(--tx3)}
+.home-next-list{margin:0 14px}.home-next-list .next-item{margin:0 0 7px;border-radius:18px;padding:12px 14px;background:#fff;border:1px solid var(--bd);box-shadow:none}
+.home-next-list .ni-day-num{font-size:20px}.home-next-list .ni-times{font-size:11px;line-height:1.7}
+.home-notice-wrap{margin-top:13px}
+
+/* tool hub: independent utilities */
+.tools-head{padding:18px 20px 12px}.tools-title{font-size:27px;font-weight:950;letter-spacing:-1px;margin-top:4px}.tools-desc{font-size:11px;color:var(--tx2);margin-top:5px;line-height:1.55}
+.tool-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:0 14px 13px;background:#EAE9E5;border-radius:15px;padding:4px}
+.tool-tab{border:0;background:transparent;border-radius:11px;padding:10px 5px;font-size:10px;font-weight:900;color:var(--tx2);transition:.18s}.tool-tab.on{background:#fff;color:#111;box-shadow:0 2px 7px rgba(0,0,0,.06)}
+.tool-view{display:none;padding:0 14px 22px}.tool-view.on{display:block;animation:fadeUp .2s ease both}
+.tool-card{background:#fff;border:1px solid var(--bd);border-radius:26px;padding:18px;box-shadow:0 8px 24px rgba(20,20,20,.035)}
+.tool-card-title{font-size:20px;font-weight:950;letter-spacing:-.55px;margin-top:4px}.tool-card-desc{font-size:11px;color:var(--tx2);line-height:1.6;margin-top:6px}
+.tool-timer-card{background:#151515;color:#fff;border:0;box-shadow:0 15px 34px rgba(20,20,20,.12)}
+.tool-timer-card .timer-status{color:#FF6B64}.tool-timer-card .timer-display{font-size:58px;line-height:1;font-weight:950;letter-spacing:-3px;margin:27px 0 24px}.tool-timer-card .timer-primary{background:#fff;color:#111}.tool-timer-card .timer-secondary{background:rgba(255,255,255,.1);color:#fff}.tool-timer-card .timer-finish{background:transparent;color:rgba(255,255,255,.75);border-color:rgba(255,255,255,.14)}.tool-timer-card .timer-stat{background:rgba(255,255,255,.08)}.tool-timer-card .timer-stat-label{color:rgba(255,255,255,.42)}.tool-timer-card .timer-stat-val{color:#fff}
+.tool-feedback-card .feedback-tags{margin-top:16px}.tool-feedback-card .feedback-area{margin-top:4px}.tool-feedback-card .feedback-save{margin-top:10px}.tool-history-title{font-size:11px;font-weight:900;margin:18px 2px 8px;color:var(--tx2)}
+.tool-feedback-card .feedback-history{margin-top:0}.tool-feedback-card .feedback-item{background:var(--sf2);border-radius:15px}
+.tool-dday-card{padding:0;overflow:hidden}.dday-hero{padding:21px 19px 19px;background:#fff}.dday-label{font-size:9px;letter-spacing:.13em;font-weight:950;color:var(--tx3)}.dday-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:10px}.dday-target{font-size:21px;font-weight:950;letter-spacing:-.65px;line-height:1.25;min-width:0}.dday-target.empty{color:var(--tx3)}.dday-number{font-size:29px;font-weight:950;letter-spacing:-1px;color:var(--red);white-space:nowrap}.dday-edit{width:100%;border:0;border-top:1px solid var(--bd);background:var(--sf2);padding:13px;font-size:11px;font-weight:900;color:var(--tx)}
+@media(max-width:380px){.home-today-main{font-size:28px}.tool-timer-card .timer-display{font-size:49px}.tool-tabs{gap:3px}.tool-tab{font-size:9px}}
+
 </style>
 </head>
 <body>
@@ -255,7 +298,7 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 <!-- 로그인 -->
 <div class="auth on" id="vLogin">
   <div class="auth-logo">STUDENT</div>
-  <div class="auth-sub">수업 · 작업 관리</div>
+  <div class="auth-sub">학생 시간표</div>
   <div class="auth-card">
     <div class="auth-title">로그인</div>
     <div class="auth-msg" id="loginMsg"></div>
@@ -311,49 +354,20 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 
   <main class="scr" id="mainScr">
     <section class="pane on" id="pane-home">
-      <div class="brief-card" id="goalPin">
-        <div class="brief-top">
-          <div class="brief-kicker">TODAY BRIEF</div>
-          <div class="brief-dday" id="goalDday"></div>
-        </div>
-        <div class="brief-target-row">
-          <div class="brief-target empty" id="goalPinText">목표 대학과 시험일을 설정해보세요</div>
-          <button class="brief-edit" type="button" aria-label="목표 수정" onclick="event.stopPropagation();openGoalSheet()">✎</button>
-        </div>
-        <div class="brief-rule"></div>
-        <div class="brief-focus-label">NEXT FOCUS</div>
-        <div class="brief-focus empty" id="homeFocusText">첫 작업 피드백을 남기면 다음 그림의 집중 포인트가 여기에 이어집니다.</div>
-        <div class="brief-tags" id="homeFocusTags"></div>
-        <div class="brief-bottom">
-          <div class="brief-date" id="homeFocusDate"></div>
-          <button class="brief-start" type="button" onclick="event.stopPropagation();openRoutineFromHome()">집중 작업 시작 <span>↗</span></button>
-        </div>
+      <div class="home-schedule-head">
+        <div><div class="home-schedule-kicker">MY SCHEDULE</div><div class="home-schedule-title">오늘 시간표</div></div>
+        <div class="home-month-meta" id="homeMonthMeta"></div>
       </div>
 
-      <div class="section-title-row"><div><div class="section-eyebrow">TODAY</div><div class="section-title-lg">오늘 할 일</div></div></div>
-      <div class="home-main-grid v13-mission">
-        <div class="mission-wrap">
-          <div class="mission-card" id="missionCard" onclick="toggleMissionDetail(event)">
-            <div class="mission-top">
-              <div class="mission-label" id="missionLabel">랜덤 과제</div>
-              <div class="mission-top-right"><div class="mission-streak" id="missionStreak">🔥 0일</div><button class="mission-more" type="button" aria-label="과제 설명 펼치기">⌄</button></div>
-            </div>
-            <div class="mission-title" id="missionTitle">오늘의 미션을 불러오는 중입니다.</div>
-            <div class="mission-desc" id="missionDesc"></div>
-            <div class="mission-foot"><button class="mission-btn" id="missionBtn" onclick="event.stopPropagation();completeMission()">완료</button></div>
-            <div class="mission-complete-flash" id="missionFlash">✓</div>
-          </div>
-        </div>
+      <div class="home-today-wrap"><div id="todayCard"></div></div>
+
+      <div class="home-calendar-section">
+        <div class="cal-head"><div class="cal-title" id="calTitle"></div><div class="cal-navs"><button class="cal-nb" onclick="moveCal(-1)">‹</button><button class="cal-nb" onclick="moveCal(1)">›</button></div></div>
+        <div class="cal-grid"><div class="cal-dh"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="cal-body" id="calBody"></div></div>
       </div>
 
-      <div class="home-info-grid">
-        <div id="todayCard"></div>
-        <div class="week-motive" id="weekMotive" onclick="showWeekMotivation()">
-          <div class="week-motive-top"><div class="week-motive-label">이번 주 루틴</div><div class="week-motive-count" id="weekCount">0/5</div></div>
-          <div class="week-bars" id="weekBars"></div>
-          <div class="week-message" id="weekMessage">한 번씩 쌓아보세요.</div>
-        </div>
-      </div>
+      <div class="home-section-row"><h3>다음 수업</h3><span>UP NEXT</span></div>
+      <div class="home-next-list" id="nextList"></div>
 
       <div class="home-notice-wrap">
         <div class="notice-bar" id="noticeBanner" onclick="toggleNoticeBanner()">
@@ -377,56 +391,42 @@ body{background:#EAE7E1}.app{background:var(--bg)}
     </section>
 
     <section class="pane" id="pane-routine">
-      <div class="work-head">
-        <div><div class="page-kicker">NEXT CANVAS</div><div class="page-title">작업</div><div class="page-desc">지난 피드백을 켜고 작업한 뒤, 다음 그림에 한 줄을 남깁니다.</div></div>
-        <button class="work-target-chip" type="button" onclick="openGoalSheet()"><span id="routineDday">목표일</span></button>
-      </div>
-      <div class="work-target-line" onclick="openGoalSheet()"><span class="work-target-label">목표</span><span class="work-target-text" id="routineTarget">목표를 입력해보세요</span><span class="work-target-arrow">›</span></div>
-
-      <div class="work-segment" role="tablist">
-        <button class="work-seg-btn on" id="workSegWork" type="button" onclick="switchWorkView('work',this)">작업</button>
-        <button class="work-seg-btn" id="workSegHistory" type="button" onclick="switchWorkView('history',this)">기록</button>
+      <div class="tools-head"><div class="tool-kicker">UTILITY</div><div class="tools-title">도구</div><div class="tools-desc">시간표 외에 필요할 때만 꺼내 쓰는 보조 기능입니다.</div></div>
+      <div class="tool-tabs" role="tablist">
+        <button class="tool-tab on" id="toolTabTimer" type="button" onclick="switchToolView('timer',this)">타이머</button>
+        <button class="tool-tab" id="toolTabFeedback" type="button" onclick="switchToolView('feedback',this)">피드백</button>
+        <button class="tool-tab" id="toolTabDday" type="button" onclick="switchToolView('dday',this)">D-day</button>
       </div>
 
-      <div class="work-view on" id="workView">
-        <div class="work-focus-card">
-          <div class="work-focus-top"><span>오늘의 포커스</span><span class="work-focus-state" id="workFocusState">READY</span></div>
-          <div class="work-focus-text empty" id="routineFocusText">첫 피드백을 기록하면 여기에 표시됩니다.</div>
-          <div class="work-focus-caption" id="timerFocusCaption">포커스를 켜고 한 번의 작업에 집중해보세요.</div>
-        </div>
-
-        <div class="work-timer-card" id="timerCard">
+      <div class="tool-view on" id="toolViewTimer">
+        <div class="tool-card tool-timer-card" id="timerCard">
           <div class="timer-status" id="timerStateLabel">READY</div>
           <div class="timer-display" id="timerDisplay">00:00:00</div>
-          <div class="timer-actions"><button class="timer-btn timer-primary" id="timerStartBtn" onclick="toggleTimer()">작업 시작</button><button class="timer-btn timer-secondary" onclick="resetTimer()">초기화</button></div>
-          <button class="timer-finish" onclick="finishTimer()">작업 종료 · 피드백 남기기</button>
+          <div class="timer-actions"><button class="timer-btn timer-primary" id="timerStartBtn" onclick="toggleTimer()">시작</button><button class="timer-btn timer-secondary" onclick="resetTimer()">초기화</button></div>
+          <button class="timer-finish" onclick="finishTimer()">작업 종료 · 기록 저장</button>
           <div class="timer-meta"><div class="timer-stat"><div class="timer-stat-label">이번 주 집중</div><div class="timer-stat-val" id="weekFocusTime">0분</div></div><div class="timer-stat"><div class="timer-stat-label">이번 주 세션</div><div class="timer-stat-val" id="weekSessionCount">0회</div></div></div>
         </div>
+      </div>
 
-        <div class="feedback-composer is-hidden" id="feedbackCard">
-          <div class="composer-kicker">SESSION REVIEW</div>
-          <div class="routine-card-title">다음 그림에 가져갈 한 가지</div>
-          <div class="routine-card-desc">길게 쓰지 않아도 됩니다. 다음 작업에서 실제로 바꿀 한 문장만 남기세요.</div>
+      <div class="tool-view" id="toolViewFeedback">
+        <div class="tool-card tool-feedback-card" id="feedbackCard">
+          <div class="tool-kicker">MEMO</div><div class="tool-card-title">피드백 메모</div><div class="tool-card-desc">수업에서 들은 피드백을 간단히 적어두세요. 타이머와는 별개로 저장됩니다.</div>
           <div class="feedback-tags" id="feedbackTags">
             <button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'형태')">형태</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'구도')">구도</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'명암')">명암</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'색감')">색감</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'묘사')">묘사</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'완성도')">완성도</button>
           </div>
-          <textarea class="feedback-area" id="feedbackNote" placeholder="예: 주제부 명암 대비를 한 단계 더 강하게 만들기"></textarea>
-          <button class="feedback-save" onclick="saveFeedback()">NEXT FOCUS로 저장</button>
+          <textarea class="feedback-area" id="feedbackNote" placeholder="예: 주제부 명암 대비를 더 강하게"></textarea>
+          <button class="feedback-save" onclick="saveFeedback()">메모 저장</button>
         </div>
+        <div class="tool-history-title">최근 메모</div><div class="feedback-history" id="feedbackHistory"></div>
       </div>
 
-      <div class="work-view" id="historyView">
-        <div class="history-summary-card">
-          <div class="history-summary-title">이번 주 기록</div>
-          <div class="history-stats"><div><span>집중</span><strong id="historyWeekFocus">0분</strong></div><div><span>세션</span><strong id="historyWeekSessions">0회</strong></div></div>
-        </div>
-        <div class="history-pattern-card">
-          <div class="history-card-head"><div><div class="history-eyebrow">PATTERN</div><div class="history-title">반복되는 피드백</div></div></div>
-          <div class="feedback-patterns" id="feedbackPatterns"><div class="routine-empty">피드백이 쌓이면 자주 나오는 항목을 보여드려요.</div></div>
-        </div>
-        <div class="history-list-card">
-          <div class="history-card-head"><div><div class="history-eyebrow">RECENT</div><div class="history-title">최근 피드백</div></div></div>
-          <div class="feedback-history" id="feedbackHistory"></div>
+      <div class="tool-view" id="toolViewDday">
+        <div class="tool-card tool-dday-card" id="goalPin">
+          <div class="dday-hero">
+            <div class="dday-label">TARGET EXAM</div>
+            <div class="dday-row"><div class="dday-target empty" id="goalPinText">목표 대학과 시험일을 설정해보세요</div><div class="dday-number" id="goalDday"></div></div>
+          </div>
+          <button class="dday-edit" type="button" onclick="openGoalSheet()">목표 · 시험일 수정</button>
         </div>
       </div>
     </section>
@@ -439,9 +439,9 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 
   <nav class="tabbar">
     <div class="tabbar-pill">
-      <button class="tbtn on" onclick="switchTab('home',this)" id="tab-home"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20h-6v-6h-4v6H4z"/></svg><span>홈</span></button>
+      <button class="tbtn on" onclick="switchTab('home',this)" id="tab-home"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20h-6v-6h-4v6H4z"/></svg><span>오늘</span></button>
       <button class="tbtn" onclick="switchTab('schedule',this)" id="tab-schedule"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span>시간표</span></button>
-      <button class="tbtn" onclick="switchTab('routine',this)" id="tab-routine"><svg viewBox="0 0 24 24"><path d="M5 19l3.5-.8L18 8.7 15.3 6 5.8 15.5 5 19Z"/><path d="M13.8 7.5l2.7 2.7M5 21h14"/></svg><span>작업</span></button>
+      <button class="tbtn" onclick="switchTab('routine',this)" id="tab-routine"><svg viewBox="0 0 24 24"><path d="M5 19l3.5-.8L18 8.7 15.3 6 5.8 15.5 5 19Z"/><path d="M13.8 7.5l2.7 2.7M5 21h14"/></svg><span>도구</span></button>
     </div>
   </nav>
 </div>
@@ -452,7 +452,7 @@ body{background:#EAE7E1}.app{background:var(--bg)}
   <div class="bs-card goal-sheet-card">
     <div class="bs-handle"></div>
     <div class="goal-sheet-title">내 목표</div>
-    <div class="goal-sheet-desc">앱을 열 때마다 가장 먼저 보이는 목표입니다.</div>
+    <div class="goal-sheet-desc">시험 D-day 도구에서 확인할 목표와 날짜를 설정합니다.</div>
     <div class="goal-sheet-fields">
       <div><label>목표</label><input id="goalQuickText" placeholder="예: 국민대 시각디자인 합격"></div>
       <div><label>목표일</label><input id="goalQuickDate" type="date"></div>
@@ -628,7 +628,7 @@ function switchTab(name,btn){
   if(btn)btn.classList.add('on');
   else document.querySelectorAll('.tbtn').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+name+"'"))b.classList.add('on');});
   document.getElementById('mainScr').scrollTop=0;
-  if(name==='routine'){loadRoutine();if(!document.getElementById('historyView')?.classList.contains('on'))switchWorkView('work');}
+  if(name==='routine'){loadRoutine();switchToolView('timer',document.getElementById('toolTabTimer'));}
 }
 
 // ── 헬퍼 ──
@@ -658,43 +658,31 @@ function renderCal(y,m,bodyId){
 
 // ── 홈 ──
 function renderHome(){
-
   const now=new Date(),m=now.getMonth()+1,d=now.getDate(),y=now.getFullYear();
-  const dw=DY[now.getDay()];
-  const sd=myD(y,m);
-  const reg=(sd.lessons||[]).filter(l=>l.day===d);
-  const sp=(sd.special||[]).filter(l=>l.day===d);
+  const dw=DY[now.getDay()],sd=myD(y,m);
+  const allReg=sd.lessons||[],allSp=sd.special||[];
+  const reg=allReg.filter(l=>l.day===d),sp=allSp.filter(l=>l.day===d);
   const tims=[...new Set([...reg.map(l=>l.tim),...sp.map(l=>l.tim)])].sort();
-
   const tc=document.getElementById('todayCard');
-  if(!tims.length){
-    tc.innerHTML=`<div class="home-class-card" onclick="switchTab('schedule')"><div class="home-class-top"><div><div class="home-class-label">오늘 수업</div><div class="home-class-main">없음</div><div class="home-class-sub">오늘은 수업이 없습니다</div></div></div><div class="home-class-link">시간표 보기 <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>`;
-  }else{
-    tc.innerHTML=`<div class="home-class-card active" onclick="switchTab('schedule')"><div class="home-class-top"><div><div class="home-class-label">오늘 수업</div><div class="home-class-main">${tims.length}T</div><div class="home-class-sub">${tims.map(t=>t+'T').join(' · ')}</div></div></div><div class="home-class-link">상세 시간표 보기 <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>`;
+  if(tc){
+    const rows=tims.map(t=>{const isSp=sp.some(l=>l.tim===t)&&!reg.some(l=>l.tim===t);return `<div class="home-time-row"><div class="home-time-t">${t}타임</div><div class="home-time-range">${TM[String(t)]}</div>${isSp?'<div class="home-time-special">특강</div>':''}</div>`;}).join('');
+    tc.innerHTML=`<div class="home-today-card" onclick="switchTab('schedule')"><div class="home-today-top"><div><div class="home-today-label">TODAY · ${dw}</div><div class="home-today-main">${tims.length?`오늘 ${tims.length}T`:'오늘 수업 없음'}</div></div><div class="home-today-date">${m}.${d}</div></div>${tims.length?`<div class="home-today-times">${rows}</div>`:'<div class="home-today-empty">오늘은 등록된 정규·특강 수업이 없습니다.</div>'}<div class="home-today-foot"><span>전체 시간표 보기</span><span class="home-today-arrow">›</span></div></div>`;
   }
+  const meta=document.getElementById('homeMonthMeta');
+  if(meta)meta.textContent=`${m}월 정규 ${allReg.length}T${allSp.length?` · 특강 ${allSp.length}T`:''}`;
+  const ct=document.getElementById('calTitle');if(ct)ct.textContent=`${calY}년 ${calM}월`;
+  if(document.getElementById('calBody'))renderCal(calY,calM,'calBody');
 
-  const todayStr=ds(y,m,d);
-  const up=[];
+  const todayStr=ds(y,m,d),up=[];
   for(let mi=0;mi<3;mi++){
-    const td=new Date(y,now.getMonth()+mi,1),ty=td.getFullYear(),tm=td.getMonth()+1;
-    const sd2=myD(ty,tm);
-    const bd={};
-    [...(sd2.lessons||[]),...(sd2.special||[])].forEach(l=>{
-      if(!bd[l.day])bd[l.day]={r:[],s:[]};
-      if((sd2.lessons||[]).some(x=>x.day===l.day&&x.tim===l.tim))bd[l.day].r.push(l.tim);
-      else bd[l.day].s.push(l.tim);
-    });
+    const td=new Date(y,now.getMonth()+mi,1),ty=td.getFullYear(),tm=td.getMonth()+1,sd2=myD(ty,tm),bd={};
+    [...(sd2.lessons||[]),...(sd2.special||[])].forEach(l=>{if(!bd[l.day])bd[l.day]={r:[],s:[]};if((sd2.lessons||[]).some(x=>x.day===l.day&&x.tim===l.tim))bd[l.day].r.push(l.tim);else bd[l.day].s.push(l.tim);});
     Object.keys(bd).map(Number).sort((a,b)=>a-b).forEach(dd=>{if(ds(ty,tm,dd)>todayStr)up.push({ty,tm,dd,...bd[dd]});});
   }
   const nl=document.getElementById('nextList');
   if(nl){
-    if(!up.length){nl.innerHTML='<div class="empty">예정된 수업이 없습니다</div>';} 
-    else nl.innerHTML=up.slice(0,5).map(({ty,tm,dd,r,s})=>{
-      const dw2=new Date(ty,tm-1,dd).getDay(),dwN=DY[dw2],dwC=dw2===0?' sun':dw2===6?' sat':'';
-      const ts2=[...new Set([...r,...s])].sort();
-      const rows=ts2.map(t=>{const isSp=s.includes(t)&&!r.includes(t);return `${t}타임 ${TM[String(t)]}${isSp?'<span class="sp-pip">특강</span>':''}`;}).join('<br>');
-      return `<div class="next-item"><div class="ni-date-col"><div class="ni-day-num">${dd}</div><div class="ni-day-label${dwC}">${tm}/${dd}<br>${dwN}</div></div><div class="ni-sep"></div><div class="ni-times">${rows}</div></div>`;
-    }).join('');
+    if(!up.length)nl.innerHTML='<div class="empty">예정된 수업이 없습니다</div>';
+    else nl.innerHTML=up.slice(0,2).map(({ty,tm,dd,r,s})=>{const dw2=new Date(ty,tm-1,dd).getDay(),dwN=DY[dw2],dwC=dw2===0?' sun':dw2===6?' sat':'';const ts2=[...new Set([...r,...s])].sort();const rows=ts2.map(t=>{const isSp=s.includes(t)&&!r.includes(t);return `${t}타임 ${TM[String(t)]}${isSp?'<span class="sp-pip">특강</span>':''}`;}).join('<br>');return `<div class="next-item" onclick="switchTab('schedule')"><div class="ni-date-col"><div class="ni-day-num">${dd}</div><div class="ni-day-label${dwC}">${tm}/${dd}<br>${dwN}</div></div><div class="ni-sep"></div><div class="ni-times">${rows}</div></div>`;}).join('');
   }
 }
 function moveCal(dir){
@@ -869,7 +857,7 @@ function loadGoalPin(){
   }
   const t=document.getElementById('goalPinText');
   const d=document.getElementById('goalDday');
-  if(t){t.textContent=g.text||'목표 대학과 시험일을 설정해보세요';t.className='brief-target'+(g.text?'':' empty');}
+  if(t){t.textContent=g.text||'목표 대학과 시험일을 설정해보세요';t.className='dday-target'+(g.text?'':' empty');}
   if(d)d.textContent=goalDdayText(g.date||'');
   const rt=document.getElementById('routineTarget');if(rt)rt.textContent=g.text||'목표를 입력해보세요';
   const rd=document.getElementById('routineDday');if(rd)rd.textContent=goalDdayText(g.date||'')||'목표일 설정';
@@ -979,7 +967,7 @@ function loadNextCanvas(){
 function formatTimer(sec){const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return [h,m,s].map(v=>String(v).padStart(2,'0')).join(':');}
 function renderTimer(){
   const d=document.getElementById('timerDisplay');if(d)d.textContent=formatTimer(routineTimerSeconds);
-  const b=document.getElementById('timerStartBtn');if(b)b.textContent=routineTimerRunning?'일시정지':routineTimerSeconds?'계속하기':'작업 시작';
+  const b=document.getElementById('timerStartBtn');if(b)b.textContent=routineTimerRunning?'일시정지':routineTimerSeconds?'계속하기':'시작';
   const state=document.getElementById('timerStateLabel'),focusState=document.getElementById('workFocusState'),card=document.getElementById('timerCard');
   const label=routineTimerRunning?'FOCUSING':routineTimerSeconds?'PAUSED':'READY';
   if(state)state.textContent=label;if(focusState)focusState.textContent=label;if(card)card.classList.toggle('is-running',routineTimerRunning);
@@ -992,19 +980,17 @@ function resetTimer(){
   if(routineTimerId)clearInterval(routineTimerId);routineTimerRunning=false;routineTimerSeconds=0;renderTimer();haptic('light');showToast('타이머를 초기화했어요','info');
 }
 function finishTimer(){
-  if(routineTimerSeconds<=0){showToast('작업을 시작한 뒤 종료해주세요','info');return;}
+  if(routineTimerSeconds<=0){showToast('타이머를 먼저 시작해주세요','info');return;}
   if(routineTimerId)clearInterval(routineTimerId);routineTimerRunning=false;
   const st=getRoutineStore();st.sessions=st.sessions||[];st.sessions.unshift({createdAt:new Date().toISOString(),seconds:routineTimerSeconds});saveRoutineStore(st);
-  const mins=Math.max(1,Math.round(routineTimerSeconds/60));routineTimerSeconds=0;renderTimer();renderRoutineStats();
-  const f=document.getElementById('feedbackCard');if(f){f.classList.remove('is-hidden');setTimeout(()=>f.scrollIntoView({behavior:'smooth',block:'center'}),60);}setTimeout(()=>document.getElementById('feedbackNote')?.focus(),420);haptic('medium');showToast(`작업 ${mins}분 기록 · 다음 그림에 한 줄을 남겨보세요`,'ok');
+  const mins=Math.max(1,Math.round(routineTimerSeconds/60));routineTimerSeconds=0;renderTimer();renderRoutineStats();haptic('medium');showToast(`${mins}분 작업 기록을 저장했어요`,'ok');
 }
 function toggleFeedbackTag(btn,tag){btn.classList.toggle('on');if(btn.classList.contains('on')){if(!selectedFeedbackTags.includes(tag))selectedFeedbackTags.push(tag);}else selectedFeedbackTags=selectedFeedbackTags.filter(t=>t!==tag);haptic('light');}
 function saveFeedback(){
-  const note=document.getElementById('feedbackNote').value.trim();if(!note){showToast('다음 그림에서 바꿀 점을 한 줄 적어주세요','info');return;}
+  const note=document.getElementById('feedbackNote').value.trim();if(!note){showToast('피드백 내용을 입력해주세요','info');return;}
   const st=getRoutineStore();st.feedbacks=st.feedbacks||[];st.feedbacks.unshift({createdAt:new Date().toISOString(),note,tags:[...selectedFeedbackTags]});st.feedbacks=st.feedbacks.slice(0,30);saveRoutineStore(st);
   document.getElementById('feedbackNote').value='';selectedFeedbackTags=[];document.querySelectorAll('.fb-tag').forEach(b=>b.classList.remove('on'));
-  const composer=document.getElementById('feedbackCard');if(composer)composer.classList.add('is-hidden');
-  loadRoutine();loadNextCanvas();haptic('medium');showToast('다음 그림의 포커스로 이어졌어요','ok');
+  renderFeedbackHistory();renderFeedbackPatterns();haptic('medium');showToast('피드백 메모를 저장했어요','ok');
 }
 function weekStartDate(){const n=new Date();n.setHours(0,0,0,0);const day=(n.getDay()+6)%7;n.setDate(n.getDate()-day);return n;}
 function renderRoutineStats(){
@@ -1034,7 +1020,17 @@ function switchWorkView(view,btn){
   if(isHistory){renderRoutineStats();renderFeedbackHistory();renderFeedbackPatterns();}
   haptic('light');
 }
-function loadRoutine(){loadGoalPin();loadNextCanvas();renderTimer();renderRoutineStats();renderFeedbackHistory();renderFeedbackPatterns();}
+function loadRoutine(){loadGoalPin();renderTimer();renderRoutineStats();renderFeedbackHistory();renderFeedbackPatterns();}
+function switchToolView(view,btn){
+  document.querySelectorAll('.tool-view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.tool-tab').forEach(b=>b.classList.remove('on'));
+  const target=document.getElementById('toolView'+view.charAt(0).toUpperCase()+view.slice(1));if(target)target.classList.add('on');
+  if(btn)btn.classList.add('on');
+  if(view==='timer'){renderTimer();renderRoutineStats();}
+  if(view==='feedback'){renderFeedbackHistory();}
+  if(view==='dday'){loadGoalPin();}
+  haptic('light');
+}
 function toggleNoticeBanner(){const b=document.getElementById('noticeBanner');if(!b)return;b.classList.toggle('expanded');haptic('light');}
 
 // ── 시간표 탭 ──
