@@ -55,14 +55,16 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSyst
 .hdr-logout{background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer;padding:4px;line-height:1;}
 
 /* 탭바 */
-.tabbar{flex-shrink:0;display:flex;background:var(--sf);border-top:1px solid var(--bd);padding:6px 0 calc(6px + env(safe-area-inset-bottom));}
-.tbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--tx3);font-size:10px;font-weight:600;cursor:pointer;padding:6px 4px;position:relative;}
+.tabbar{flex-shrink:0;display:flex;justify-content:center;padding:10px 20px calc(10px + env(safe-area-inset-bottom));background:transparent;}
+.tabbar-pill{display:flex;background:var(--sf);border-radius:999px;padding:6px;gap:2px;border:1px solid var(--bd);box-shadow:0 4px 20px rgba(0,0,0,.35);}
+.tbtn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--tx3);font-size:10px;font-weight:600;cursor:pointer;padding:8px 14px;border-radius:999px;position:relative;transition:all .2s ease;-webkit-user-select:none;}
+.tbtn.on{background:var(--sf2);color:var(--tx);}
 .tbtn.on{color:var(--acc);}
 .t-icon{font-size:22px;line-height:1;}
 .t-badge{position:absolute;top:4px;right:calc(50% - 16px);background:var(--acc);color:#fff;border-radius:999px;font-size:9px;font-weight:700;padding:1px 5px;display:none;}
 
 /* 스크롤 영역 */
-.scr{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.scr{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:90px;}
 .pane{display:none;}
 .pane.on{display:block;}
 
@@ -597,21 +599,20 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSyst
 
   <!-- 탭바 -->
   <div class="tabbar">
-    <button class="tbtn on" onclick="switchTab('home',this)">
-      <span class="t-icon">🏠</span><span>홈</span>
-    </button>
-    <button class="tbtn" onclick="switchTab('schedule',this)">
-      <span class="t-icon">📅</span><span>시간표</span>
-    </button>
-    <button class="tbtn" onclick="switchTab('notice',this)">
-      <span class="t-icon">📢<span class="t-badge" id="nbadge"></span></span><span>공지</span>
-    </button>
-    <button class="tbtn" onclick="switchTab('gallery',this)">
-      <span class="t-icon">🎨</span><span>갤러리</span>
-    </button>
-    <button class="tbtn" onclick="switchTab('chat',this)">
-      <span class="t-icon">💬<span class="t-badge" id="cbadge"></span></span><span>상담</span>
-    </button>
+    <div class="tabbar-pill">
+      <button class="tbtn on" onclick="switchTab('home',this)">
+        <span class="t-icon">🏠</span><span>홈</span>
+      </button>
+      <button class="tbtn" onclick="switchTab('schedule',this)">
+        <span class="t-icon">🗓</span><span>시간표</span>
+      </button>
+      <button class="tbtn" onclick="switchTab('notice',this)">
+        <span class="t-icon" style="position:relative">📣<span class="t-badge" id="nbadge"></span></span><span>공지</span>
+      </button>
+      <button class="tbtn" onclick="switchTab('gallery',this)">
+        <span class="t-icon">🖼️</span><span>갤러리</span>
+      </button>
+    </div>
   </div>
 </div>
 
