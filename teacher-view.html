@@ -124,7 +124,48 @@ async function teacherSignup(){clearTeacherAuthMsg();const name=document.getElem
 async function checkTeacherApproval(){const email=localStorage.getItem('hwa_pending_teacher_email');const name=localStorage.getItem('hwa_pending_teacher_name');if(!email){backToTeacherLogin();return}toast('승인 후 같은 계정으로 로그인해주세요');backToTeacherLogin();document.getElementById('teacherName').value=name||'';document.getElementById('teacherEmail').value=email||''}
 async function ensureTeacherApproved(user){const s=await db.ref('teacher_accounts/'+user.uid).once('value'),a=s.val();if(!a)return {ok:false,msg:'선생님 가입 정보가 없습니다. 회원가입부터 진행해주세요.'};if(a.approved!==true)return {ok:false,pending:true,name:a.name||'',email:a.email||user.email};return {ok:true,data:a}}
 
-async function teacherLogin(){const name=document.getElementById('teacherName').value.trim(),email=document.getElementById('teacherEmail').value.trim().toLowerCase(),pw=document.getElementById('teacherPw').value;clearTeacherAuthMsg();if(!name||!email||!pw){showTeacherAuthMsg('이름, 이메일, 비밀번호를 모두 입력하세요.');return}try{const c=await auth.signInWithEmailAndPassword(email,teacherSecret(pw));const chk=await ensureTeacherApproved(c.user);if(!chk.ok){await auth.signOut();if(chk.pending){showTeacherPending(chk.name||name,chk.email||email)}else showTeacherAuthMsg(chk.msg);return}teacher=c.user;teacherName=chk.data.name||name;localStorage.setItem('hwa_teacher_name',teacherName);localStorage.removeItem('hwa_pending_teacher_email');localStorage.removeItem('hwa_pending_teacher_name');document.getElementById('hdrTeacher').textContent=teacherName+' 선생님';document.getElementById('authView').style.display='none';document.getElementById('appView').classList.add('on');await loadAll()}catch(e){showTeacherAuthMsg(e.code==='auth/invalid-credential'?'이메일 또는 비밀번호를 확인해주세요.':'로그인 오류: '+(e.code||e.message))}}
+async function signInTeacherCompat(email,pw){
+  // 현재 버전 계정: 앱 내부용 비밀번호로 로그인
+  try{
+    return await auth.signInWithEmailAndPassword(email,teacherSecret(pw));
+  }catch(firstErr){
+    const retryCodes=['auth/invalid-credential','auth/wrong-password','auth/user-not-found'];
+    if(!retryCodes.includes(firstErr?.code))throw firstErr;
+    // 이전 버전에서 Firebase에 원래 비밀번호 그대로 저장한 계정 호환
+    try{
+      const legacy=await auth.signInWithEmailAndPassword(email,pw);
+      try{
+        await legacy.user.updatePassword(teacherSecret(pw));
+        console.log('선생님 계정 비밀번호 형식을 최신 방식으로 자동 이전했습니다.');
+      }catch(migrateErr){
+        console.warn('선생님 비밀번호 이전 실패(로그인은 유지):',migrateErr);
+      }
+      return legacy;
+    }catch(legacyErr){
+      throw firstErr;
+    }
+  }
+}
+async function teacherLogin(){
+  const name=document.getElementById('teacherName').value.trim(),email=document.getElementById('teacherEmail').value.trim().toLowerCase(),pw=document.getElementById('teacherPw').value;
+  clearTeacherAuthMsg();
+  if(!name||!email||!pw){showTeacherAuthMsg('이름, 이메일, 비밀번호를 모두 입력하세요.');return}
+  try{
+    const c=await signInTeacherCompat(email,pw);
+    const chk=await ensureTeacherApproved(c.user);
+    if(!chk.ok){await auth.signOut();if(chk.pending){showTeacherPending(chk.name||name,chk.email||email)}else showTeacherAuthMsg(chk.msg);return}
+    teacher=c.user;teacherName=chk.data.name||name;
+    localStorage.setItem('hwa_teacher_name',teacherName);
+    localStorage.removeItem('hwa_pending_teacher_email');localStorage.removeItem('hwa_pending_teacher_name');
+    document.getElementById('hdrTeacher').textContent=teacherName+' 선생님';
+    document.getElementById('authView').style.display='none';document.getElementById('appView').classList.add('on');
+    await loadAll();
+  }catch(e){
+    console.error('teacher login',e);
+    const bad=['auth/invalid-credential','auth/wrong-password','auth/user-not-found'];
+    showTeacherAuthMsg(bad.includes(e?.code)?'이메일 또는 비밀번호를 확인해주세요.':'로그인 오류: '+(e.code||e.message));
+  }
+}
 async function teacherLogout(){await auth.signOut();localStorage.removeItem('hwa_teacher_name');location.reload()}
 auth.onAuthStateChanged(async u=>{if(!u)return;try{const chk=await ensureTeacherApproved(u);if(!chk.ok){await auth.signOut();if(chk.pending)showTeacherPending(chk.name,chk.email);return}teacher=u;teacherName=chk.data.name||localStorage.getItem('hwa_teacher_name')||u.email?.split('@')[0]||'선생님';localStorage.setItem('hwa_teacher_name',teacherName);document.getElementById('hdrTeacher').textContent=teacherName+' 선생님';document.getElementById('authView').style.display='none';document.getElementById('appView').classList.add('on');await loadAll()}catch(e){console.error(e)}});
 function switchTab(n,b){document.querySelectorAll('.pane').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));document.getElementById('pane-'+n).classList.add('on');b.classList.add('on');document.getElementById('mainScr').scrollTop=0}

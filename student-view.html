@@ -945,6 +945,33 @@ async function uploadPracticeBlob(blob,projectId,sessionId){
   await ref.put(blob,{contentType:'image/jpeg',cacheControl:'private,max-age=3600'});
   return path;
 }
+
+function storagePathOwner(path=''){
+  const m=String(path||'').match(/^artworks\/([^/]+)\//);
+  return m?m[1]:'';
+}
+async function repairLegacyPracticePaths(store){
+  const u=fbAuth.currentUser;if(!u||!store?.projects?.length)return {store,repaired:0,missing:0};
+  let repaired=0,missing=0,changed=false;
+  for(const project of store.projects){
+    for(const shot of (project.sessions||[])){
+      const owner=storagePathOwner(shot.imagePath);
+      if(!shot.imagePath||owner===u.uid)continue;
+      const blob=await getPracticeImage(shot.imageId||shot.id);
+      if(!blob){missing++;continue;}
+      const sid=shot.id||practiceId('shot');
+      shot.id=sid;shot.imageId=shot.imageId||sid;
+      shot.imagePath=await uploadPracticeBlob(blob,project.id,sid);
+      repaired++;changed=true;
+    }
+  }
+  if(changed){
+    const ref=practiceCloudRef();if(ref)await ref.set(store);
+    localStorage.setItem(practiceStoreKey(),JSON.stringify(store));
+  }
+  return {store,repaired,missing};
+}
+
 async function migrateLocalPracticeToCloud(local){
   if(!fbAuth.currentUser||!local?.projects?.length)return local;
   setCloudStatus('syncing','기존 기록 이전 중');
@@ -968,7 +995,12 @@ async function loadPracticeStoreFromCloud(){
     if(cloud&&Array.isArray(cloud.projects))practiceCache=cloud;
     else if(local.projects.length){practiceCache=await migrateLocalPracticeToCloud(local);await ref.set(practiceCache);}
     else practiceCache={projects:[]};
-    localStorage.setItem(practiceStoreKey(),JSON.stringify(practiceCache));practiceCloudReady=true;setCloudStatus('on','클라우드 저장됨');return practiceCache;
+    const repaired=await repairLegacyPracticePaths(practiceCache);practiceCache=repaired.store;
+    localStorage.setItem(practiceStoreKey(),JSON.stringify(practiceCache));practiceCloudReady=true;
+    if(repaired.missing>0)setCloudStatus('err',`이전 사진 ${repaired.missing}장 재연결 필요`);
+    else if(repaired.repaired>0)setCloudStatus('on',`이전 사진 ${repaired.repaired}장 복구됨`);
+    else setCloudStatus('on','클라우드 저장됨');
+    return practiceCache;
   }catch(e){console.error(e);practiceCache=local;setCloudStatus('err','동기화 오류');return local;}
 }
 async function compressPracticeImage(file){
@@ -1050,10 +1082,16 @@ async function completePracticeProject(id){
   try{await savePracticeStore(s);await loadPracticeTracker();haptic('medium');showToast(`총 ${projectTotalT(p)}T 작업으로 완료했어요`,'ok');}
   catch(e){showToast('완료 상태를 저장하지 못했어요','info');}
 }
-async function deleteStoragePath(path){if(!path)return;try{await fbStorage.ref(path).delete();}catch(e){if(e?.code!=='storage/object-not-found')throw e;}}
+async function deleteStoragePath(path){
+  if(!path)return;
+  const u=fbAuth.currentUser,owner=storagePathOwner(path);
+  if(u&&owner&&owner!==u.uid){const e=new Error('legacy-owner-mismatch');e.code='storage/legacy-owner-mismatch';e.ownerUid=owner;e.currentUid=u.uid;throw e;}
+  try{await fbStorage.ref(path).delete();}catch(e){if(e?.code!=='storage/object-not-found')throw e;}
+}
 function cloudDeleteErrorMessage(e){
   const code=e?.code||'';
-  if(code==='storage/unauthorized')return '클라우드 사진 삭제 권한이 없습니다. Storage 규칙을 확인해주세요.';
+  if(code==='storage/legacy-owner-mismatch')return '이 사진은 이전 로그인 계정의 클라우드 폴더에 저장되어 있어요. 앱을 새로고침하면 가능한 사진은 현재 계정으로 자동 복구합니다.';
+  if(code==='storage/unauthorized')return '현재 계정의 Storage 삭제 권한이 없습니다. Storage 규칙의 delete 권한을 확인해주세요.';
   if(code==='storage/unauthenticated')return '로그인이 풀렸습니다. 다시 로그인해주세요.';
   if(code==='storage/retry-limit-exceeded')return '네트워크 문제로 삭제하지 못했습니다. 다시 시도해주세요.';
   return '클라우드 사진을 삭제하지 못했습니다. 다시 시도해주세요.';
