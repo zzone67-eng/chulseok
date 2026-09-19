@@ -699,9 +699,26 @@ function calcFeeRaw(){
   if(!s)return null;
   const abs=getAbs(),sp=d.special.length,actualReg=d.lessons.length;
   const use4wk=document.getElementById('use4wk')?.checked;
-  // 4주 기준: 실제 타임수를 4주 기준으로 환산 (이번달 일수 기반)
-  const monthDays=getDays(mon);
-  let reg=use4wk?Math.round(actualReg/monthDays*28):actualReg;
+  // 4주 기준: 요일 고정 패턴으로 주당 타임수 × 4주
+  let reg;
+  if(use4wk){
+    // 체크된 lessons에서 요일별 타임수 분석
+    const d2=getData(curCls,curStu,mon);
+    const dayTimSet={}; // {요일: Set(타임번호)}
+    (d2.lessons||[]).forEach(l=>{
+      const date=new Date(YEAR,mon-1,l.day);
+      const dw=date.getDay();
+      if(!dayTimSet[dw])dayTimSet[dw]=new Set();
+      dayTimSet[dw].add(l.tim);
+    });
+    // 주당 타임수 = 각 요일의 타임 수 합계 (최빈값 기준)
+    // 각 요일에서 가장 많이 나온 타임 수를 주당 고정으로 봄
+    let weeklyT=0;
+    Object.values(dayTimSet).forEach(tims=>{weeklyT+=tims.size;});
+    reg=weeklyT*4;
+  } else {
+    reg=actualReg;
+  }
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
@@ -893,8 +910,23 @@ function calcFee(){
   const abs=getAbs(),sp=d.special.length;
   const actualReg=d.lessons.length; // 실제 체크 시수
   const use4wk=document.getElementById('use4wk')?.checked;
-  const monthDays2=getDays(mon);
-  let reg=use4wk?Math.round(actualReg/monthDays2*28):actualReg; // 수강료 계산용
+  // 4주 기준: 요일 고정 패턴
+  let reg;
+  if(use4wk){
+    const d3=getData(curCls,curStu,mon);
+    const dwSet={};
+    (d3.lessons||[]).forEach(l=>{
+      const date=new Date(YEAR,mon-1,l.day);
+      const dw=date.getDay();
+      if(!dwSet[dw])dwSet[dw]=new Set();
+      dwSet[dw].add(l.tim);
+    });
+    let weeklyT2=0;
+    Object.values(dwSet).forEach(tims=>{weeklyT2+=tims.size;});
+    reg=weeklyT2*4;
+  } else {
+    reg=actualReg;
+  } // 수강료 계산용
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
