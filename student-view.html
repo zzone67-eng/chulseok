@@ -57,22 +57,18 @@ button{cursor:pointer}
 .app.on{display:flex}
 .hdr{height:68px;flex:none;padding:12px 18px;display:flex;align-items:center;gap:10px;background:rgba(244,244,242,.92);backdrop-filter:blur(18px);z-index:10;border-bottom:1px solid rgba(0,0,0,0)}
 .hdr.scrolled{border-bottom-color:var(--bd)}
-.hdr-brand{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
-.hdr-logo-mark{width:34px;height:34px;border-radius:11px;background:var(--black);color:#fff;display:grid;place-items:center;font-size:15px;font-weight:900;letter-spacing:-1px;box-shadow:0 5px 14px rgba(0,0,0,.14)}
-.hdr-logo-mark b{color:#FF5757}
-.hdr-meta{min-width:0}.hdr-logo{font-size:14px;font-weight:900;letter-spacing:-.35px;line-height:1.15}.hdr-logo span{color:var(--acc)}
-.hdr-user{font-size:11px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.hdr-brand{display:flex;align-items:center;min-width:0;flex:1}.hdr-meta{min-width:0}.hdr-date{font-size:13px;font-weight:900;letter-spacing:-.25px;line-height:1.15}.hdr-user{font-size:11px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
 .hdr-logout{width:36px;height:36px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);display:grid;place-items:center;color:var(--tx2)}
 .hdr-logout svg{width:17px;height:17px}
 .scr{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 110px;scrollbar-width:none}.scr::-webkit-scrollbar{display:none}
 .pane{display:none}.pane.on{display:block;animation:fadeUp .25s ease both}
 
 /* home intro */
-.home-intro{padding:16px 20px 12px}
-.home-kicker{font-size:12px;color:var(--tx2);font-weight:700;margin-bottom:5px}
-.home-title{font-size:28px;line-height:1.16;font-weight:900;letter-spacing:-1.35px}
-.home-title em{font-style:normal;color:var(--acc)}
-.home-sub{font-size:13px;color:var(--tx2);margin-top:7px}
+.home-intro{padding:18px 20px 12px}
+.home-kicker{font-size:12px;color:var(--tx2);font-weight:800;letter-spacing:.06em;margin-bottom:6px}
+.home-title{font-size:34px;line-height:1.06;font-weight:900;letter-spacing:-1.55px}
+.home-title .title-accent{display:block;color:var(--acc)}
+.home-sub{font-size:13px;color:var(--tx2);margin-top:10px;line-height:1.72}
 .section-head{display:flex;align-items:end;justify-content:space-between;margin:24px 20px 10px}
 .section-head:first-child{margin-top:8px}
 .section-label{font-size:15px;font-weight:900;letter-spacing:-.35px;color:var(--tx)}
@@ -88,6 +84,10 @@ button{cursor:pointer}
 .tc-status{font-size:22px;font-weight:900;letter-spacing:-.7px;margin-top:3px}.today-card:not(.active) .tc-status{font-size:18px}
 .tc-chips{display:grid;gap:8px;margin-top:18px;position:relative;z-index:1}.tc-chip{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.11);border-radius:14px;padding:12px 13px}.tc-chip.sp{background:rgba(255,196,69,.10);border-color:rgba(255,196,69,.22)}
 .tc-tnum{font-size:13px;font-weight:900;color:#fff}.tc-trange{font-size:12px;color:rgba(255,255,255,.65)}.tc-stag{margin-left:auto;font-size:10px;font-weight:800;background:#F3B73C;color:#191919;border-radius:999px;padding:4px 8px}
+
+
+/* daily mission */
+.mission-wrap{margin:0 16px 14px}.mission-card{background:linear-gradient(135deg,#111 0%,#1A1A1D 100%);color:#fff;border-radius:24px;padding:18px 18px 16px;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.15)}.mission-card:after{content:"";position:absolute;width:180px;height:180px;right:-92px;top:-96px;border-radius:50%;background:radial-gradient(circle,rgba(216,57,57,.45),rgba(216,57,57,0) 72%)}.mission-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative;z-index:1}.mission-label{font-size:11px;font-weight:800;color:rgba(255,255,255,.55);letter-spacing:.08em}.mission-streak{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.09);font-size:11px;font-weight:800;white-space:nowrap}.mission-title{font-size:20px;font-weight:900;letter-spacing:-.5px;line-height:1.35;margin-top:10px;position:relative;z-index:1}.mission-desc{font-size:12px;color:rgba(255,255,255,.68);line-height:1.7;margin-top:8px;position:relative;z-index:1}.mission-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;position:relative;z-index:1}.mission-meta{font-size:12px;color:rgba(255,255,255,.74)}.mission-btn{border:0;background:#fff;color:#111;border-radius:14px;padding:11px 14px;font-size:12px;font-weight:900;white-space:nowrap}.mission-btn.done{background:#1E8A57;color:#fff}.mission-btn:disabled{opacity:1}
 
 /* notice banner */
 .notice-bar{margin:0 16px 14px;background:#FFF;border:1px solid var(--bd);border-radius:18px;padding:13px 14px;display:none;align-items:center;gap:10px;box-shadow:0 5px 18px rgba(0,0,0,.035)}
@@ -136,8 +136,8 @@ button{cursor:pointer}
 
 <!-- 로그인 -->
 <div class="auth on" id="vLogin">
-  <div class="auth-logo">화강암<span>+</span></div>
-  <div class="auth-sub">미술학원 앱</div>
+  <div class="auth-logo">STUDENT</div>
+  <div class="auth-sub">수업 · 작업 관리</div>
   <div class="auth-card">
     <div class="auth-title">로그인</div>
     <div class="auth-msg" id="loginMsg"></div>
@@ -150,7 +150,7 @@ button{cursor:pointer}
 
 <!-- 회원가입 -->
 <div class="auth" id="vSignup">
-  <div class="auth-logo">화강암<span>+</span></div>
+  <div class="auth-logo">STUDENT</div>
   <div class="auth-sub">회원가입</div>
   <div class="auth-card">
     <div class="auth-title">계정 만들기</div>
@@ -181,9 +181,8 @@ button{cursor:pointer}
 <div class="app" id="vApp">
   <header class="hdr">
     <div class="hdr-brand">
-      <div class="hdr-logo-mark">화<b>+</b></div>
       <div class="hdr-meta">
-        <div class="hdr-logo">화강암<span>+</span> 미술학원</div>
+        <div class="hdr-date" id="hdrDate">오늘</div>
         <div class="hdr-user" id="hdrUser"></div>
       </div>
     </div>
@@ -195,9 +194,25 @@ button{cursor:pointer}
   <main class="scr" id="mainScr">
     <section class="pane on" id="pane-home">
       <div class="home-intro">
-        <div class="home-kicker">STUDENT SCHEDULE</div>
-        <div class="home-title">오늘도 <em>좋은 작업</em><br>만들어봐요.</div>
-        <div class="home-sub">내 수업 일정과 학원 공지를 한눈에 확인하세요.</div>
+        <div class="home-kicker">ART STUDY ROUTINE</div>
+        <div class="home-title">추용하 <span class="title-accent">입시반</span></div>
+        <div class="home-sub">오늘 수업, 과제, 드로잉 루틴을 한 번에 확인하고 손풀기부터 완성까지 흐름 있게 작업해보세요.</div>
+      </div>
+
+      <div class="section-head"><div class="section-label">오늘의 드로잉 미션</div><div class="section-sub">DAILY MOTIVE</div></div>
+      <div class="mission-wrap">
+        <div class="mission-card" id="missionCard">
+          <div class="mission-top">
+            <div class="mission-label" id="missionLabel">오늘의 작업 루틴</div>
+            <div class="mission-streak" id="missionStreak">🔥 0일 연속</div>
+          </div>
+          <div class="mission-title" id="missionTitle">오늘의 미션을 불러오는 중입니다.</div>
+          <div class="mission-desc" id="missionDesc">5~10분 안에 끝나는 드로잉 루틴으로 작업 감각을 빠르게 깨워보세요.</div>
+          <div class="mission-foot">
+            <div class="mission-meta" id="missionMeta">오늘 1개 미션</div>
+            <button class="mission-btn" id="missionBtn" onclick="completeMission()">미션 완료</button>
+          </div>
+        </div>
       </div>
 
       <div class="section-head"><div class="section-label">오늘 수업</div><div class="section-sub">TODAY</div></div>
@@ -274,6 +289,66 @@ let me=null, sch={}, ntcData={}, asnData={};
 let calY=new Date().getFullYear(), calM=new Date().getMonth()+1;
 let schY=new Date().getFullYear(), schM=new Date().getMonth()+1;
 let goalEditing=false;
+const missionPools={
+  '입시반':[
+    {title:'기초도형 투시 10분',desc:'육면체·원기둥·원뿔을 서로 다른 각도로 빠르게 그려 형태 감각을 깨워보세요.'},
+    {title:'소재 하나 20분 묘사',desc:'오늘 사용할 소재 하나를 골라 형태·재질·하이라이트까지 집중해서 묘사해보세요.'},
+    {title:'구도 썸네일 6개',desc:'같은 소재로 시점과 크기 대비를 바꾼 작은 구도를 6개 만들어보세요.'},
+    {title:'재질 3종 비교 표현',desc:'금속·유리·플라스틱 중 3가지를 골라 빛 반응 차이를 짧게 표현해보세요.'},
+    {title:'색채 팔레트 5색 만들기',desc:'오늘 작업에 쓸 메인·서브·포인트 컬러를 포함해 5색 팔레트를 만들어보세요.'},
+    {title:'분해결합 아이디어 4개',desc:'공산품 하나를 골라 동물이나 다른 사물로 변형하는 아이디어를 4개 스케치해보세요.'},
+    {title:'주제부 밀도 올리기 15분',desc:'기존 작업에서 가장 중요한 부분 한 곳만 골라 묘사 밀도를 집중적으로 높여보세요.'},
+    {title:'근경 크롭 연습 4개',desc:'소재가 화면 밖으로 크게 잘리는 근경 구도를 4가지 각도로 연습해보세요.'},
+    {title:'명암 대비 강화하기',desc:'기존 그림에서 가장 밝은 곳과 가장 어두운 곳을 명확하게 다시 정리해보세요.'},
+    {title:'제한시간 30분 완성',desc:'소재 2개를 정하고 30분 안에 구도부터 명암까지 한 번에 마무리해보세요.'},
+    {title:'관찰소묘 15분',desc:'복잡한 물체 하나를 정해 외곽선보다 구조와 비례를 먼저 잡아보세요.'},
+    {title:'피드백 1개 즉시 수정',desc:'최근 받은 피드백 중 가장 중요한 한 가지를 골라 오늘 작업에 바로 적용해보세요.'},
+    {title:'같은 소재 다른 시점 3개',desc:'한 소재를 로우앵글·하이앵글·정면 시점으로 각각 빠르게 스케치해보세요.'},
+    {title:'완성작 분석 5분',desc:'좋다고 생각하는 입시작 한 장을 보고 시선 흐름·주제부·색 대비를 각각 한 줄로 적어보세요.'}
+  ],
+  '예비반':[
+    {title:'직선·곡선 손풀기 5분',desc:'긴 직선, S곡선, C곡선을 반복해서 손의 힘을 풀어보세요.'},
+    {title:'타원 30개 그리기',desc:'크기와 기울기를 바꿔 타원을 빠르게 그리며 원기둥 형태의 기본을 잡아보세요.'},
+    {title:'명암 5단계 만들기',desc:'밝음부터 어두움까지 5단계 톤을 끊김 없이 정리해보세요.'},
+    {title:'육면체 3시점 연습',desc:'눈높이 위·아래·같은 높이에서 육면체가 어떻게 달라지는지 그려보세요.'},
+    {title:'사물 비례 재기',desc:'주변 사물 하나를 골라 가로·세로 비율을 눈으로 재고 정확하게 옮겨보세요.'},
+    {title:'질감 하나 집중 표현',desc:'나무·금속·천·유리 중 하나를 선택해 작은 면적에 질감을 표현해보세요.'},
+    {title:'색 혼합 6칸 만들기',desc:'두 색을 골라 혼합 비율을 바꿔 6단계 색 변화를 만들어보세요.'},
+    {title:'정물 2개 배치 스케치',desc:'단순한 사물 2개를 겹치게 배치하고 큰 형태와 공간감을 먼저 잡아보세요.'},
+    {title:'그림자 방향 연습',desc:'광원 방향을 하나 정하고 구·육면체·원기둥의 그림자를 각각 표현해보세요.'},
+    {title:'크로키 3개 3분씩',desc:'사진이나 주변 사물을 보고 각 3분씩 빠르게 형태를 잡아보세요.'},
+    {title:'포인트 컬러 찾기',desc:'좋아하는 그림 한 장에서 가장 시선을 끄는 색을 찾고 왜 그런지 적어보세요.'},
+    {title:'오늘 그림 한 곳 고치기',desc:'오늘 그린 그림에서 가장 어색한 부분 하나만 골라 전후 차이가 보이게 수정해보세요.'}
+  ],
+  '중등반':[
+    {title:'정물 외곽선 10분',desc:'컵이나 신발처럼 익숙한 물건 하나를 골라 비례를 정확하게 관찰해 그려보세요.'},
+    {title:'빛 방향 하나 정하기',desc:'사물 하나에 광원 방향을 정하고 밝음·중간·어두움 세 덩어리로 나눠보세요.'},
+    {title:'연필 압력 5단계',desc:'연필 힘 조절만으로 밝기 5단계를 만들어보세요.'},
+    {title:'사물 3개 크로키',desc:'주변 물건 3개를 각각 3분씩 빠르게 그려 관찰 속도를 높여보세요.'},
+    {title:'표면 질감 따라 그리기',desc:'금속·유리·천 중 하나를 골라 특징적인 질감만 집중해서 표현해보세요.'},
+    {title:'형태 단순화하기',desc:'복잡한 사물을 원·삼각형·사각형 같은 단순 도형으로 바꿔 스케치해보세요.'},
+    {title:'원근감 있는 방 그리기',desc:'소실점 하나를 정하고 책상과 창문이 있는 간단한 공간을 그려보세요.'},
+    {title:'좋아하는 물건 디자인하기',desc:'자주 쓰는 물건 하나를 더 재미있는 형태로 바꿔 3가지 아이디어를 그려보세요.'},
+    {title:'흑백 사진 소묘 15분',desc:'명암이 뚜렷한 사진을 골라 큰 덩어리부터 빠르게 소묘해보세요.'},
+    {title:'색 3개만 써서 표현',desc:'세 가지 색만 골라 작은 그림 하나를 완성해 색 조합 감각을 익혀보세요.'},
+    {title:'관찰 후 안 보고 그리기',desc:'사물을 30초 동안 관찰한 뒤 치우고 기억나는 형태를 그려보세요.'},
+    {title:'내 그림 좋은 점 2개 찾기',desc:'오늘 작업에서 마음에 드는 부분 두 곳을 직접 골라 이유를 적어보세요.'}
+  ],
+  '취미반':[
+    {title:'좋아하는 사물 10분 드로잉',desc:'지금 눈앞에 있는 좋아하는 물건 하나를 편하게 그려보세요.'},
+    {title:'오늘 기분 색 3개',desc:'오늘 기분을 표현하는 색 세 가지를 골라 작은 컬러칩을 만들어보세요.'},
+    {title:'사진 한 장 크로키',desc:'휴대폰 사진 한 장을 골라 10분 안에 핵심 형태만 빠르게 그려보세요.'},
+    {title:'캐릭터 표정 6개',desc:'한 캐릭터로 기쁨·슬픔·화남·놀람·졸림·신남 표정을 그려보세요.'},
+    {title:'한 컷 일러스트 만들기',desc:'오늘 있었던 일을 한 장면으로 단순하게 그려보세요.'},
+    {title:'색 조합 하나 저장',desc:'마음에 드는 사진이나 그림에서 컬러 4개를 뽑아 나만의 팔레트로 저장해보세요.'},
+    {title:'선 하나로 그리기',desc:'펜을 떼지 않고 사물 하나를 끝까지 이어서 그려보세요.'},
+    {title:'내 방에서 소재 찾기',desc:'방 안에서 재미있는 형태의 물건 세 개를 골라 작은 스케치를 남겨보세요.'},
+    {title:'10분 낙서 채우기',desc:'주제 없이 떠오르는 모양과 캐릭터로 한 페이지를 자유롭게 채워보세요.'},
+    {title:'좋아하는 그림 따라 그리기',desc:'좋아하는 작가나 작품의 일부를 짧게 모사하며 선과 색을 관찰해보세요.'},
+    {title:'내일 그리고 싶은 것 저장',desc:'내일 그리고 싶은 주제나 레퍼런스 한 장을 미리 정해두세요.'},
+    {title:'오늘 그림 제목 붙이기',desc:'오늘 만든 그림에 제목을 하나 붙이고 한 문장으로 설명해보세요.'}
+  ]
+};
 
 // ── 인증 ──
 function showAuth(id){document.querySelectorAll('.auth').forEach(v=>v.classList.remove('on'));document.getElementById(id).classList.add('on');}
@@ -344,7 +419,11 @@ function doLogout(){localStorage.removeItem('hwa_user');me=null;location.reload(
 async function enterApp(){
   document.querySelectorAll('.auth').forEach(v=>v.classList.remove('on'));
   document.getElementById('vApp').classList.add('on');
+  const hd=new Date();
+  document.getElementById('hdrDate').textContent=`${hd.getMonth()+1}월 ${hd.getDate()}일 ${DY[hd.getDay()]}요일`;
   document.getElementById('hdrUser').textContent=me.name+' · '+me.cls;
+  const ht=document.querySelector('.home-title');
+  if(ht) ht.innerHTML=`${me.name} <span class="title-accent">${me.cls}</span>`;
   const r=await fetch(`${DB}/schedule_backup.json?_=${Date.now()}`);
   sch=r.ok?(await r.json()||{}):{};
   renderHome();
@@ -353,6 +432,7 @@ async function enterApp(){
   loadGallery();
   loadChat();
   loadGoal();
+  loadMission();
 }
 
 // ── 탭 ──
@@ -443,6 +523,68 @@ function moveCal(dir){
   calM+=dir;if(calM>12){calM=1;calY++;}if(calM<1){calM=12;calY--;}
   document.getElementById('calTitle').textContent=`${calY}년 ${calM}월`;
   renderCal(calY,calM,'calBody');
+}
+
+// ── 오늘의 미션 ──
+function todayKey(){
+  const n=new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+}
+function getMissionPool(){
+  return missionPools[me?.cls]||missionPools['예비반'];
+}
+function getMissionIndex(){
+  const pool=getMissionPool();
+  const n=new Date();
+  const start=new Date(n.getFullYear(),0,1);
+  const base=Math.floor((n-start)/86400000);
+  const uidSeed=[...(me?.uid||'')].reduce((a,c)=>a+c.charCodeAt(0),0);
+  return (base+uidSeed)%pool.length;
+}
+function getMissionStore(){
+  return JSON.parse(localStorage.getItem('hwa_missions_'+me.uid)||'{"completed":[]}');
+}
+function calcStreak(completed){
+  const dates=[...new Set(completed)].sort();
+  if(!dates.length) return 0;
+  let streak=0;
+  let cursor=new Date();
+  cursor.setHours(0,0,0,0);
+  while(true){
+    const key=`${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,'0')}-${String(cursor.getDate()).padStart(2,'0')}`;
+    if(dates.includes(key)){
+      streak++;
+      cursor.setDate(cursor.getDate()-1);
+    }else break;
+  }
+  return streak;
+}
+function loadMission(){
+  if(!me||!document.getElementById('missionTitle')) return;
+  const pool=getMissionPool();
+  const mission=pool[getMissionIndex()];
+  const store=getMissionStore();
+  const tk=todayKey();
+  const done=(store.completed||[]).includes(tk);
+  const streak=calcStreak(store.completed||[]);
+  document.getElementById('missionLabel').textContent=`${me.cls} · 오늘의 랜덤 과제`;
+  document.getElementById('missionTitle').textContent=mission.title;
+  document.getElementById('missionDesc').textContent=mission.desc;
+  document.getElementById('missionStreak').textContent=`🔥 ${streak}일 연속`;
+  document.getElementById('missionMeta').textContent=done?'오늘 미션 완료':'오늘 1개 미션';
+  const btn=document.getElementById('missionBtn');
+  btn.textContent=done?'완료했어요':'미션 완료';
+  btn.className='mission-btn'+(done?' done':'');
+}
+function completeMission(){
+  haptic('medium');
+  const store=getMissionStore();
+  store.completed=store.completed||[];
+  const tk=todayKey();
+  if(!store.completed.includes(tk)) store.completed.push(tk);
+  localStorage.setItem('hwa_missions_'+me.uid, JSON.stringify(store));
+  loadMission();
+  showToast('오늘의 드로잉 미션 완료!','ok');
 }
 
 // ── 목표 ──
