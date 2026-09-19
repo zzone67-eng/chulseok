@@ -187,6 +187,30 @@ button{cursor:pointer}
 .sch-next-wrap{margin:0 16px 14px}.sch-next-card{background:#fff;border:1px solid var(--bd);border-radius:19px;padding:14px 15px;box-shadow:0 4px 14px rgba(0,0,0,.025)}.sch-next-label{font-size:10px;font-weight:900;color:var(--tx3)}.sch-next-title{font-size:17px;font-weight:900;letter-spacing:-.45px;margin-top:4px}.sch-next-meta{font-size:12px;color:var(--tx2);margin-top:5px;line-height:1.65}.sch-next-empty{font-size:12px;color:var(--tx2)}
 .sch-list-head{display:flex;align-items:flex-end;justify-content:space-between;margin:0 20px 10px}.sch-list-head .sch-sec{margin:0}.sch-sub{font-size:11px;color:var(--tx3)}
 
+
+/* ========================= v12 : NEXT CANVAS redesign ========================= */
+#pane-home{padding-top:4px}
+.home-goal-hero{margin:8px 16px 14px;background:#111;color:#fff;border-radius:28px;padding:22px 20px;position:relative;overflow:hidden;box-shadow:0 16px 36px rgba(0,0,0,.12);cursor:pointer}.home-goal-hero.saved{animation:goalSaved .62s ease}.home-goal-hero:after{content:"";position:absolute;width:230px;height:230px;border-radius:50%;right:-115px;top:-135px;background:radial-gradient(circle,rgba(216,57,57,.48),rgba(216,57,57,0) 68%)}.goal-hero-kicker{font-size:10px;font-weight:900;letter-spacing:.12em;color:rgba(255,255,255,.5);position:relative;z-index:1}.goal-hero-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-top:10px;position:relative;z-index:1}.goal-hero-text{font-size:24px;line-height:1.22;font-weight:950;letter-spacing:-.9px;min-width:0}.goal-hero-text.empty{color:rgba(255,255,255,.55);font-size:20px}.goal-hero-dday{font-size:26px;font-weight:950;letter-spacing:-.7px;white-space:nowrap;color:#FF5B5B}.goal-hero-sub{font-size:11px;color:rgba(255,255,255,.58);margin-top:11px;position:relative;z-index:1}.goal-hero-edit{position:absolute;right:16px;bottom:15px;border:0;background:rgba(255,255,255,.09);color:#fff;border-radius:10px;padding:7px 9px;font-size:10px;font-weight:850;z-index:2}
+
+.home-section-head{display:flex;align-items:flex-end;justify-content:space-between;margin:24px 20px 10px}.home-section-title{font-size:17px;font-weight:950;letter-spacing:-.45px}.home-section-en{font-size:9px;font-weight:850;letter-spacing:.09em;color:var(--tx3)}
+.next-canvas{margin:0 16px 14px;background:#fff;border:1px solid var(--bd);border-radius:24px;padding:17px 17px 16px;position:relative;overflow:hidden;box-shadow:0 5px 18px rgba(0,0,0,.035);cursor:pointer;transition:transform .15s,border-color .2s}.next-canvas:active{transform:scale(.987)}.next-canvas:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--red)}.nc-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.nc-badge{font-size:9px;font-weight:950;letter-spacing:.1em;color:var(--red)}.nc-date{font-size:10px;color:var(--tx3)}.nc-title{font-size:20px;font-weight:950;line-height:1.35;letter-spacing:-.55px;margin-top:9px}.nc-title.empty{font-size:16px;color:var(--tx2)}.nc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}.nc-tag{font-size:9px;font-weight:850;padding:5px 7px;border-radius:999px;background:#F3F3F0;color:var(--tx2)}.nc-foot{display:flex;align-items:center;justify-content:space-between;margin-top:14px}.nc-desc{font-size:10px;color:var(--tx3)}.nc-go{border:0;background:#111;color:#fff;border-radius:11px;padding:9px 11px;font-size:10px;font-weight:900}
+
+.home-main-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:0 16px}.home-main-grid .mission-wrap{margin:0}.home-main-grid .mission-card{height:auto;min-height:174px;border-radius:24px;padding:18px}.home-main-grid .mission-title{font-size:21px;margin-top:14px}.home-main-grid .mission-label{font-size:10px}.home-main-grid .mission-streak{font-size:9px;padding:5px 7px}.home-main-grid .mission-desc{font-size:11px;line-height:1.7}.home-main-grid .mission-card.peek{height:auto;min-height:214px}.home-main-grid .mission-btn{font-size:10px;padding:9px 12px;border-radius:11px}
+.home-support-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:10px;margin:10px 16px 0}.home-support-grid #todayCard,.home-support-grid .week-motive{height:100%}.home-support-grid .home-class-card{min-height:108px;padding:15px;border-radius:20px}.home-support-grid .home-class-main{font-size:23px}.home-support-grid .home-class-label{font-size:10px}.home-support-grid .home-class-sub{font-size:11px}.home-support-grid .week-motive{height:auto;min-height:108px;border-radius:20px;padding:14px}.home-support-grid .week-motive-label{font-size:10px}.home-support-grid .week-motive-count{font-size:14px}.home-support-grid .week-bars{gap:4px}.home-support-grid .week-bar{height:6px}.home-support-grid .week-message{display:block;font-size:9px;color:var(--tx3);line-height:1.4}
+.home-cal{margin:0 16px 14px!important;border-radius:24px!important;padding:7px 0 10px!important}.home-cal .cal-head{padding:12px 16px 8px!important}.home-cal .cal-title{font-size:16px!important}.home-cal .cal-nb{width:31px!important;height:31px!important;border-radius:10px!important}.home-cal .cal-grid{padding:0 10px!important}.home-cal .cal-dh span{font-size:10px!important;padding:5px 0!important}.home-cal .cal-body{gap:3px!important}.home-cal .cd{height:42px!important;border-radius:12px!important;font-size:12px!important;gap:3px!important}.home-cal .cd-dot{width:4px!important;height:4px!important}
+.after-fold{margin-top:0}
+.notice-bar{cursor:pointer;transition:max-height .25s,padding .25s}.nb-copy{min-width:0;flex:1}.nb-body{display:none;font-size:10px;line-height:1.55;color:var(--tx2);margin-top:6px;white-space:normal}.notice-bar.expanded{align-items:flex-start}.notice-bar.expanded .nb-body{display:block}.notice-bar.expanded .nb-arr{transform:rotate(90deg)}
+
+/* routine tab */
+.routine-pad{padding:0 16px 32px}.routine-hero{background:#111;color:#fff;border-radius:26px;padding:18px;margin-bottom:12px;position:relative;overflow:hidden}.routine-hero:after{content:"";position:absolute;width:170px;height:170px;border-radius:50%;right:-82px;top:-95px;background:radial-gradient(circle,rgba(216,57,57,.46),rgba(216,57,57,0) 70%)}.routine-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;position:relative;z-index:1}.routine-hero-label{font-size:9px;font-weight:900;letter-spacing:.11em;color:rgba(255,255,255,.5)}.routine-dday{font-size:22px;font-weight:950;color:#FF5B5B}.routine-target{font-size:21px;font-weight:950;letter-spacing:-.6px;line-height:1.3;margin-top:8px;position:relative;z-index:1}.routine-hero-sub{font-size:10px;color:rgba(255,255,255,.58);margin-top:7px;position:relative;z-index:1}.routine-hero button{margin-top:13px;border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:10px;padding:8px 10px;font-size:10px;font-weight:850;position:relative;z-index:1}
+.routine-card{background:#fff;border:1px solid var(--bd);border-radius:24px;padding:17px;margin-bottom:12px;box-shadow:0 5px 18px rgba(0,0,0,.03)}.routine-card-title{font-size:15px;font-weight:950;letter-spacing:-.4px}.routine-card-desc{font-size:10px;color:var(--tx2);line-height:1.6;margin-top:4px}.focus-chip{margin-top:12px;background:#FFF3F3;border-radius:14px;padding:11px 12px;border:1px solid #FFE1E1}.focus-chip-label{font-size:8px;font-weight:950;letter-spacing:.09em;color:var(--red)}.focus-chip-text{font-size:13px;font-weight:900;margin-top:4px;line-height:1.45}.focus-chip-text.empty{color:var(--tx3);font-weight:750}
+.timer-display{font-size:44px;font-weight:950;letter-spacing:-2px;margin:15px 0 14px;font-variant-numeric:tabular-nums}.timer-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.timer-btn{border:0;border-radius:13px;padding:12px;font-size:12px;font-weight:900}.timer-primary{background:#111;color:#fff}.timer-secondary{background:var(--sf2);color:var(--tx)}.timer-finish{margin-top:8px;width:100%;border:1px solid var(--bd);background:#fff;border-radius:13px;padding:11px;font-size:11px;font-weight:900;color:var(--red)}.timer-meta{display:flex;justify-content:space-between;gap:8px;margin-top:12px}.timer-stat{flex:1;background:var(--sf2);border-radius:12px;padding:10px}.timer-stat-label{font-size:8px;color:var(--tx3);font-weight:850}.timer-stat-val{font-size:14px;font-weight:950;margin-top:3px}
+.feedback-tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 10px}.fb-tag{border:1px solid var(--bd);background:#fff;border-radius:999px;padding:7px 9px;font-size:10px;font-weight:850;color:var(--tx2)}.fb-tag.on{background:#111;color:#fff;border-color:#111}.feedback-area{width:100%;min-height:94px;resize:vertical;border:1px solid var(--bd);background:var(--sf2);border-radius:14px;padding:12px;font-size:12px;line-height:1.6;outline:none}.feedback-area:focus{background:#fff;border-color:#222}.feedback-save{width:100%;margin-top:9px;border:0;background:#111;color:#fff;border-radius:13px;padding:12px;font-size:12px;font-weight:900}.feedback-hint{font-size:9px;color:var(--tx3);line-height:1.5;margin-top:8px}
+.feedback-history{display:grid;gap:8px;margin-top:12px}.feedback-item{background:var(--sf2);border-radius:14px;padding:11px 12px}.feedback-item-top{display:flex;justify-content:space-between;gap:8px}.feedback-item-date{font-size:9px;color:var(--tx3)}.feedback-item-tags{font-size:9px;color:var(--red);font-weight:850}.feedback-item-note{font-size:11px;line-height:1.55;margin-top:5px}.routine-empty{font-size:11px;color:var(--tx3);padding:8px 0}
+.routine-loop{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:13px}.loop-step{border-radius:12px;background:var(--sf2);padding:9px 5px;text-align:center;font-size:8px;font-weight:850;color:var(--tx2)}.loop-step.active{background:#111;color:#fff}.loop-arrow{display:none}
+
+@media(max-width:380px){.goal-hero-text{font-size:21px}.goal-hero-dday{font-size:23px}.home-support-grid{grid-template-columns:1fr}.timer-display{font-size:39px}}
+
 </style>
 </head>
 <body>
@@ -250,18 +274,26 @@ button{cursor:pointer}
 
   <main class="scr" id="mainScr">
     <section class="pane on" id="pane-home">
-      <div class="goal-pin" id="goalPin" onclick="openGoalSheet()">
-        <div class="goal-pin-icon">◎</div>
-        <div class="goal-pin-copy">
-          <div class="goal-pin-label">MY GOAL</div>
-          <div class="goal-pin-text empty" id="goalPinText">목표를 입력해보세요</div>
+      <div class="home-goal-hero" id="goalPin" onclick="openGoalSheet()">
+        <div class="goal-hero-kicker">MY TARGET</div>
+        <div class="goal-hero-row">
+          <div class="goal-hero-text empty" id="goalPinText">목표 대학과 시험일을 설정해보세요</div>
+          <div class="goal-hero-dday" id="goalDday"></div>
         </div>
-        <div class="goal-dday" id="goalDday"></div>
-        <button class="goal-pin-edit" type="button" aria-label="목표 편집" onclick="event.stopPropagation();openGoalSheet()">✎</button>
+        <div class="goal-hero-sub">목표를 매일 확인하고 오늘의 작업을 연결합니다.</div>
+        <button class="goal-hero-edit" type="button" onclick="event.stopPropagation();openGoalSheet()">목표 수정</button>
       </div>
 
-      <div class="section-head today-head"><div class="section-label">오늘</div></div>
-      <div class="today-dashboard">
+      <div class="home-section-head"><div class="home-section-title">다음 그림에서 바꿀 것</div><div class="home-section-en">NEXT CANVAS</div></div>
+      <div class="next-canvas" onclick="openRoutineFromHome()">
+        <div class="nc-top"><div class="nc-badge">LAST FEEDBACK → NEXT FOCUS</div><div class="nc-date" id="homeFocusDate"></div></div>
+        <div class="nc-title empty" id="homeFocusText">아직 기록된 피드백이 없어요.</div>
+        <div class="nc-tags" id="homeFocusTags"></div>
+        <div class="nc-foot"><div class="nc-desc">작업을 시작하면 이 피드백을 집중 포인트로 가져갑니다.</div><button class="nc-go" type="button">작업 시작</button></div>
+      </div>
+
+      <div class="home-section-head"><div class="home-section-title">오늘의 작업</div><div class="home-section-en">TODAY</div></div>
+      <div class="home-main-grid">
         <div class="mission-wrap">
           <div class="mission-card" id="missionCard" onclick="toggleMissionDetail(event)">
             <div class="mission-top">
@@ -270,27 +302,25 @@ button{cursor:pointer}
             </div>
             <div class="mission-title" id="missionTitle">오늘의 미션을 불러오는 중입니다.</div>
             <div class="mission-desc" id="missionDesc"></div>
-            <div class="mission-foot">
-              <button class="mission-btn" id="missionBtn" onclick="event.stopPropagation();completeMission()">완료</button>
-            </div>
+            <div class="mission-foot"><button class="mission-btn" id="missionBtn" onclick="event.stopPropagation();completeMission()">완료</button></div>
             <div class="mission-complete-flash" id="missionFlash">✓</div>
           </div>
         </div>
-        <div class="today-wrap" id="todayWrap"><div id="todayCard"></div><div class="week-motive" id="weekMotive" onclick="showWeekMotivation()"><div class="week-motive-top"><div class="week-motive-label">이번 주 작업</div><div class="week-motive-count" id="weekCount">0/5</div></div><div class="week-bars" id="weekBars"></div><div class="week-message" id="weekMessage"></div></div></div>
       </div>
-
-      <div class="cal-wrap home-cal">
-        <div class="cal-head"><div class="cal-title" id="calTitle"></div><div class="cal-navs"><button class="cal-nb" onclick="moveCal(-1)">‹</button><button class="cal-nb" onclick="moveCal(1)">›</button></div></div>
-        <div class="cal-grid"><div class="cal-dh"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="cal-body" id="calBody"></div></div>
-      </div>
-
-      <div class="after-fold">
-        <div class="notice-bar" id="noticeBanner" onclick="switchTab('notice')">
-          <div class="nb-icon"><svg viewBox="0 0 24 24"><path d="M5 10v4h3l7 4V6l-7 4H5Z" stroke="currentColor" fill="none" stroke-linejoin="round"/><path d="M18 9c1.2 1.5 1.2 4.5 0 6" stroke="currentColor" fill="none" stroke-linecap="round"/></svg></div>
-          <div class="nb-txt" id="nbTxt"></div><div class="nb-arr">›</div>
+      <div class="home-support-grid">
+        <div id="todayCard"></div>
+        <div class="week-motive" id="weekMotive" onclick="showWeekMotivation()">
+          <div class="week-motive-top"><div class="week-motive-label">이번 주 작업</div><div class="week-motive-count" id="weekCount">0/5</div></div>
+          <div class="week-bars" id="weekBars"></div><div class="week-message" id="weekMessage">작업 기록을 쌓아보세요.</div>
         </div>
       </div>
 
+      <div class="after-fold">
+        <div class="notice-bar" id="noticeBanner" onclick="toggleNoticeBanner()">
+          <div class="nb-icon"><svg viewBox="0 0 24 24"><path d="M5 10v4h3l7 4V6l-7 4H5Z" stroke="currentColor" fill="none" stroke-linejoin="round"/><path d="M18 9c1.2 1.5 1.2 4.5 0 6" stroke="currentColor" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="nb-copy"><div class="nb-txt" id="nbTxt"></div><div class="nb-body" id="nbBody"></div></div><div class="nb-arr">›</div>
+        </div>
+      </div>
     </section>
 
     <section class="pane" id="pane-schedule">
@@ -304,9 +334,49 @@ button{cursor:pointer}
       </div>
     </section>
 
-    <section class="pane" id="pane-notice">
-      <div class="page-top"><div class="page-title">공지 · 과제</div><div class="page-desc">학원 공지와 과제 마감일을 확인하세요.</div></div>
-      <div class="ntc-pad"><div class="filter-row"><button class="ftab on" onclick="filterNtc('all',this)">전체</button><button class="ftab" onclick="filterNtc('notice',this)">공지</button><button class="ftab" onclick="filterNtc('assign',this)">과제</button></div><div id="ntcContent"></div></div>
+    <section class="pane" id="pane-routine">
+      <div class="page-top"><div class="page-title">루틴</div><div class="page-desc">지난 피드백을 다음 작업에 연결하는 입시 작업 루프입니다.</div></div>
+      <div class="routine-pad">
+        <div class="routine-hero" onclick="openGoalSheet()">
+          <div class="routine-hero-top"><div class="routine-hero-label">TARGET EXAM</div><div class="routine-dday" id="routineDday">목표일 설정</div></div>
+          <div class="routine-target" id="routineTarget">목표를 입력해보세요</div>
+          <div class="routine-hero-sub">시험일까지의 시간을 오늘 작업으로 바꿔보세요.</div>
+          <button type="button" onclick="event.stopPropagation();openGoalSheet()">목표 · 시험일 수정</button>
+        </div>
+
+        <div class="routine-card">
+          <div class="routine-card-title">NEXT CANVAS</div>
+          <div class="routine-card-desc">지난 그림에서 받은 피드백을 다음 작업의 한 가지 집중 포인트로 가져갑니다.</div>
+          <div class="focus-chip"><div class="focus-chip-label">TODAY FOCUS</div><div class="focus-chip-text empty" id="routineFocusText">첫 피드백을 기록하면 여기에 표시됩니다.</div></div>
+          <div class="routine-loop"><div class="loop-step active">① 피드백</div><div class="loop-step">② 작업</div><div class="loop-step">③ 기록</div><div class="loop-step">④ 다음 그림</div></div>
+        </div>
+
+        <div class="routine-card" id="timerCard">
+          <div class="routine-card-title">집중 타이머</div>
+          <div class="routine-card-desc" id="timerFocusCaption">오늘의 집중 포인트를 켜고 작업을 시작하세요.</div>
+          <div class="timer-display" id="timerDisplay">00:00:00</div>
+          <div class="timer-actions"><button class="timer-btn timer-primary" id="timerStartBtn" onclick="toggleTimer()">작업 시작</button><button class="timer-btn timer-secondary" onclick="resetTimer()">초기화</button></div>
+          <button class="timer-finish" onclick="finishTimer()">작업 종료 · 피드백 남기기</button>
+          <div class="timer-meta"><div class="timer-stat"><div class="timer-stat-label">이번 주 집중</div><div class="timer-stat-val" id="weekFocusTime">0분</div></div><div class="timer-stat"><div class="timer-stat-label">이번 주 세션</div><div class="timer-stat-val" id="weekSessionCount">0회</div></div></div>
+        </div>
+
+        <div class="routine-card" id="feedbackCard">
+          <div class="routine-card-title">작업 후 피드백</div>
+          <div class="routine-card-desc">오늘 그림에서 다음 그림까지 반드시 가져갈 한 가지를 남겨보세요.</div>
+          <div class="feedback-tags" id="feedbackTags">
+            <button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'형태')">형태</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'구도')">구도</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'명암')">명암</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'색감')">색감</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'묘사')">묘사</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'완성도')">완성도</button>
+          </div>
+          <textarea class="feedback-area" id="feedbackNote" placeholder="예: 주제부 명암 대비를 한 단계 더 강하게 만들기"></textarea>
+          <button class="feedback-save" onclick="saveFeedback()">다음 그림의 포커스로 저장</button>
+          <div class="feedback-hint">저장한 내용은 홈의 NEXT CANVAS와 다음 타이머 시작 화면에 자동으로 이어집니다.</div>
+        </div>
+
+        <div class="routine-card">
+          <div class="routine-card-title">최근 피드백</div>
+          <div class="routine-card-desc">반복되는 피드백을 확인하면 내가 자주 놓치는 부분이 보입니다.</div>
+          <div class="feedback-history" id="feedbackHistory"></div>
+        </div>
+      </div>
     </section>
 
     <section class="pane" id="pane-chat">
@@ -319,7 +389,7 @@ button{cursor:pointer}
     <div class="tabbar-pill">
       <button class="tbtn on" onclick="switchTab('home',this)" id="tab-home"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20h-6v-6h-4v6H4z"/></svg><span>홈</span></button>
       <button class="tbtn" onclick="switchTab('schedule',this)" id="tab-schedule"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span>시간표</span></button>
-      <button class="tbtn" onclick="switchTab('notice',this)" id="tab-notice"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 7 3 7 3 8H3c0-1 3-1 3-8Z"/><path d="M10 20h4"/></svg><span class="t-badge" id="nbadge"></span><span>공지</span></button>
+      <button class="tbtn" onclick="switchTab('routine',this)" id="tab-routine"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg><span>루틴</span></button>
     </div>
   </nav>
 </div>
@@ -491,10 +561,9 @@ async function enterApp(){
   renderHome();
   renderSchTab();
   loadNotices();
-  loadGallery();
-  loadChat();
   loadGoalPin();
   loadMission();
+  loadRoutine();
 }
 
 // ── 탭 ──
@@ -506,6 +575,7 @@ function switchTab(name,btn){
   if(btn)btn.classList.add('on');
   else document.querySelectorAll('.tbtn').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+name+"'"))b.classList.add('on');});
   document.getElementById('mainScr').scrollTop=0;
+  if(name==='routine')loadRoutine();
 }
 
 // ── 헬퍼 ──
@@ -535,8 +605,6 @@ function renderCal(y,m,bodyId){
 
 // ── 홈 ──
 function renderHome(){
-  document.getElementById('calTitle').textContent=`${calY}년 ${calM}월`;
-  renderCal(calY,calM,'calBody');
 
   const now=new Date(),m=now.getMonth()+1,d=now.getDate(),y=now.getFullYear();
   const dw=DY[now.getDay()];
@@ -687,6 +755,7 @@ function loadMission(){
   const done=(store.completed||[]).includes(tk);
   const streak=calcStreak(store.completed||[]);
   renderWeeklyMotive(store.completed||[]);
+  loadNextCanvas();
   document.getElementById('missionLabel').textContent='랜덤 과제';
   document.getElementById('missionTitle').textContent=mission.title;
   document.getElementById('missionDesc').textContent=mission.desc;
@@ -747,10 +816,10 @@ function loadGoalPin(){
   }
   const t=document.getElementById('goalPinText');
   const d=document.getElementById('goalDday');
-  if(!t||!d)return;
-  t.textContent=g.text||'목표를 입력해보세요';
-  t.className='goal-pin-text'+(g.text?'':' empty');
-  d.textContent=goalDdayText(g.date||'');
+  if(t){t.textContent=g.text||'목표 대학과 시험일을 설정해보세요';t.className='goal-hero-text'+(g.text?'':' empty');}
+  if(d)d.textContent=goalDdayText(g.date||'');
+  const rt=document.getElementById('routineTarget');if(rt)rt.textContent=g.text||'목표를 입력해보세요';
+  const rd=document.getElementById('routineDday');if(rd)rd.textContent=goalDdayText(g.date||'')||'목표일 설정';
 }
 function openGoalSheet(){
   const g=getQuickGoal();
@@ -764,11 +833,11 @@ function saveQuickGoal(){
   const text=document.getElementById('goalQuickText').value.trim();
   const date=document.getElementById('goalQuickDate').value;
   localStorage.setItem(goalStoreKey(),JSON.stringify({text,date}));
-  loadGoalPin();closeGoalSheet();haptic('medium');const pin=document.getElementById('goalPin');if(pin){pin.classList.remove('saved');void pin.offsetWidth;pin.classList.add('saved');}showToast('목표를 고정했어요','ok');
+  loadGoalPin();loadRoutine();closeGoalSheet();haptic('medium');const pin=document.getElementById('goalPin');if(pin){pin.classList.remove('saved');void pin.offsetWidth;pin.classList.add('saved');}showToast('목표를 고정했어요','ok');
 }
 function clearQuickGoal(){
   localStorage.removeItem(goalStoreKey());
-  loadGoalPin();closeGoalSheet();haptic('light');showToast('목표를 지웠어요','info');
+  loadGoalPin();loadRoutine();closeGoalSheet();haptic('light');showToast('목표를 지웠어요','info');
 }
 
 // ── 목표 ──
@@ -825,6 +894,66 @@ function saveGoal(){
   toggleGoalEdit();loadGoal();
   showToast('저장됐습니다 🎯','ok');
 }
+
+
+// ── NEXT CANVAS · 루틴 ──
+let routineTimerSeconds=0, routineTimerRunning=false, routineTimerId=null, selectedFeedbackTags=[];
+function routineStoreKey(){return 'hwa_routine_'+me.uid;}
+function getRoutineStore(){
+  try{return JSON.parse(localStorage.getItem(routineStoreKey())||'{"sessions":[],"feedbacks":[]}');}catch(e){return {sessions:[],feedbacks:[]};}
+}
+function saveRoutineStore(s){localStorage.setItem(routineStoreKey(),JSON.stringify(s));}
+function latestFeedback(){const s=getRoutineStore();return (s.feedbacks||[])[0]||null;}
+function fmtShortDate(iso){try{return new Date(iso).toLocaleDateString('ko',{month:'short',day:'numeric'});}catch(e){return '';}}
+function openRoutineFromHome(){switchTab('routine');setTimeout(()=>{const c=document.getElementById('timerCard');if(c)c.scrollIntoView({behavior:'smooth',block:'start'});},180);}
+function loadNextCanvas(){
+  const fb=latestFeedback();
+  const home=document.getElementById('homeFocusText'),date=document.getElementById('homeFocusDate'),tags=document.getElementById('homeFocusTags');
+  const rFocus=document.getElementById('routineFocusText'),cap=document.getElementById('timerFocusCaption');
+  if(fb){
+    if(home){home.textContent=fb.note;home.className='nc-title';}
+    if(date)date.textContent=fmtShortDate(fb.createdAt);
+    if(tags)tags.innerHTML=(fb.tags||[]).map(t=>`<span class="nc-tag">${t}</span>`).join('');
+    if(rFocus){rFocus.textContent=fb.note;rFocus.className='focus-chip-text';}
+    if(cap)cap.textContent=`오늘 포커스 · ${fb.note}`;
+  }else{
+    if(home){home.textContent='아직 기록된 피드백이 없어요.';home.className='nc-title empty';}
+    if(date)date.textContent='';if(tags)tags.innerHTML='';
+    if(rFocus){rFocus.textContent='첫 피드백을 기록하면 여기에 표시됩니다.';rFocus.className='focus-chip-text empty';}
+    if(cap)cap.textContent='오늘의 집중 포인트를 켜고 작업을 시작하세요.';
+  }
+}
+function formatTimer(sec){const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return [h,m,s].map(v=>String(v).padStart(2,'0')).join(':');}
+function renderTimer(){const d=document.getElementById('timerDisplay');if(d)d.textContent=formatTimer(routineTimerSeconds);const b=document.getElementById('timerStartBtn');if(b)b.textContent=routineTimerRunning?'일시정지':routineTimerSeconds?'계속하기':'작업 시작';}
+function toggleTimer(){
+  if(routineTimerRunning){clearInterval(routineTimerId);routineTimerRunning=false;renderTimer();haptic('light');return;}
+  routineTimerRunning=true;routineTimerId=setInterval(()=>{routineTimerSeconds++;renderTimer();},1000);renderTimer();haptic('medium');
+}
+function resetTimer(){if(routineTimerId)clearInterval(routineTimerId);routineTimerRunning=false;routineTimerSeconds=0;renderTimer();haptic('light');showToast('타이머를 초기화했어요','info');}
+function finishTimer(){
+  if(routineTimerId)clearInterval(routineTimerId);routineTimerRunning=false;
+  if(routineTimerSeconds>0){const st=getRoutineStore();st.sessions=st.sessions||[];st.sessions.unshift({createdAt:new Date().toISOString(),seconds:routineTimerSeconds});saveRoutineStore(st);}
+  const mins=Math.max(1,Math.round(routineTimerSeconds/60));routineTimerSeconds=0;renderTimer();renderRoutineStats();
+  const f=document.getElementById('feedbackCard');if(f)f.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>document.getElementById('feedbackNote')?.focus(),350);haptic('medium');showToast(`작업 ${mins}분 기록 · 피드백을 남겨보세요`,'ok');
+}
+function toggleFeedbackTag(btn,tag){btn.classList.toggle('on');if(btn.classList.contains('on')){if(!selectedFeedbackTags.includes(tag))selectedFeedbackTags.push(tag);}else selectedFeedbackTags=selectedFeedbackTags.filter(t=>t!==tag);haptic('light');}
+function saveFeedback(){
+  const note=document.getElementById('feedbackNote').value.trim();if(!note){showToast('다음 그림에서 바꿀 점을 한 줄 적어주세요','info');return;}
+  const st=getRoutineStore();st.feedbacks=st.feedbacks||[];st.feedbacks.unshift({createdAt:new Date().toISOString(),note,tags:[...selectedFeedbackTags]});st.feedbacks=st.feedbacks.slice(0,30);saveRoutineStore(st);
+  document.getElementById('feedbackNote').value='';selectedFeedbackTags=[];document.querySelectorAll('.fb-tag').forEach(b=>b.classList.remove('on'));loadRoutine();loadNextCanvas();haptic('medium');showToast('다음 그림의 포커스로 저장했어요','ok');
+}
+function weekStartDate(){const n=new Date();n.setHours(0,0,0,0);const day=(n.getDay()+6)%7;n.setDate(n.getDate()-day);return n;}
+function renderRoutineStats(){
+  const st=getRoutineStore(),ws=weekStartDate().getTime();const sessions=(st.sessions||[]).filter(x=>new Date(x.createdAt).getTime()>=ws);const sec=sessions.reduce((a,b)=>a+(b.seconds||0),0);const mins=Math.round(sec/60);
+  const ft=document.getElementById('weekFocusTime');if(ft)ft.textContent=mins>=60?`${Math.floor(mins/60)}시간 ${mins%60}분`:`${mins}분`;
+  const sc=document.getElementById('weekSessionCount');if(sc)sc.textContent=`${sessions.length}회`;
+}
+function renderFeedbackHistory(){
+  const el=document.getElementById('feedbackHistory');if(!el)return;const f=(getRoutineStore().feedbacks||[]).slice(0,5);if(!f.length){el.innerHTML='<div class="routine-empty">아직 피드백 기록이 없습니다.</div>';return;}
+  el.innerHTML=f.map(x=>`<div class="feedback-item"><div class="feedback-item-top"><div class="feedback-item-tags">${(x.tags||[]).join(' · ')||'피드백'}</div><div class="feedback-item-date">${fmtShortDate(x.createdAt)}</div></div><div class="feedback-item-note">${x.note}</div></div>`).join('');
+}
+function loadRoutine(){loadGoalPin();loadNextCanvas();renderTimer();renderRoutineStats();renderFeedbackHistory();}
+function toggleNoticeBanner(){const b=document.getElementById('noticeBanner');if(!b)return;b.classList.toggle('expanded');haptic('light');}
 
 // ── 시간표 탭 ──
 function renderSchTab(){
@@ -883,10 +1012,11 @@ async function loadNotices(){
     const latest=myN[0][1];
     const bar=document.getElementById('noticeBanner');bar.classList.add('show');
     document.getElementById('nbTxt').textContent=(latest.urgent?'🚨 ':'📢 ')+latest.title;
+    const nbBody=document.getElementById('nbBody');if(nbBody)nbBody.textContent=latest.body||'';
   }
   const unread=myN.filter(([id])=>!localStorage.getItem('nr_'+id)).length;
-  if(unread){const b=document.getElementById('nbadge');b.textContent=unread;b.style.display='block';}
-  filterNtc('all');
+  const badge=document.getElementById('nbadge');if(badge&&unread){badge.textContent=unread;badge.style.display='block';}
+  const cont=document.getElementById('ntcContent');if(cont)filterNtc('all');
 }
 function filterNtc(type,btn){
   if(btn){document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
@@ -1103,11 +1233,11 @@ function initSwipe(){
   const scr=document.getElementById('mainScr');
   scr.addEventListener('touchstart',e=>{swipeStartX=e.touches[0].clientX;swipeStartY=e.touches[0].clientY;},{passive:true});
   scr.addEventListener('touchend',e=>{
-    if(!document.getElementById('pane-home').classList.contains('on'))return;
+    if(!document.getElementById('pane-schedule').classList.contains('on'))return;
     const dx=e.changedTouches[0].clientX-swipeStartX;
     const dy=Math.abs(e.changedTouches[0].clientY-swipeStartY);
     if(Math.abs(dx)>60&&dy<40){
-      if(dx<0)moveCal(1);else moveCal(-1);
+      if(dx<0)moveSchMon(1);else moveSchMon(-1);
     }
   },{passive:true});
 }
@@ -1131,11 +1261,11 @@ function initCalClick(){
       cd.animate([{transform:'scale(.88)'},{transform:'scale(1)'}],{duration:180,easing:'ease-out'});
       const cells=[...el.querySelectorAll('.cd')];
       const idx=cells.indexOf(cd);
-      const first=new Date(calY,calM-1,1).getDay();
-      const d=idx-first+1;
-      if(d<1)return;
       const y=id==='calBody'?calY:schY;
       const m=id==='calBody'?calM:schM;
+      const first=new Date(y,m-1,1).getDay();
+      const d=idx-first+1;
+      if(d<1)return;
       openDaySheet(y,m,d);
     });
   });
