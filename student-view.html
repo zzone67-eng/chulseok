@@ -564,7 +564,20 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSyst
     <!-- 갤러리 -->
     <div class="pane" id="pane-gallery">
       <div class="gal-pad">
-        <div class="gal-grid" id="galGrid"></div>
+        <!-- 내 작품 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:15px;font-weight:700;">나의 작품</div>
+          <label style="background:var(--acc);border-radius:10px;color:#fff;font-size:13px;font-weight:700;padding:8px 14px;cursor:pointer;">
+            + 추가
+            <input type="file" accept="image/*" multiple style="display:none;" onchange="addMyPhotos(this)">
+          </label>
+        </div>
+        <div class="gal-grid" id="myGalGrid"></div>
+        <!-- 학원 갤러리 -->
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--bd);">
+          <div style="font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:12px;">학원 갤러리</div>
+          <div class="gal-grid" id="galGrid"></div>
+        </div>
       </div>
     </div>
 
@@ -647,43 +660,6 @@ async function hashPw(pw,name){const b=await crypto.subtle.digest('SHA-256',new 
 function mkUid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 
 async function init(){
-  // ?preview=1 이면 더미 데이터로 미리보기
-  if(new URLSearchParams(location.search).get('preview')==='1'){
-    me={uid:'preview',name:'홍길동',cls:'입시반'};
-    // 더미 시간표 데이터
-    const now=new Date(),m=now.getMonth()+1,nm=m===12?1:m+1;
-    sch[`입시반_홍길동_${m}`]={
-      lessons:[
-        {day:now.getDate(),tim:1},{day:now.getDate(),tim:2},{day:now.getDate(),tim:3},
-        ...Array.from({length:12},(_,i)=>({day:Math.min(now.getDate()+((i%4)+1)*7-((i%4)*5),28),tim:(i%3)+1}))
-      ],
-      special:[{day:Math.min(now.getDate()+5,28),tim:1}],
-      abs:1
-    };
-    sch[`입시반_홍길동_${nm}`]={
-      lessons:Array.from({length:12},(_,i)=>({day:(i*2)+1,tim:(i%3)+1})),
-      special:[],abs:0
-    };
-    document.querySelectorAll('.auth').forEach(v=>v.classList.remove('on'));
-    document.getElementById('vApp').classList.add('on');
-    document.getElementById('hdrUser').textContent='홍길동 · 입시반 (미리보기)';
-    try{document.getElementById('sideMenuName').textContent='홍길동 (미리보기)';}catch(e){}
-    try{document.getElementById('sideMenuCls').textContent='입시반';}catch(e){}
-    renderHome();renderSchTab();
-    // 더미 공지
-    const nb=document.getElementById('noticeBanner');
-    if(nb){nb.classList.add('show');document.getElementById('nbTxt').textContent='📢 10월 수업료 안내 - 납부 기한 10/5';}
-    // 더미 갤러리
-    setTimeout(()=>{
-      try{
-        const grid=document.getElementById('myGalGrid');
-        if(grid)grid.innerHTML='<div class="empty" style="grid-column:1/-1">+ 추가로 첫 작품을 올려보세요!</div>';
-        const ag=document.getElementById('galGrid');
-        if(ag)ag.innerHTML='<div class="empty" style="grid-column:1/-1">학원 갤러리가 비어있습니다</div>';
-      }catch(e){}
-    },100);
-    return;
-  }
   const s=localStorage.getItem('hwa_user');if(!s)return;
   try{
     const u=JSON.parse(s);
@@ -970,6 +946,8 @@ function filterNtc(type,btn){
 
 // ── 갤러리 ──
 async function loadGallery(){
+  if(me)loadMyGallery();
+  if(me)loadMyGallery();
   const r=await fetch(`${DB}/gallery.json?_=${Date.now()}`);
   const data=r.ok?(await r.json()||{}):{};
   const items=Object.entries(data).filter(([_,g])=>!g.cls||g.cls===me.cls||g.cls==='전체').sort((a,b)=>new Date(b[1].createdAt)-new Date(a[1].createdAt));
@@ -980,6 +958,115 @@ async function loadGallery(){
 function openLb(url,cap){document.getElementById('lbImg').src=url;document.getElementById('lbCap').textContent=cap;document.getElementById('lb').classList.add('on');}
 function closeLb(){document.getElementById('lb').classList.remove('on');}
 
+// ── 개인 갤러리 ──
+function loadMyGallery(){
+  const photos=JSON.parse(localStorage.getItem('hwa_photos_'+me.uid)||'[]');
+  const grid=document.getElementById('myGalGrid');
+  if(!grid)return;
+  if(!photos.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1;font-size:13px;padding:16px 0">아직 작품이 없어요<br><span style="color:var(--tx3);font-size:12px">+ 추가로 사진을 업로드해보세요</span></div>';
+    return;
+  }
+  grid.innerHTML=photos.map((p,i)=>`
+    <div class="gal-item">
+      <img src="${p.url}" loading="lazy" onclick="openLb('${p.url}','${(p.caption||'').replace(/'/g,'`')}')">
+      ${p.caption?`<div class="gal-cap">${p.caption}</div>`:''}
+      <button onclick="deleteMyPhoto(${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.65);border:none;color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+    </div>`).join('');
+}
+
+function addMyPhotos(input){
+  const files=Array.from(input.files);
+  if(!files.length)return;
+  let done=0;
+  const photos=JSON.parse(localStorage.getItem('hwa_photos_'+me.uid)||'[]');
+  files.forEach(file=>{
+    if(!file.type.startsWith('image/')){done++;return;}
+    // 이미지 리사이즈 후 base64 저장
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const MAX=1200;
+        let w=img.width,h=img.height;
+        if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        const url=canvas.toDataURL('image/jpeg',0.82);
+        photos.unshift({url,caption:'',createdAt:new Date().toISOString()});
+        done++;
+        if(done===files.length){
+          localStorage.setItem('hwa_photos_'+me.uid,JSON.stringify(photos));
+          loadMyGallery();
+          showToast('사진 '+files.length+'장 추가됐습니다 🎨','ok');
+        }
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value='';
+}
+
+function deleteMyPhoto(i){
+  haptic('medium');
+  if(!confirm('이 사진을 삭제할까요?'))return;
+  const photos=JSON.parse(localStorage.getItem('hwa_photos_'+me.uid)||'[]');
+  photos.splice(i,1);
+  localStorage.setItem('hwa_photos_'+me.uid,JSON.stringify(photos));
+  loadMyGallery();
+  showToast('삭제됐습니다','');
+}
+
+// ── 개인 갤러리 ──
+function loadMyGallery(){
+  const photos=JSON.parse(localStorage.getItem('hwa_photos_'+me.uid)||'[]');
+  const grid=document.getElementById('myGalGrid');
+  if(!grid)return;
+  if(!photos.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1;font-size:13px;padding:16px 0">아직 작품이 없어요<br><span style="color:var(--tx3);font-size:12px">+ 추가로 사진을 업로드해보세요</span></div>';
+    return;
+  }
+  grid.innerHTML=photos.map((p,i)=>`<div class="gal-item"><img src="${p.url}" loading="lazy" onclick="openLb('${p.url}','${(p.caption||'').replace(/'/g,'` ')}">${p.caption?`<div class="gal-cap">${p.caption}</div>`:''}<button onclick="deleteMyPhoto(${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.65);border:none;color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;cursor:pointer;">✕</button></div>`).join('');
+}
+function addMyPhotos(input){
+  const files=Array.from(input.files);if(!files.length)return;
+  let done=0;
+  const photos=JSON.parse(localStorage.getItem('hwa_photos_'+me.uid)||'[]');
+  files.forEach(file=>{
+    if(!file.type.startsWith('image/')){done++;return;}
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const MAX=1200;let w=img.width,h=img.height;
+        if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        const url=canvas.toDataURL('image/jpeg',0.82);
+        photos.unshift({url,caption:'',createdAt:new Date().toISOString()});
+        done++;
+        if(done===files.length){
+          localStorage.setItem('hwa_photos_'+me.uid,JSON.stringify(photos));
+          loadMyGallery();
+          showToast('사진 '+files.length+'장 추가됐습니다 🎨','ok');
+        }
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value='';
+}
+function deleteMyPhoto(i){
+  haptic('medium');
+  if(!confirm('이 사진을 삭제할까요?'))return;
+  const photos=JSON.parse(localStorage.getItem('hwa_photos_'+me.uid)||'[]');
+  photos.splice(i,1);
+  localStorage.setItem('hwa_photos_'+me.uid,JSON.stringify(photos));
+  loadMyGallery();showToast('삭제됐습니다','');
+}
 // ── 상담 ──
 async function loadChat(){
   const r=await fetch(`${DB}/messages/${me.uid}.json?_=${Date.now()}`);

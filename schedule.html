@@ -343,27 +343,30 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 
 </div>
 
-<!-- 승인 관리 모달 -->
+<!-- 회원 관리 모달 -->
 <div class="modal-overlay" id="approvalModal" onclick="closeApproval()">
-  <div class="modal-box" onclick="event.stopPropagation()" style="width:420px;max-height:80vh;overflow-y:auto">
-    <div class="modal-title">가입 승인 관리</div>
-    <div id="pendingList" style="margin-bottom:12px">불러오는 중...</div>
-    <div class="modal-btns">
+  <div class="modal-box" onclick="event.stopPropagation()" style="width:460px;max-height:85vh;display:flex;flex-direction:column;">
+    <div class="modal-title">회원 관리</div>
+    <!-- 탭 -->
+    <div style="display:flex;gap:6px;margin-bottom:16px;">
+      <button id="mtab1" onclick="switchMemberTab('pending')" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">대기중 <span id="pendingCount"></span></button>
+      <button id="mtab2" onclick="switchMemberTab('approved')" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;">승인된 회원</button>
+    </div>
+    <!-- 대기 목록 -->
+    <div id="pendingPanel" style="flex:1;overflow-y:auto;">
+      <div id="pendingList">불러오는 중...</div>
+    </div>
+    <!-- 승인된 회원 목록 -->
+    <div id="approvedPanel" style="flex:1;overflow-y:auto;display:none;">
+      <div id="approvedList">불러오는 중...</div>
+    </div>
+    <div class="modal-btns" style="margin-top:12px;">
       <button type="button" class="modal-btn cancel" onclick="closeApproval()">닫기</button>
     </div>
   </div>
 </div>
 
-<!-- 승인 관리 모달 -->
-<div class="modal-overlay" id="approvalModal" onclick="closeApproval()">
-  <div class="modal-box" onclick="event.stopPropagation()" style="width:420px;max-height:80vh;overflow-y:auto">
-    <div class="modal-title">가입 승인 관리</div>
-    <div id="pendingList" style="margin-bottom:12px">불러오는 중...</div>
-    <div class="modal-btns">
-      <button type="button" class="modal-btn cancel" onclick="closeApproval()">닫기</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- 특이사항 모달 -->
 <div class="modal-overlay" id="specialModal" onclick="closeSpecialModal()">
@@ -521,111 +524,133 @@ let _addingCls='';
 // ── 승인 관리 ──
 async function openApproval(){
   document.getElementById('approvalModal').classList.add('on');
+  switchMemberTab('pending');
+}
+function closeApproval(){document.getElementById('approvalModal').classList.remove('on');}
+
+function switchMemberTab(tab){
+  _memberTab=tab;
+  const t1=document.getElementById('mtab1'),t2=document.getElementById('mtab2');
+  const p1=document.getElementById('pendingPanel'),p2=document.getElementById('approvedPanel');
+  if(tab==='pending'){
+    t1.style.cssText='flex:1;padding:8px;border-radius:8px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-size:13px;font-weight:700;cursor:pointer;';
+    t2.style.cssText='flex:1;padding:8px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;';
+    p1.style.display='block';p2.style.display='none';
+    loadPendingList();
+  }else{
+    t2.style.cssText='flex:1;padding:8px;border-radius:8px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-size:13px;font-weight:700;cursor:pointer;';
+    t1.style.cssText='flex:1;padding:8px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;';
+    p1.style.display='none';p2.style.display='block';
+    loadApprovedList();
+  }
+}
+
+async function loadPendingList(){
   const list=document.getElementById('pendingList');
   list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0">불러오는 중...</div>';
   try{
     const r=await fetch(DB+'/pending_users.json?_='+Date.now());
     const data=await r.json();
     if(!data||!Object.keys(data).length){
-      list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0">대기 중인 가입 신청이 없습니다</div>';
-      document.getElementById('pendingBadge').style.display='none';
-      return;
+      list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0;text-align:center">대기 중인 신청이 없습니다</div>';
+      updatePendingBadge(0);return;
     }
     const entries=Object.entries(data);
-    document.getElementById('pendingBadge').textContent=entries.length;
-    document.getElementById('pendingBadge').style.display='block';
+    updatePendingBadge(entries.length);
+    document.getElementById('pendingCount').textContent='('+entries.length+')';
     list.innerHTML=entries.map(([uid,u])=>`
-      <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
-        <div style="flex:1">
-          <div style="font-size:14px;font-weight:700">${u.name}</div>
-          <div style="font-size:12px;color:var(--tx2)">${u.cls} · ${new Date(u.createdAt).toLocaleDateString('ko')}</div>
+      <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:36px;height:36px;background:var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0">${u.name[0]}</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700">${u.name}</div>
+            <div style="font-size:12px;color:var(--tx2)">${u.cls} · ${new Date(u.createdAt).toLocaleDateString('ko',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+          </div>
         </div>
-        <button onclick="approveUser('${uid}')" style="padding:6px 12px;border-radius:8px;border:none;background:#152A1E;color:var(--green);font-size:12px;font-weight:700;cursor:pointer">승인</button>
-        <button onclick="rejectUser('${uid}')" style="padding:6px 12px;border-radius:8px;border:none;background:#2A1515;color:var(--red);font-size:12px;font-weight:700;cursor:pointer">거절</button>
+        <div style="display:flex;gap:8px;">
+          <button onclick="approveUser('${uid}')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#152A1E;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;">✓ 승인</button>
+          <button onclick="rejectUser('${uid}')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#2A1515;color:var(--red);font-size:13px;font-weight:700;cursor:pointer;">✕ 거절</button>
+        </div>
       </div>`).join('');
   }catch(e){list.innerHTML='<div style="color:var(--red);font-size:13px">오류가 발생했습니다</div>';}
 }
-function closeApproval(){ document.getElementById('approvalModal').classList.remove('on'); }
 
-async function approveUser(uid){
-  try{
-    const r=await fetch(DB+'/pending_users/'+uid+'.json');
-    const u=await r.json();
-    if(!u)return;
-    // approved_users로 이동
-    await fetch(DB+'/approved_users/'+uid+'.json',{method:'PUT',body:JSON.stringify(u),headers:{'Content-Type':'application/json'}});
-    await fetch(DB+'/pending_users/'+uid+'.json',{method:'DELETE'});
-    alert(u.name+' 학생 승인 완료!');
-    openApproval();
-  }catch(e){alert('오류가 발생했습니다.');}
-}
-async function rejectUser(uid){
-  if(!confirm('거절하면 해당 계정이 삭제됩니다. 계속할까요?'))return;
-  await fetch(DB+'/pending_users/'+uid+'.json',{method:'DELETE'});
-  openApproval();
-}
-
-// 페이지 로드 시 대기 건수 확인
-async function checkPendingCount(){
-  try{
-    const r=await fetch(DB+'/pending_users.json?_='+Date.now());
-    const data=await r.json();
-    const cnt=data?Object.keys(data).length:0;
-    const badge=document.getElementById('pendingBadge');
-    if(badge){badge.textContent=cnt;badge.style.display=cnt>0?'block':'none';}
-  }catch(e){}
-}
-
-// ── 승인 관리 ──
-async function openApproval(){
-  document.getElementById('approvalModal').classList.add('on');
-  const list=document.getElementById('pendingList');
+async function loadApprovedList(){
+  const list=document.getElementById('approvedList');
   list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0">불러오는 중...</div>';
   try{
-    const r=await fetch(DB+'/pending_users.json?_='+Date.now());
+    const r=await fetch(DB+'/approved_users.json?_='+Date.now());
     const data=await r.json();
     if(!data||!Object.keys(data).length){
-      list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0">대기 중인 가입 신청이 없습니다</div>';
-      document.getElementById('pendingBadge').style.display='none';
-      return;
+      list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0;text-align:center">승인된 회원이 없습니다</div>';return;
     }
-    const entries=Object.entries(data);
-    document.getElementById('pendingBadge').textContent=entries.length;
-    document.getElementById('pendingBadge').style.display='block';
-    list.innerHTML=entries.map(([uid,u])=>`
-      <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
-        <div style="flex:1">
-          <div style="font-size:14px;font-weight:700">${u.name}</div>
-          <div style="font-size:12px;color:var(--tx2)">${u.cls} · ${new Date(u.createdAt).toLocaleDateString('ko')}</div>
-        </div>
-        <button onclick="approveUser('${uid}')" style="padding:6px 12px;border-radius:8px;border:none;background:#152A1E;color:var(--green);font-size:12px;font-weight:700;cursor:pointer">승인</button>
-        <button onclick="rejectUser('${uid}')" style="padding:6px 12px;border-radius:8px;border:none;background:#2A1515;color:var(--red);font-size:12px;font-weight:700;cursor:pointer">거절</button>
+    const entries=Object.entries(data).sort((a,b)=>(a[1].cls||'').localeCompare(b[1].cls||''));
+    // 반별 그룹핑
+    const byCls={};
+    entries.forEach(([uid,u])=>{if(!byCls[u.cls])byCls[u.cls]=[];byCls[u.cls].push([uid,u]);});
+    list.innerHTML=Object.entries(byCls).map(([cls,members])=>`
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.07em;margin-bottom:8px;">${cls} (${members.length}명)</div>
+        ${members.map(([uid,u])=>`
+          <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;background:var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${u.name[0]}</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;">${u.name}</div>
+              <div style="font-size:11px;color:var(--tx3);">가입: ${u.createdAt?new Date(u.createdAt).toLocaleDateString('ko'):'알 수 없음'}</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button onclick="resetPassword('${uid}','${u.name}')" style="padding:5px 10px;border-radius:7px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:11px;font-weight:600;cursor:pointer;">비번초기화</button>
+              <button onclick="deleteUser('${uid}','${u.name}')" style="padding:5px 10px;border-radius:7px;border:none;background:#2A1515;color:var(--red);font-size:11px;font-weight:600;cursor:pointer;">삭제</button>
+            </div>
+          </div>`).join('')}
       </div>`).join('');
   }catch(e){list.innerHTML='<div style="color:var(--red);font-size:13px">오류가 발생했습니다</div>';}
 }
-function closeApproval(){ document.getElementById('approvalModal').classList.remove('on'); }
+
 async function approveUser(uid){
   try{
     const r=await fetch(DB+'/pending_users/'+uid+'.json');
-    const u=await r.json(); if(!u)return;
+    const u=await r.json();if(!u)return;
     await fetch(DB+'/approved_users/'+uid+'.json',{method:'PUT',body:JSON.stringify(u),headers:{'Content-Type':'application/json'}});
     await fetch(DB+'/pending_users/'+uid+'.json',{method:'DELETE'});
     alert(u.name+' 학생 승인 완료!');
-    openApproval();
+    loadPendingList();
   }catch(e){alert('오류가 발생했습니다.');}
 }
 async function rejectUser(uid){
   if(!confirm('거절하면 해당 계정이 삭제됩니다. 계속할까요?'))return;
   await fetch(DB+'/pending_users/'+uid+'.json',{method:'DELETE'});
-  openApproval();
+  loadPendingList();
+}
+async function deleteUser(uid,name){
+  if(!confirm(name+' 계정을 삭제할까요? 복구할 수 없습니다.'))return;
+  await fetch(DB+'/approved_users/'+uid+'.json',{method:'DELETE'});
+  alert(name+' 계정이 삭제됐습니다.');
+  loadApprovedList();
+}
+async function resetPassword(uid,name){
+  const newPw=prompt(name+' 학생의 새 비밀번호를 입력하세요:');
+  if(!newPw||newPw.length<4){alert('4자 이상 입력해주세요.');return;}
+  try{
+    const r=await fetch(DB+'/approved_users/'+uid+'.json');
+    const u=await r.json();if(!u)return;
+    // SHA-256 해시 (student-view.html과 동일한 방식)
+    const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(newPw+name+'hwagangam2024'));
+    const hash=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    u.pw=hash;
+    await fetch(DB+'/approved_users/'+uid+'.json',{method:'PUT',body:JSON.stringify(u),headers:{'Content-Type':'application/json'}});
+    alert(name+' 비밀번호 초기화 완료. 새 비밀번호: '+newPw);
+  }catch(e){alert('오류가 발생했습니다.');}
+}
+function updatePendingBadge(cnt){
+  const badge=document.getElementById('pendingBadge');
+  if(badge){badge.textContent=cnt;badge.style.display=cnt>0?'block':'none';}
 }
 async function checkPendingCount(){
   try{
     const r=await fetch(DB+'/pending_users.json?_='+Date.now());
     const data=await r.json();
-    const cnt=data?Object.keys(data).length:0;
-    const badge=document.getElementById('pendingBadge');
-    if(badge){badge.textContent=cnt;badge.style.display=cnt>0?'block':'none';}
+    updatePendingBadge(data?Object.keys(data).length:0);
   }catch(e){}
 }
 
