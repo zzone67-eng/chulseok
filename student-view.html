@@ -211,6 +211,43 @@ button{cursor:pointer}
 
 @media(max-width:380px){.goal-hero-text{font-size:21px}.goal-hero-dday{font-size:23px}.home-support-grid{grid-template-columns:1fr}.timer-display{font-size:39px}}
 
+
+/* ========================= v13 : Flow-first redesign ========================= */
+:root{--bg:#F6F4F0;--sf:#FFFFFF;--sf2:#F3F1ED;--sf3:#ECE9E3;--bd:#E8E4DD;--bd2:#D8D3CB;--tx:#151515;--tx2:#6E6A64;--tx3:#A6A098;--red:#FF4D45;--acc:#FF4D45;--black:#141414;--green:#2D8A5A}
+body{background:#EAE7E1}.app{background:var(--bg)}
+.hdr{height:72px;padding:14px 20px;background:rgba(246,244,240,.84);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}.hdr.scrolled{border-bottom-color:rgba(20,20,20,.06);box-shadow:0 4px 18px rgba(20,20,20,.03)}.hdr-date{font-size:10px;color:var(--tx3);font-weight:800}.hdr-user{font-size:17px;font-weight:950;letter-spacing:-.55px;margin-top:4px}.hdr-logout{border-radius:999px;width:38px;height:38px;background:rgba(255,255,255,.72)}
+.scr{padding-bottom:108px}.pane{padding-top:2px}
+
+/* auth */
+.auth{background:var(--bg)}.auth-brand-icon{width:68px;height:68px;border-radius:20px;overflow:hidden;box-shadow:0 10px 24px rgba(20,20,20,.12);margin-bottom:12px}.auth-brand-icon img{width:100%;height:100%;object-fit:cover}.auth-sub{font-size:12px;font-weight:800;color:var(--tx2);margin-bottom:28px}.auth-card{border-radius:28px;border-color:var(--bd);box-shadow:0 16px 44px rgba(20,20,20,.06)}.auth-logo{display:none}
+
+/* common headings */
+.page-kicker,.section-eyebrow{font-size:9px;letter-spacing:.13em;font-weight:950;color:var(--tx3)}.page-title{font-size:30px;font-weight:950;letter-spacing:-1.2px}.page-desc{font-size:11px;color:var(--tx2);line-height:1.55}.v13-page-top{padding:18px 20px 12px}.v13-page-top .page-title{margin-top:4px}.section-title-row{display:flex;align-items:flex-end;justify-content:space-between;margin:28px 20px 11px}.section-title-lg{font-size:20px;font-weight:950;letter-spacing:-.65px;margin-top:3px}
+
+/* home brief = goal + next focus in one surface */
+.brief-card{margin:10px 16px 0;background:linear-gradient(145deg,#171717 0%,#101010 100%);color:#fff;border-radius:30px;padding:20px;position:relative;overflow:hidden;box-shadow:0 18px 42px rgba(20,20,20,.14)}.brief-card:after{content:"";position:absolute;width:270px;height:270px;border-radius:50%;right:-145px;top:-160px;background:radial-gradient(circle,rgba(255,77,69,.56),rgba(255,77,69,0) 68%);pointer-events:none}.brief-top,.brief-target-row,.brief-bottom{position:relative;z-index:1}.brief-top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brief-kicker{font-size:9px;font-weight:950;letter-spacing:.14em;color:rgba(255,255,255,.44)}.brief-dday{font-size:12px;font-weight:950;color:#FF6B64;background:rgba(255,255,255,.08);padding:6px 9px;border-radius:999px;min-height:26px}.brief-dday:empty{display:none}.brief-target-row{display:flex;gap:10px;align-items:flex-start;margin-top:10px}.brief-target{font-size:19px;font-weight:900;letter-spacing:-.55px;line-height:1.35;flex:1}.brief-target.empty{color:rgba(255,255,255,.54);font-size:16px}.brief-edit{width:30px;height:30px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.07);color:#fff;border-radius:10px;font-size:11px}.brief-rule{height:1px;background:rgba(255,255,255,.1);margin:18px 0 15px}.brief-focus-label{font-size:9px;font-weight:950;letter-spacing:.13em;color:#FF6B64;position:relative;z-index:1}.brief-focus{font-size:24px;line-height:1.34;font-weight:950;letter-spacing:-.8px;margin-top:8px;position:relative;z-index:1;max-width:92%}.brief-focus.empty{font-size:17px;color:rgba(255,255,255,.64);font-weight:800}.brief-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;position:relative;z-index:1}.brief-tags .nc-tag{background:rgba(255,255,255,.09);color:rgba(255,255,255,.72);padding:5px 8px}.brief-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:18px}.brief-date{font-size:10px;color:rgba(255,255,255,.38)}.brief-start{border:0;background:#fff;color:#111;border-radius:14px;padding:11px 13px;font-size:11px;font-weight:950;display:flex;align-items:center;gap:8px}.brief-start span{font-size:14px}
+
+/* home task cards */
+.v13-mission{margin:0 16px}.v13-mission .mission-card{min-height:158px;height:auto;border:1px solid var(--bd);border-radius:25px;padding:18px;background:#fff;box-shadow:0 6px 20px rgba(20,20,20,.035)}.v13-mission .mission-card.done{background:#151515;color:#fff;border-color:#151515}.v13-mission .mission-title{font-size:21px;line-height:1.28;margin-top:12px}.v13-mission .mission-desc{font-size:11px;line-height:1.65}.v13-mission .mission-label{font-size:10px}.v13-mission .mission-btn{border-radius:12px;padding:9px 13px}.v13-mission .mission-streak{font-size:9px;padding:5px 7px}
+.home-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 16px 0}.home-class-card{min-height:110px;padding:15px;border-radius:22px;background:#fff;border:1px solid var(--bd);box-shadow:0 5px 18px rgba(20,20,20,.025)}.home-class-card.active{background:#fff;color:var(--tx);border-color:var(--bd);box-shadow:0 5px 18px rgba(20,20,20,.025)}.home-class-card.active:after{display:none}.home-class-card.active .home-class-label{color:var(--tx3)}.home-class-card.active .home-class-sub{color:var(--tx2)}.home-class-card.active .home-class-link{color:var(--red)}.home-class-label{font-size:9px;color:var(--tx3)}.home-class-main{font-size:22px}.home-class-sub{font-size:10px}.home-class-link{font-size:9px}.week-motive{height:auto;min-height:110px;border-radius:22px;padding:15px;border-color:var(--bd);box-shadow:0 5px 18px rgba(20,20,20,.025)}.week-motive-label{font-size:10px}.week-motive-count{font-size:15px}.week-bars{gap:4px}.week-bar{height:6px}.week-message{display:block!important;font-size:9px;color:var(--tx3);line-height:1.4}.home-notice-wrap{margin-top:12px}.home-notice-wrap .notice-bar{margin:0 16px 20px;border-radius:18px;background:rgba(255,255,255,.72);border-color:var(--bd);box-shadow:none}.nb-icon{background:#FFF0EF;color:var(--red)}
+
+/* schedule */
+.v13-sch-pad{padding-bottom:30px}.v13-sch-pad .sch-hero{margin-top:0}.sch-hero-card{border-radius:28px;padding:20px;background:linear-gradient(145deg,#171717,#101010);box-shadow:0 16px 38px rgba(20,20,20,.12)}.sch-hero-num{font-size:48px}.sch-hero-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase}.sch-pill{background:rgba(255,255,255,.08);padding:6px 9px}.schedule-calendar-card{margin:0 16px 12px;background:#fff;border:1px solid var(--bd);border-radius:26px;padding:6px 0 12px;box-shadow:0 6px 22px rgba(20,20,20,.03)}.schedule-calendar-card .sch-month-row{margin:0 4px 2px}.schedule-calendar-card .cal-head{padding:12px 12px 8px}.schedule-calendar-card .cal-grid{padding:0 10px}.schedule-calendar-card .cd{height:43px}.schedule-calendar-card .cd.selected{outline:2px solid #151515;outline-offset:-2px;background:#fff!important;color:#151515!important}.schedule-calendar-card .cd.selected .cd-dot{background:var(--red)}.sch-next-card{border-radius:22px;padding:16px 17px;box-shadow:0 5px 18px rgba(20,20,20,.025)}.sch-next-label{font-size:9px;letter-spacing:.08em}.sch-next-title{font-size:18px}.cls-item{border-radius:19px;padding:15px 16px;margin-bottom:8px}.sch-list-head{margin-top:20px}
+
+/* work tab */
+.work-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 20px 10px}.work-head .page-title{margin-top:4px}.work-target-chip{border:1px solid #FFD5D2;background:#FFF0EF;color:var(--red);border-radius:999px;padding:8px 10px;font-size:11px;font-weight:950;white-space:nowrap;margin-top:4px}.work-target-line{margin:0 16px 12px;background:#fff;border:1px solid var(--bd);border-radius:16px;min-height:48px;padding:0 13px;display:flex;align-items:center;gap:8px;cursor:pointer}.work-target-label{font-size:9px;color:var(--tx3);font-weight:900}.work-target-text{font-size:11px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}.work-target-arrow{font-size:18px;color:var(--tx3)}
+.work-segment{margin:0 16px 14px;background:#EDEAE4;border-radius:14px;padding:4px;display:grid;grid-template-columns:1fr 1fr;gap:4px}.work-seg-btn{border:0;background:transparent;border-radius:11px;padding:9px;font-size:11px;font-weight:900;color:var(--tx2);transition:.18s}.work-seg-btn.on{background:#fff;color:#111;box-shadow:0 3px 10px rgba(20,20,20,.06)}.work-view{display:none;padding:0 16px 30px}.work-view.on{display:block;animation:fadeUp .2s ease both}
+.work-focus-card{background:#fff;border:1px solid var(--bd);border-radius:24px;padding:17px;margin-bottom:10px}.work-focus-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:9px;font-weight:950;color:var(--tx3);letter-spacing:.06em}.work-focus-state{color:var(--red)}.work-focus-text{font-size:20px;font-weight:950;letter-spacing:-.55px;line-height:1.38;margin-top:10px}.work-focus-text.empty{font-size:15px;color:var(--tx2);font-weight:800}.work-focus-caption{font-size:10px;color:var(--tx3);line-height:1.55;margin-top:7px}
+.work-timer-card{background:#151515;color:#fff;border-radius:28px;padding:20px;margin-bottom:10px;position:relative;overflow:hidden;box-shadow:0 16px 34px rgba(20,20,20,.13);transition:.22s}.work-timer-card.is-running{box-shadow:0 18px 42px rgba(255,77,69,.18)}.work-timer-card:after{content:"";position:absolute;width:210px;height:210px;right:-122px;top:-135px;border-radius:50%;background:radial-gradient(circle,rgba(255,77,69,.48),rgba(255,77,69,0) 70%)}.timer-status{font-size:9px;font-weight:950;letter-spacing:.14em;color:#FF6B64;position:relative;z-index:1}.work-timer-card .timer-display{font-size:54px;line-height:1;font-weight:950;margin:18px 0 20px;letter-spacing:-2.8px;position:relative;z-index:1}.work-timer-card .timer-actions{position:relative;z-index:1}.work-timer-card .timer-primary{background:#fff;color:#111}.work-timer-card .timer-secondary{background:rgba(255,255,255,.09);color:#fff}.work-timer-card .timer-finish{position:relative;z-index:1;background:transparent;border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.78)}.work-timer-card .timer-meta{position:relative;z-index:1}.work-timer-card .timer-stat{background:rgba(255,255,255,.08)}.work-timer-card .timer-stat-label{color:rgba(255,255,255,.42)}.work-timer-card .timer-stat-val{color:#fff}
+.feedback-composer{background:#fff;border:1px solid var(--bd);border-radius:25px;padding:18px;box-shadow:0 8px 24px rgba(20,20,20,.04);transition:.24s}.feedback-composer.is-hidden{display:none}.composer-kicker{font-size:9px;font-weight:950;letter-spacing:.12em;color:var(--red);margin-bottom:5px}.feedback-area{min-height:100px;border-radius:15px}.feedback-save{background:#151515;border-radius:14px;padding:13px}
+.history-summary-card,.history-pattern-card,.history-list-card{background:#fff;border:1px solid var(--bd);border-radius:24px;padding:17px;margin-bottom:10px}.history-summary-title{font-size:11px;font-weight:900;color:var(--tx2)}.history-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.history-stats>div{background:var(--sf2);border-radius:15px;padding:13px}.history-stats span{display:block;font-size:9px;color:var(--tx3);font-weight:850}.history-stats strong{display:block;font-size:22px;margin-top:5px;letter-spacing:-.8px}.history-card-head{display:flex;justify-content:space-between;align-items:flex-end}.history-eyebrow{font-size:8px;letter-spacing:.12em;color:var(--tx3);font-weight:950}.history-title{font-size:16px;font-weight:950;letter-spacing:-.45px;margin-top:3px}.feedback-patterns{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}.pattern-pill{border-radius:999px;padding:8px 10px;background:#FFF0EF;color:#C93B35;font-size:10px;font-weight:900}.pattern-pill b{font-size:11px;margin-left:4px}.feedback-history{margin-top:12px}.feedback-item{border-radius:16px;background:var(--sf2);padding:12px 13px}.feedback-item-note{font-size:12px;line-height:1.6}
+
+/* bottom nav */
+.tabbar{padding:8px 14px calc(9px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 72%,rgba(246,244,240,0))}.tabbar-pill{height:64px;border-radius:24px;padding:5px;background:rgba(255,255,255,.9);border-color:rgba(20,20,20,.06);box-shadow:0 14px 36px rgba(20,20,20,.11)}.tbtn{border-radius:19px;font-size:9px;gap:3px}.tbtn.on{background:#151515}.tbtn svg{width:19px;height:19px}
+
+@media(max-width:390px){.brief-focus{font-size:21px}.home-info-grid{grid-template-columns:1fr}.work-timer-card .timer-display{font-size:47px}}
+@media(prefers-reduced-motion:reduce){.work-view,.work-seg-btn,.work-timer-card{animation:none!important;transition:none!important}}
+
 </style>
 </head>
 <body>
@@ -274,26 +311,27 @@ button{cursor:pointer}
 
   <main class="scr" id="mainScr">
     <section class="pane on" id="pane-home">
-      <div class="home-goal-hero" id="goalPin" onclick="openGoalSheet()">
-        <div class="goal-hero-kicker">MY TARGET</div>
-        <div class="goal-hero-row">
-          <div class="goal-hero-text empty" id="goalPinText">목표 대학과 시험일을 설정해보세요</div>
-          <div class="goal-hero-dday" id="goalDday"></div>
+      <div class="brief-card" id="goalPin">
+        <div class="brief-top">
+          <div class="brief-kicker">TODAY BRIEF</div>
+          <div class="brief-dday" id="goalDday"></div>
         </div>
-        <div class="goal-hero-sub">목표를 매일 확인하고 오늘의 작업을 연결합니다.</div>
-        <button class="goal-hero-edit" type="button" onclick="event.stopPropagation();openGoalSheet()">목표 수정</button>
+        <div class="brief-target-row">
+          <div class="brief-target empty" id="goalPinText">목표 대학과 시험일을 설정해보세요</div>
+          <button class="brief-edit" type="button" aria-label="목표 수정" onclick="event.stopPropagation();openGoalSheet()">✎</button>
+        </div>
+        <div class="brief-rule"></div>
+        <div class="brief-focus-label">NEXT FOCUS</div>
+        <div class="brief-focus empty" id="homeFocusText">첫 작업 피드백을 남기면 다음 그림의 집중 포인트가 여기에 이어집니다.</div>
+        <div class="brief-tags" id="homeFocusTags"></div>
+        <div class="brief-bottom">
+          <div class="brief-date" id="homeFocusDate"></div>
+          <button class="brief-start" type="button" onclick="event.stopPropagation();openRoutineFromHome()">집중 작업 시작 <span>↗</span></button>
+        </div>
       </div>
 
-      <div class="home-section-head"><div class="home-section-title">다음 그림에서 바꿀 것</div><div class="home-section-en">NEXT CANVAS</div></div>
-      <div class="next-canvas" onclick="openRoutineFromHome()">
-        <div class="nc-top"><div class="nc-badge">LAST FEEDBACK → NEXT FOCUS</div><div class="nc-date" id="homeFocusDate"></div></div>
-        <div class="nc-title empty" id="homeFocusText">아직 기록된 피드백이 없어요.</div>
-        <div class="nc-tags" id="homeFocusTags"></div>
-        <div class="nc-foot"><div class="nc-desc">작업을 시작하면 이 피드백을 집중 포인트로 가져갑니다.</div><button class="nc-go" type="button">작업 시작</button></div>
-      </div>
-
-      <div class="home-section-head"><div class="home-section-title">오늘의 작업</div><div class="home-section-en">TODAY</div></div>
-      <div class="home-main-grid">
+      <div class="section-title-row"><div><div class="section-eyebrow">TODAY</div><div class="section-title-lg">오늘 할 일</div></div></div>
+      <div class="home-main-grid v13-mission">
         <div class="mission-wrap">
           <div class="mission-card" id="missionCard" onclick="toggleMissionDetail(event)">
             <div class="mission-top">
@@ -307,15 +345,17 @@ button{cursor:pointer}
           </div>
         </div>
       </div>
-      <div class="home-support-grid">
+
+      <div class="home-info-grid">
         <div id="todayCard"></div>
         <div class="week-motive" id="weekMotive" onclick="showWeekMotivation()">
-          <div class="week-motive-top"><div class="week-motive-label">이번 주 작업</div><div class="week-motive-count" id="weekCount">0/5</div></div>
-          <div class="week-bars" id="weekBars"></div><div class="week-message" id="weekMessage">작업 기록을 쌓아보세요.</div>
+          <div class="week-motive-top"><div class="week-motive-label">이번 주 루틴</div><div class="week-motive-count" id="weekCount">0/5</div></div>
+          <div class="week-bars" id="weekBars"></div>
+          <div class="week-message" id="weekMessage">한 번씩 쌓아보세요.</div>
         </div>
       </div>
 
-      <div class="after-fold">
+      <div class="home-notice-wrap">
         <div class="notice-bar" id="noticeBanner" onclick="toggleNoticeBanner()">
           <div class="nb-icon"><svg viewBox="0 0 24 24"><path d="M5 10v4h3l7 4V6l-7 4H5Z" stroke="currentColor" fill="none" stroke-linejoin="round"/><path d="M18 9c1.2 1.5 1.2 4.5 0 6" stroke="currentColor" fill="none" stroke-linecap="round"/></svg></div>
           <div class="nb-copy"><div class="nb-txt" id="nbTxt"></div><div class="nb-body" id="nbBody"></div></div><div class="nb-arr">›</div>
@@ -324,56 +364,68 @@ button{cursor:pointer}
     </section>
 
     <section class="pane" id="pane-schedule">
-      <div class="page-top tight"><div class="page-title">시간표</div><div class="page-desc">정규 타임 요약부터 월간 일정까지 한 번에 확인하세요.</div></div>
-      <div class="sch-pad">
+      <div class="page-top v13-page-top"><div class="page-kicker">SCHEDULE</div><div class="page-title">시간표</div><div class="page-desc">월간 수업량과 날짜별 시간을 한 흐름에서 확인하세요.</div></div>
+      <div class="sch-pad v13-sch-pad">
         <div class="sch-hero" id="schHero"></div>
-        <div class="sch-month-row"><div class="cal-head"><div class="cal-title" id="schTitle"></div><div class="cal-navs"><button class="cal-nb" onclick="moveSchMon(-1)">‹</button><button class="cal-nb" onclick="moveSchMon(1)">›</button></div></div></div>
-        <div class="cal-wrap"><div class="cal-grid"><div class="cal-dh"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="cal-body" id="schCalBody"></div></div></div>
+        <div class="schedule-calendar-card">
+          <div class="sch-month-row"><div class="cal-head"><div class="cal-title" id="schTitle"></div><div class="cal-navs"><button class="cal-nb" onclick="moveSchMon(-1)">‹</button><button class="cal-nb" onclick="moveSchMon(1)">›</button></div></div></div>
+          <div class="cal-grid"><div class="cal-dh"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="cal-body" id="schCalBody"></div></div>
+        </div>
         <div class="sch-next-wrap"><div class="sch-next-card" id="schNext"></div></div>
-        <div class="sch-list-head"><div class="sch-sec">이번 달 상세</div><div class="sch-sub" id="schDayCount"></div></div><div id="schList"></div>
+        <div class="sch-list-head"><div class="sch-sec">이번 달 전체</div><div class="sch-sub" id="schDayCount"></div></div><div id="schList"></div>
       </div>
     </section>
 
     <section class="pane" id="pane-routine">
-      <div class="page-top"><div class="page-title">루틴</div><div class="page-desc">지난 피드백을 다음 작업에 연결하는 입시 작업 루프입니다.</div></div>
-      <div class="routine-pad">
-        <div class="routine-hero" onclick="openGoalSheet()">
-          <div class="routine-hero-top"><div class="routine-hero-label">TARGET EXAM</div><div class="routine-dday" id="routineDday">목표일 설정</div></div>
-          <div class="routine-target" id="routineTarget">목표를 입력해보세요</div>
-          <div class="routine-hero-sub">시험일까지의 시간을 오늘 작업으로 바꿔보세요.</div>
-          <button type="button" onclick="event.stopPropagation();openGoalSheet()">목표 · 시험일 수정</button>
+      <div class="work-head">
+        <div><div class="page-kicker">NEXT CANVAS</div><div class="page-title">작업</div><div class="page-desc">지난 피드백을 켜고 작업한 뒤, 다음 그림에 한 줄을 남깁니다.</div></div>
+        <button class="work-target-chip" type="button" onclick="openGoalSheet()"><span id="routineDday">목표일</span></button>
+      </div>
+      <div class="work-target-line" onclick="openGoalSheet()"><span class="work-target-label">목표</span><span class="work-target-text" id="routineTarget">목표를 입력해보세요</span><span class="work-target-arrow">›</span></div>
+
+      <div class="work-segment" role="tablist">
+        <button class="work-seg-btn on" id="workSegWork" type="button" onclick="switchWorkView('work',this)">작업</button>
+        <button class="work-seg-btn" id="workSegHistory" type="button" onclick="switchWorkView('history',this)">기록</button>
+      </div>
+
+      <div class="work-view on" id="workView">
+        <div class="work-focus-card">
+          <div class="work-focus-top"><span>오늘의 포커스</span><span class="work-focus-state" id="workFocusState">READY</span></div>
+          <div class="work-focus-text empty" id="routineFocusText">첫 피드백을 기록하면 여기에 표시됩니다.</div>
+          <div class="work-focus-caption" id="timerFocusCaption">포커스를 켜고 한 번의 작업에 집중해보세요.</div>
         </div>
 
-        <div class="routine-card">
-          <div class="routine-card-title">NEXT CANVAS</div>
-          <div class="routine-card-desc">지난 그림에서 받은 피드백을 다음 작업의 한 가지 집중 포인트로 가져갑니다.</div>
-          <div class="focus-chip"><div class="focus-chip-label">TODAY FOCUS</div><div class="focus-chip-text empty" id="routineFocusText">첫 피드백을 기록하면 여기에 표시됩니다.</div></div>
-          <div class="routine-loop"><div class="loop-step active">① 피드백</div><div class="loop-step">② 작업</div><div class="loop-step">③ 기록</div><div class="loop-step">④ 다음 그림</div></div>
-        </div>
-
-        <div class="routine-card" id="timerCard">
-          <div class="routine-card-title">집중 타이머</div>
-          <div class="routine-card-desc" id="timerFocusCaption">오늘의 집중 포인트를 켜고 작업을 시작하세요.</div>
+        <div class="work-timer-card" id="timerCard">
+          <div class="timer-status" id="timerStateLabel">READY</div>
           <div class="timer-display" id="timerDisplay">00:00:00</div>
           <div class="timer-actions"><button class="timer-btn timer-primary" id="timerStartBtn" onclick="toggleTimer()">작업 시작</button><button class="timer-btn timer-secondary" onclick="resetTimer()">초기화</button></div>
           <button class="timer-finish" onclick="finishTimer()">작업 종료 · 피드백 남기기</button>
           <div class="timer-meta"><div class="timer-stat"><div class="timer-stat-label">이번 주 집중</div><div class="timer-stat-val" id="weekFocusTime">0분</div></div><div class="timer-stat"><div class="timer-stat-label">이번 주 세션</div><div class="timer-stat-val" id="weekSessionCount">0회</div></div></div>
         </div>
 
-        <div class="routine-card" id="feedbackCard">
-          <div class="routine-card-title">작업 후 피드백</div>
-          <div class="routine-card-desc">오늘 그림에서 다음 그림까지 반드시 가져갈 한 가지를 남겨보세요.</div>
+        <div class="feedback-composer is-hidden" id="feedbackCard">
+          <div class="composer-kicker">SESSION REVIEW</div>
+          <div class="routine-card-title">다음 그림에 가져갈 한 가지</div>
+          <div class="routine-card-desc">길게 쓰지 않아도 됩니다. 다음 작업에서 실제로 바꿀 한 문장만 남기세요.</div>
           <div class="feedback-tags" id="feedbackTags">
             <button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'형태')">형태</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'구도')">구도</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'명암')">명암</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'색감')">색감</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'묘사')">묘사</button><button class="fb-tag" type="button" onclick="toggleFeedbackTag(this,'완성도')">완성도</button>
           </div>
           <textarea class="feedback-area" id="feedbackNote" placeholder="예: 주제부 명암 대비를 한 단계 더 강하게 만들기"></textarea>
-          <button class="feedback-save" onclick="saveFeedback()">다음 그림의 포커스로 저장</button>
-          <div class="feedback-hint">저장한 내용은 홈의 NEXT CANVAS와 다음 타이머 시작 화면에 자동으로 이어집니다.</div>
+          <button class="feedback-save" onclick="saveFeedback()">NEXT FOCUS로 저장</button>
         </div>
+      </div>
 
-        <div class="routine-card">
-          <div class="routine-card-title">최근 피드백</div>
-          <div class="routine-card-desc">반복되는 피드백을 확인하면 내가 자주 놓치는 부분이 보입니다.</div>
+      <div class="work-view" id="historyView">
+        <div class="history-summary-card">
+          <div class="history-summary-title">이번 주 기록</div>
+          <div class="history-stats"><div><span>집중</span><strong id="historyWeekFocus">0분</strong></div><div><span>세션</span><strong id="historyWeekSessions">0회</strong></div></div>
+        </div>
+        <div class="history-pattern-card">
+          <div class="history-card-head"><div><div class="history-eyebrow">PATTERN</div><div class="history-title">반복되는 피드백</div></div></div>
+          <div class="feedback-patterns" id="feedbackPatterns"><div class="routine-empty">피드백이 쌓이면 자주 나오는 항목을 보여드려요.</div></div>
+        </div>
+        <div class="history-list-card">
+          <div class="history-card-head"><div><div class="history-eyebrow">RECENT</div><div class="history-title">최근 피드백</div></div></div>
           <div class="feedback-history" id="feedbackHistory"></div>
         </div>
       </div>
@@ -389,7 +441,7 @@ button{cursor:pointer}
     <div class="tabbar-pill">
       <button class="tbtn on" onclick="switchTab('home',this)" id="tab-home"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20h-6v-6h-4v6H4z"/></svg><span>홈</span></button>
       <button class="tbtn" onclick="switchTab('schedule',this)" id="tab-schedule"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span>시간표</span></button>
-      <button class="tbtn" onclick="switchTab('routine',this)" id="tab-routine"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg><span>루틴</span></button>
+      <button class="tbtn" onclick="switchTab('routine',this)" id="tab-routine"><svg viewBox="0 0 24 24"><path d="M5 19l3.5-.8L18 8.7 15.3 6 5.8 15.5 5 19Z"/><path d="M13.8 7.5l2.7 2.7M5 21h14"/></svg><span>작업</span></button>
     </div>
   </nav>
 </div>
@@ -420,6 +472,7 @@ const DY=['일','월','화','수','목','금','토'];
 let me=null, sch={}, ntcData={}, asnData={};
 let calY=new Date().getFullYear(), calM=new Date().getMonth()+1;
 let schY=new Date().getFullYear(), schM=new Date().getMonth()+1;
+let schSelectedDay=null;
 let goalEditing=false;
 const missionPools={
   '입시반':[
@@ -575,7 +628,7 @@ function switchTab(name,btn){
   if(btn)btn.classList.add('on');
   else document.querySelectorAll('.tbtn').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+name+"'"))b.classList.add('on');});
   document.getElementById('mainScr').scrollTop=0;
-  if(name==='routine')loadRoutine();
+  if(name==='routine'){loadRoutine();if(!document.getElementById('historyView')?.classList.contains('on'))switchWorkView('work');}
 }
 
 // ── 헬퍼 ──
@@ -816,7 +869,7 @@ function loadGoalPin(){
   }
   const t=document.getElementById('goalPinText');
   const d=document.getElementById('goalDday');
-  if(t){t.textContent=g.text||'목표 대학과 시험일을 설정해보세요';t.className='goal-hero-text'+(g.text?'':' empty');}
+  if(t){t.textContent=g.text||'목표 대학과 시험일을 설정해보세요';t.className='brief-target'+(g.text?'':' empty');}
   if(d)d.textContent=goalDdayText(g.date||'');
   const rt=document.getElementById('routineTarget');if(rt)rt.textContent=g.text||'목표를 입력해보세요';
   const rd=document.getElementById('routineDday');if(rd)rd.textContent=goalDdayText(g.date||'')||'목표일 설정';
@@ -905,54 +958,83 @@ function getRoutineStore(){
 function saveRoutineStore(s){localStorage.setItem(routineStoreKey(),JSON.stringify(s));}
 function latestFeedback(){const s=getRoutineStore();return (s.feedbacks||[])[0]||null;}
 function fmtShortDate(iso){try{return new Date(iso).toLocaleDateString('ko',{month:'short',day:'numeric'});}catch(e){return '';}}
-function openRoutineFromHome(){switchTab('routine');setTimeout(()=>{const c=document.getElementById('timerCard');if(c)c.scrollIntoView({behavior:'smooth',block:'start'});},180);}
+function openRoutineFromHome(){switchTab('routine');switchWorkView('work');setTimeout(()=>{const c=document.getElementById('timerCard');if(c)c.scrollIntoView({behavior:'smooth',block:'center'});},160);}
 function loadNextCanvas(){
   const fb=latestFeedback();
   const home=document.getElementById('homeFocusText'),date=document.getElementById('homeFocusDate'),tags=document.getElementById('homeFocusTags');
   const rFocus=document.getElementById('routineFocusText'),cap=document.getElementById('timerFocusCaption');
   if(fb){
-    if(home){home.textContent=fb.note;home.className='nc-title';}
+    if(home){home.textContent=fb.note;home.className='brief-focus';}
     if(date)date.textContent=fmtShortDate(fb.createdAt);
     if(tags)tags.innerHTML=(fb.tags||[]).map(t=>`<span class="nc-tag">${t}</span>`).join('');
-    if(rFocus){rFocus.textContent=fb.note;rFocus.className='focus-chip-text';}
+    if(rFocus){rFocus.textContent=fb.note;rFocus.className='work-focus-text';}
     if(cap)cap.textContent=`오늘 포커스 · ${fb.note}`;
   }else{
-    if(home){home.textContent='아직 기록된 피드백이 없어요.';home.className='nc-title empty';}
+    if(home){home.textContent='첫 작업 피드백을 남기면 다음 그림의 집중 포인트가 여기에 이어집니다.';home.className='brief-focus empty';}
     if(date)date.textContent='';if(tags)tags.innerHTML='';
-    if(rFocus){rFocus.textContent='첫 피드백을 기록하면 여기에 표시됩니다.';rFocus.className='focus-chip-text empty';}
+    if(rFocus){rFocus.textContent='첫 피드백을 기록하면 여기에 표시됩니다.';rFocus.className='work-focus-text empty';}
     if(cap)cap.textContent='오늘의 집중 포인트를 켜고 작업을 시작하세요.';
   }
 }
 function formatTimer(sec){const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return [h,m,s].map(v=>String(v).padStart(2,'0')).join(':');}
-function renderTimer(){const d=document.getElementById('timerDisplay');if(d)d.textContent=formatTimer(routineTimerSeconds);const b=document.getElementById('timerStartBtn');if(b)b.textContent=routineTimerRunning?'일시정지':routineTimerSeconds?'계속하기':'작업 시작';}
+function renderTimer(){
+  const d=document.getElementById('timerDisplay');if(d)d.textContent=formatTimer(routineTimerSeconds);
+  const b=document.getElementById('timerStartBtn');if(b)b.textContent=routineTimerRunning?'일시정지':routineTimerSeconds?'계속하기':'작업 시작';
+  const state=document.getElementById('timerStateLabel'),focusState=document.getElementById('workFocusState'),card=document.getElementById('timerCard');
+  const label=routineTimerRunning?'FOCUSING':routineTimerSeconds?'PAUSED':'READY';
+  if(state)state.textContent=label;if(focusState)focusState.textContent=label;if(card)card.classList.toggle('is-running',routineTimerRunning);
+}
 function toggleTimer(){
   if(routineTimerRunning){clearInterval(routineTimerId);routineTimerRunning=false;renderTimer();haptic('light');return;}
   routineTimerRunning=true;routineTimerId=setInterval(()=>{routineTimerSeconds++;renderTimer();},1000);renderTimer();haptic('medium');
 }
-function resetTimer(){if(routineTimerId)clearInterval(routineTimerId);routineTimerRunning=false;routineTimerSeconds=0;renderTimer();haptic('light');showToast('타이머를 초기화했어요','info');}
+function resetTimer(){
+  if(routineTimerId)clearInterval(routineTimerId);routineTimerRunning=false;routineTimerSeconds=0;renderTimer();haptic('light');showToast('타이머를 초기화했어요','info');
+}
 function finishTimer(){
+  if(routineTimerSeconds<=0){showToast('작업을 시작한 뒤 종료해주세요','info');return;}
   if(routineTimerId)clearInterval(routineTimerId);routineTimerRunning=false;
-  if(routineTimerSeconds>0){const st=getRoutineStore();st.sessions=st.sessions||[];st.sessions.unshift({createdAt:new Date().toISOString(),seconds:routineTimerSeconds});saveRoutineStore(st);}
+  const st=getRoutineStore();st.sessions=st.sessions||[];st.sessions.unshift({createdAt:new Date().toISOString(),seconds:routineTimerSeconds});saveRoutineStore(st);
   const mins=Math.max(1,Math.round(routineTimerSeconds/60));routineTimerSeconds=0;renderTimer();renderRoutineStats();
-  const f=document.getElementById('feedbackCard');if(f)f.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>document.getElementById('feedbackNote')?.focus(),350);haptic('medium');showToast(`작업 ${mins}분 기록 · 피드백을 남겨보세요`,'ok');
+  const f=document.getElementById('feedbackCard');if(f){f.classList.remove('is-hidden');setTimeout(()=>f.scrollIntoView({behavior:'smooth',block:'center'}),60);}setTimeout(()=>document.getElementById('feedbackNote')?.focus(),420);haptic('medium');showToast(`작업 ${mins}분 기록 · 다음 그림에 한 줄을 남겨보세요`,'ok');
 }
 function toggleFeedbackTag(btn,tag){btn.classList.toggle('on');if(btn.classList.contains('on')){if(!selectedFeedbackTags.includes(tag))selectedFeedbackTags.push(tag);}else selectedFeedbackTags=selectedFeedbackTags.filter(t=>t!==tag);haptic('light');}
 function saveFeedback(){
   const note=document.getElementById('feedbackNote').value.trim();if(!note){showToast('다음 그림에서 바꿀 점을 한 줄 적어주세요','info');return;}
   const st=getRoutineStore();st.feedbacks=st.feedbacks||[];st.feedbacks.unshift({createdAt:new Date().toISOString(),note,tags:[...selectedFeedbackTags]});st.feedbacks=st.feedbacks.slice(0,30);saveRoutineStore(st);
-  document.getElementById('feedbackNote').value='';selectedFeedbackTags=[];document.querySelectorAll('.fb-tag').forEach(b=>b.classList.remove('on'));loadRoutine();loadNextCanvas();haptic('medium');showToast('다음 그림의 포커스로 저장했어요','ok');
+  document.getElementById('feedbackNote').value='';selectedFeedbackTags=[];document.querySelectorAll('.fb-tag').forEach(b=>b.classList.remove('on'));
+  const composer=document.getElementById('feedbackCard');if(composer)composer.classList.add('is-hidden');
+  loadRoutine();loadNextCanvas();haptic('medium');showToast('다음 그림의 포커스로 이어졌어요','ok');
 }
 function weekStartDate(){const n=new Date();n.setHours(0,0,0,0);const day=(n.getDay()+6)%7;n.setDate(n.getDate()-day);return n;}
 function renderRoutineStats(){
   const st=getRoutineStore(),ws=weekStartDate().getTime();const sessions=(st.sessions||[]).filter(x=>new Date(x.createdAt).getTime()>=ws);const sec=sessions.reduce((a,b)=>a+(b.seconds||0),0);const mins=Math.round(sec/60);
-  const ft=document.getElementById('weekFocusTime');if(ft)ft.textContent=mins>=60?`${Math.floor(mins/60)}시간 ${mins%60}분`:`${mins}분`;
+  const timeText=mins>=60?`${Math.floor(mins/60)}시간 ${mins%60}분`:`${mins}분`;
+  const ft=document.getElementById('weekFocusTime');if(ft)ft.textContent=timeText;
   const sc=document.getElementById('weekSessionCount');if(sc)sc.textContent=`${sessions.length}회`;
+  const hft=document.getElementById('historyWeekFocus');if(hft)hft.textContent=timeText;
+  const hsc=document.getElementById('historyWeekSessions');if(hsc)hsc.textContent=`${sessions.length}회`;
 }
 function renderFeedbackHistory(){
   const el=document.getElementById('feedbackHistory');if(!el)return;const f=(getRoutineStore().feedbacks||[]).slice(0,5);if(!f.length){el.innerHTML='<div class="routine-empty">아직 피드백 기록이 없습니다.</div>';return;}
   el.innerHTML=f.map(x=>`<div class="feedback-item"><div class="feedback-item-top"><div class="feedback-item-tags">${(x.tags||[]).join(' · ')||'피드백'}</div><div class="feedback-item-date">${fmtShortDate(x.createdAt)}</div></div><div class="feedback-item-note">${x.note}</div></div>`).join('');
 }
-function loadRoutine(){loadGoalPin();loadNextCanvas();renderTimer();renderRoutineStats();renderFeedbackHistory();}
+function renderFeedbackPatterns(){
+  const el=document.getElementById('feedbackPatterns');if(!el)return;
+  const all=(getRoutineStore().feedbacks||[]).slice(0,30),counts={};
+  all.forEach(x=>(x.tags||[]).forEach(t=>counts[t]=(counts[t]||0)+1));
+  const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  el.innerHTML=rows.length?rows.map(([tag,count])=>`<div class="pattern-pill">${tag}<b>${count}</b></div>`).join(''):'<div class="routine-empty">피드백이 쌓이면 자주 나오는 항목을 보여드려요.</div>';
+}
+function switchWorkView(view,btn){
+  const work=document.getElementById('workView'),history=document.getElementById('historyView');if(!work||!history)return;
+  const isHistory=view==='history';work.classList.toggle('on',!isHistory);history.classList.toggle('on',isHistory);
+  document.querySelectorAll('.work-seg-btn').forEach(b=>b.classList.remove('on'));
+  const target=btn||document.getElementById(isHistory?'workSegHistory':'workSegWork');if(target)target.classList.add('on');
+  if(isHistory){renderRoutineStats();renderFeedbackHistory();renderFeedbackPatterns();}
+  haptic('light');
+}
+function loadRoutine(){loadGoalPin();loadNextCanvas();renderTimer();renderRoutineStats();renderFeedbackHistory();renderFeedbackPatterns();}
 function toggleNoticeBanner(){const b=document.getElementById('noticeBanner');if(!b)return;b.classList.toggle('expanded');haptic('light');}
 
 // ── 시간표 탭 ──
@@ -963,44 +1045,30 @@ function renderSchTab(){
   const reg=sd.lessons||[],sp=sd.special||[],absT=sd.abs||0;
   const bd={};
   [...reg,...sp].forEach(l=>{if(!bd[l.day])bd[l.day]={r:[],s:[]};if(reg.some(x=>x.day===l.day&&x.tim===l.tim))bd[l.day].r.push(l.tim);else bd[l.day].s.push(l.tim);});
-  const days=Object.keys(bd).map(Number).sort((a,b)=>a-b);
-  const total=reg.length+sp.length-absT;
-  document.getElementById('schHero').innerHTML=`
-    <div class="sch-hero-card">
-      <div class="sch-hero-top"><div class="sch-hero-label">이번 달 정규 수업</div></div>
-      <div class="sch-hero-main"><div class="sch-hero-num">${reg.length}T</div><div class="sch-hero-unit">정규</div></div>
-      <div class="sch-hero-pills">
-        <div class="sch-pill">수업일 ${days.length}일</div>
-        <div class="sch-pill">특강 ${sp.length}T</div>
-        ${absT?`<div class="sch-pill">결석 -${absT}T</div>`:''}
-        <div class="sch-pill">합계 ${total}T</div>
-      </div>
-    </div>`;
+  const days=Object.keys(bd).map(Number).sort((a,b)=>a-b),total=reg.length+sp.length-absT;
+  document.getElementById('schHero').innerHTML=`<div class="sch-hero-card"><div class="sch-hero-top"><div class="sch-hero-label">MONTHLY LOAD</div></div><div class="sch-hero-main"><div class="sch-hero-num">${reg.length}T</div><div class="sch-hero-unit">정규</div></div><div class="sch-hero-pills"><div class="sch-pill">수업일 ${days.length}일</div>${sp.length?`<div class="sch-pill">특강 ${sp.length}T</div>`:''}${absT?`<div class="sch-pill">결석 -${absT}T</div>`:''}<div class="sch-pill">총 ${total}T</div></div></div>`;
 
-  const now=new Date();
-  const isCurrentMonth=schY===now.getFullYear()&&schM===now.getMonth()+1;
-  let nextDay=days.find(day=>!isCurrentMonth || day>=now.getDate());
-  if(nextDay===undefined && days.length) nextDay=days[0];
-  const nextBox=document.getElementById('schNext');
-  if(!days.length){
-    nextBox.innerHTML=`<div class="sch-next-label">다음 정보</div><div class="sch-next-title">예정된 수업 없음</div><div class="sch-next-empty">이번 달에는 등록된 수업이 없습니다.</div>`;
-  }else{
-    const info=bd[nextDay];
-    const dw=DY[new Date(schY,schM-1,nextDay).getDay()];
-    const ts=[...new Set([...(info.r||[]),...(info.s||[])])].sort();
-    const rows=ts.map(t=>`${t}타임 ${TM[String(t)]}${(info.s||[]).includes(t)&&!(info.r||[]).includes(t)?' · 특강':''}`).join('<br>');
-    nextBox.innerHTML=`<div class="sch-next-label">다음 정보</div><div class="sch-next-title">${schM}/${nextDay} (${dw}) · ${ts.length}T</div><div class="sch-next-meta">${rows}</div>`;
-  }
-
-  const dayCount=document.getElementById('schDayCount');
-  if(dayCount) dayCount.textContent=days.length?`${days.length}일 일정`:'일정 없음';
-  document.getElementById('schList').innerHTML=days.length?days.map(d=>{
-    const dw=DY[new Date(schY,schM-1,d).getDay()];
-    const {r,s}=bd[d];const ts=[...new Set([...r,...s])].sort();
-    return `<div class="cls-item"><div class="cls-date">${schM}/${d} (${dw})</div><div class="cls-time">${ts.map(t=>{const isSp=s.includes(t)&&!r.includes(t);return `${t}타임 ${TM[String(t)]}${isSp?'<span class="sp-pip">특강</span>':''}`;}).join('<br>')}</div></div>`;
-  }).join(''):'<div class="empty">이번달 수업이 없습니다</div>';
+  const now=new Date(),isCurrent=schY===now.getFullYear()&&schM===now.getMonth()+1;
+  if(schSelectedDay==null || !bd[schSelectedDay]){schSelectedDay=days.find(day=>!isCurrent||day>=now.getDate()) ?? days[0] ?? null;}
+  renderScheduleSelectedDay(bd,schSelectedDay);
+  const dayCount=document.getElementById('schDayCount');if(dayCount)dayCount.textContent=days.length?`${days.length}일 일정`:'일정 없음';
+  document.getElementById('schList').innerHTML=days.length?days.map(d=>{const dw=DY[new Date(schY,schM-1,d).getDay()];const {r,s}=bd[d];const ts=[...new Set([...r,...s])].sort();return `<div class="cls-item" onclick="selectScheduleDay(${d})"><div class="cls-date">${schM}/${d} (${dw})</div><div class="cls-time">${ts.map(t=>{const isSp=s.includes(t)&&!r.includes(t);return `${t}타임 ${TM[String(t)]}${isSp?'<span class="sp-pip">특강</span>':''}`;}).join('<br>')}</div></div>`;}).join(''):'<div class="empty">이번달 수업이 없습니다</div>';
+  requestAnimationFrame(()=>highlightScheduleDay());
 }
-function moveSchMon(dir){schM+=dir;if(schM>12){schM=1;schY++;}if(schM<1){schM=12;schY--;}renderSchTab();}
+function getScheduleDayMap(){
+  const sd=myD(schY,schM),reg=sd.lessons||[],sp=sd.special||[],bd={};
+  [...reg,...sp].forEach(l=>{if(!bd[l.day])bd[l.day]={r:[],s:[]};if(reg.some(x=>x.day===l.day&&x.tim===l.tim))bd[l.day].r.push(l.tim);else bd[l.day].s.push(l.tim);});return bd;
+}
+function renderScheduleSelectedDay(bd,day){
+  const box=document.getElementById('schNext');if(!box)return;
+  if(!day||!bd[day]){box.innerHTML=`<div class="sch-next-label">SELECTED DAY</div><div class="sch-next-title">예정된 수업 없음</div><div class="sch-next-empty">달력에서 수업일을 선택해보세요.</div>`;return;}
+  const info=bd[day],dw=DY[new Date(schY,schM-1,day).getDay()],ts=[...new Set([...(info.r||[]),...(info.s||[])])].sort();
+  const rows=ts.map(t=>`${t}타임 ${TM[String(t)]}${(info.s||[]).includes(t)&&!(info.r||[]).includes(t)?' · 특강':''}`).join('<br>');
+  box.innerHTML=`<div class="sch-next-label">SELECTED DAY</div><div class="sch-next-title">${schM}/${day} (${dw}) · ${ts.length}T</div><div class="sch-next-meta">${rows}</div>`;
+}
+function selectScheduleDay(day){schSelectedDay=day;renderScheduleSelectedDay(getScheduleDayMap(),day);highlightScheduleDay();haptic('light');}
+function highlightScheduleDay(){const el=document.getElementById('schCalBody');if(!el)return;el.querySelectorAll('.cd').forEach(c=>c.classList.remove('selected'));if(!schSelectedDay)return;const cells=[...el.querySelectorAll('.cd')],first=new Date(schY,schM-1,1).getDay(),idx=first+schSelectedDay-1;if(cells[idx])cells[idx].classList.add('selected');}
+function moveSchMon(dir){schM+=dir;if(schM>12){schM=1;schY++;}if(schM<1){schM=12;schY--;}schSelectedDay=null;renderSchTab();}
 
 // ── 공지 ──
 async function loadNotices(){
@@ -1266,7 +1334,7 @@ function initCalClick(){
       const first=new Date(y,m-1,1).getDay();
       const d=idx-first+1;
       if(d<1)return;
-      openDaySheet(y,m,d);
+      if(id==='schCalBody'){selectScheduleDay(d);}else{openDaySheet(y,m,d);}
     });
   });
 }
@@ -1279,7 +1347,8 @@ function initCalClick(){
 
 // ── 다음 수업 카드 클릭 → 펼치기 ──
 function initNextExpand(){
-  document.getElementById('nextList').addEventListener('click',e=>{
+  const list=document.getElementById('nextList');if(!list)return;
+  list.addEventListener('click',e=>{
     const item=e.target.closest('.next-item');if(!item)return;
     haptic('light');
     item.classList.toggle('expanded');
