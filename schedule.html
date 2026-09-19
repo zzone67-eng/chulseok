@@ -346,7 +346,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 <!-- 회원 관리 모달 -->
 <div class="modal-overlay" id="approvalModal" onclick="closeApproval()">
   <div class="modal-box" onclick="event.stopPropagation()" style="width:460px;max-height:85vh;display:flex;flex-direction:column;">
-    <div class="modal-title">회원 관리</div>
+    <div class="modal-title">회원 승인 관리</div>
     <!-- 탭 -->
     <div style="display:flex;gap:6px;margin-bottom:16px;">
       <button id="mtab1" onclick="switchMemberTab('pending')" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--acc);background:var(--acc);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">대기중 <span id="pendingCount"></span></button>
@@ -522,6 +522,24 @@ let _addingCls='';
 
 // ── 고정수강료 ──
 // ── 승인 관리 ──
+let _memberTab='pending';
+
+function adminEsc(v){
+  return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function adminDate(v){
+  if(!v)return '날짜 정보 없음';
+  try{return new Date(v).toLocaleString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch(e){return '날짜 정보 없음';}
+}
+function approvalSectionTitle(title,count,tone='student'){
+  const c=tone==='teacher'?'#C88010':'#4A90D0';
+  return `<div style="display:flex;align-items:center;gap:7px;margin:4px 2px 9px;">
+    <span style="width:7px;height:7px;border-radius:50%;background:${c}"></span>
+    <span style="font-size:11px;font-weight:800;color:var(--tx2);letter-spacing:.05em">${title}</span>
+    <span style="font-size:10px;color:var(--tx3)">${count}명</span>
+  </div>`;
+}
+
 async function openApproval(){
   document.getElementById('approvalModal').classList.add('on');
   switchMemberTab('pending');
@@ -549,62 +567,109 @@ async function loadPendingList(){
   const list=document.getElementById('pendingList');
   list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0">불러오는 중...</div>';
   try{
-    const r=await fetch(DB+'/pending_users.json?_='+Date.now());
-    const data=await r.json();
-    if(!data||!Object.keys(data).length){
-      list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0;text-align:center">대기 중인 신청이 없습니다</div>';
-      updatePendingBadge(0);return;
+    const [sr,tr]=await Promise.all([
+      fetch(DB+'/pending_users.json?_='+Date.now()),
+      fetch(DB+'/teacher_accounts.json?_='+Date.now())
+    ]);
+    const students=(await sr.json())||{};
+    const teachers=(await tr.json())||{};
+    const sEntries=Object.entries(students);
+    const tEntries=Object.entries(teachers).filter(([_,u])=>u&&u.role==='teacher'&&u.approved!==true);
+    const total=sEntries.length+tEntries.length;
+    updatePendingBadge(total);
+    document.getElementById('pendingCount').textContent=total?'('+total+')':'';
+    if(!total){
+      list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:24px 0;text-align:center">대기 중인 가입 신청이 없습니다</div>';
+      return;
     }
-    const entries=Object.entries(data);
-    updatePendingBadge(entries.length);
-    document.getElementById('pendingCount').textContent='('+entries.length+')';
-    list.innerHTML=entries.map(([uid,u])=>`
-      <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:8px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <div style="width:36px;height:36px;background:var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0">${u.name[0]}</div>
-          <div style="flex:1">
-            <div style="font-size:14px;font-weight:700">${u.name}</div>
-            <div style="font-size:12px;color:var(--tx2)">${u.cls} · ${new Date(u.createdAt).toLocaleDateString('ko',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+    let html='';
+    if(sEntries.length){
+      html+=approvalSectionTitle('학생 가입 신청',sEntries.length,'student');
+      html+=sEntries.map(([uid,u])=>`
+        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="width:36px;height:36px;background:var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0">${adminEsc((u.name||'?')[0])}</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px"><div style="font-size:14px;font-weight:700">${adminEsc(u.name||'이름 없음')}</div><span style="font-size:9px;font-weight:800;color:var(--blue);background:var(--bdim);padding:2px 6px;border-radius:999px">학생</span></div>
+              <div style="font-size:12px;color:var(--tx2);margin-top:2px">${adminEsc(u.cls||'반 미지정')} · ${adminDate(u.createdAt)}</div>
+            </div>
           </div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button onclick="approveUser('${uid}')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#152A1E;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;">✓ 승인</button>
-          <button onclick="rejectUser('${uid}')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#2A1515;color:var(--red);font-size:13px;font-weight:700;cursor:pointer;">✕ 거절</button>
-        </div>
-      </div>`).join('');
-  }catch(e){list.innerHTML='<div style="color:var(--red);font-size:13px">오류가 발생했습니다</div>';}
+          <div style="display:flex;gap:8px;">
+            <button onclick="approveUser('${uid}')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#152A1E;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;">✓ 승인</button>
+            <button onclick="rejectUser('${uid}')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#2A1515;color:var(--red);font-size:13px;font-weight:700;cursor:pointer;">✕ 거절</button>
+          </div>
+        </div>`).join('');
+    }
+    if(tEntries.length){
+      html+=`<div style="${sEntries.length?'margin-top:18px;':''}">${approvalSectionTitle('선생님 가입 신청',tEntries.length,'teacher')}</div>`;
+      html+=tEntries.map(([uid,u])=>`
+        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="width:36px;height:36px;background:#231A08;border:1px solid var(--ybr);color:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex-shrink:0">${adminEsc((u.name||'?')[0])}</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px"><div style="font-size:14px;font-weight:700">${adminEsc(u.name||'이름 없음')} 선생님</div><span style="font-size:9px;font-weight:800;color:var(--yellow);background:var(--ydim);padding:2px 6px;border-radius:999px">선생님</span></div>
+              <div style="font-size:11px;color:var(--tx2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adminEsc(u.email||'')} · ${adminDate(u.createdAt)}</div>
+            </div>
+          </div>
+          <button onclick="approveTeacher('${uid}')" style="width:100%;padding:9px;border-radius:8px;border:none;background:#152A1E;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;">✓ 선생님 승인</button>
+        </div>`).join('');
+    }
+    list.innerHTML=html;
+  }catch(e){
+    console.error('승인 대기 목록 오류',e);
+    list.innerHTML='<div style="color:var(--red);font-size:13px">오류가 발생했습니다</div>';
+  }
 }
 
 async function loadApprovedList(){
   const list=document.getElementById('approvedList');
   list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0">불러오는 중...</div>';
   try{
-    const r=await fetch(DB+'/approved_users.json?_='+Date.now());
-    const data=await r.json();
-    if(!data||!Object.keys(data).length){
-      list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:10px 0;text-align:center">승인된 회원이 없습니다</div>';return;
+    const [sr,tr]=await Promise.all([
+      fetch(DB+'/approved_users.json?_='+Date.now()),
+      fetch(DB+'/teacher_accounts.json?_='+Date.now())
+    ]);
+    const students=(await sr.json())||{};
+    const teachers=(await tr.json())||{};
+    const sEntries=Object.entries(students).sort((a,b)=>(a[1].cls||'').localeCompare(b[1].cls||''));
+    const tEntries=Object.entries(teachers).filter(([_,u])=>u&&u.role==='teacher'&&u.approved===true).sort((a,b)=>(a[1].name||'').localeCompare(b[1].name||''));
+    if(!sEntries.length&&!tEntries.length){
+      list.innerHTML='<div style="color:var(--tx3);font-size:13px;padding:24px 0;text-align:center">승인된 회원이 없습니다</div>';
+      return;
     }
-    const entries=Object.entries(data).sort((a,b)=>(a[1].cls||'').localeCompare(b[1].cls||''));
-    // 반별 그룹핑
-    const byCls={};
-    entries.forEach(([uid,u])=>{if(!byCls[u.cls])byCls[u.cls]=[];byCls[u.cls].push([uid,u]);});
-    list.innerHTML=Object.entries(byCls).map(([cls,members])=>`
-      <div style="margin-bottom:16px;">
-        <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.07em;margin-bottom:8px;">${cls} (${members.length}명)</div>
-        ${members.map(([uid,u])=>`
-          <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;">
-            <div style="width:32px;height:32px;background:var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${u.name[0]}</div>
-            <div style="flex:1;">
-              <div style="font-size:14px;font-weight:700;">${u.name}</div>
-              <div style="font-size:11px;color:var(--tx3);">가입: ${u.createdAt?new Date(u.createdAt).toLocaleDateString('ko'):'알 수 없음'}</div>
-            </div>
-            <div style="display:flex;gap:6px;">
-              <button onclick="resetPassword('${uid}','${u.name}')" style="padding:5px 10px;border-radius:7px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:11px;font-weight:600;cursor:pointer;">비번초기화</button>
-              <button onclick="deleteUser('${uid}','${u.name}')" style="padding:5px 10px;border-radius:7px;border:none;background:#2A1515;color:var(--red);font-size:11px;font-weight:600;cursor:pointer;">삭제</button>
-            </div>
-          </div>`).join('')}
-      </div>`).join('');
-  }catch(e){list.innerHTML='<div style="color:var(--red);font-size:13px">오류가 발생했습니다</div>';}
+    let html='';
+    if(sEntries.length){
+      html+=approvalSectionTitle('승인된 학생',sEntries.length,'student');
+      const byCls={};
+      sEntries.forEach(([uid,u])=>{const cls=u.cls||'반 미지정';if(!byCls[cls])byCls[cls]=[];byCls[cls].push([uid,u]);});
+      html+=Object.entries(byCls).map(([cls,members])=>`
+        <div style="margin-bottom:14px;">
+          <div style="font-size:10px;font-weight:700;color:var(--tx3);margin:0 2px 6px">${adminEsc(cls)} (${members.length}명)</div>
+          ${members.map(([uid,u])=>`
+            <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;background:var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${adminEsc((u.name||'?')[0])}</div>
+              <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">${adminEsc(u.name||'이름 없음')}</div><div style="font-size:11px;color:var(--tx3)">가입: ${u.createdAt?new Date(u.createdAt).toLocaleDateString('ko-KR'):'알 수 없음'}</div></div>
+              <div style="display:flex;gap:6px;">
+                <button onclick="resetPassword('${uid}','${adminEsc(u.name||'')}')" style="padding:5px 10px;border-radius:7px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:11px;font-weight:600;cursor:pointer;">비번초기화</button>
+                <button onclick="deleteUser('${uid}','${adminEsc(u.name||'')}')" style="padding:5px 10px;border-radius:7px;border:none;background:#2A1515;color:var(--red);font-size:11px;font-weight:600;cursor:pointer;">삭제</button>
+              </div>
+            </div>`).join('')}
+        </div>`).join('');
+    }
+    if(tEntries.length){
+      html+=`<div style="${sEntries.length?'margin-top:18px;':''}">${approvalSectionTitle('승인된 선생님',tEntries.length,'teacher')}</div>`;
+      html+=tEntries.map(([uid,u])=>`
+        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;background:#231A08;border:1px solid var(--ybr);color:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0">${adminEsc((u.name||'?')[0])}</div>
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">${adminEsc(u.name||'이름 없음')} 선생님</div><div style="font-size:11px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adminEsc(u.email||'')}</div></div>
+          <button onclick="revokeTeacher('${uid}','${adminEsc(u.name||'')}')" style="padding:6px 10px;border-radius:7px;border:1px solid #5A2020;background:#2A1515;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;">권한 해제</button>
+        </div>`).join('');
+    }
+    list.innerHTML=html;
+  }catch(e){
+    console.error('승인 회원 목록 오류',e);
+    list.innerHTML='<div style="color:var(--red);font-size:13px">오류가 발생했습니다</div>';
+  }
 }
 
 async function approveUser(uid){
@@ -613,19 +678,21 @@ async function approveUser(uid){
     const u=await r.json();if(!u)return;
     await fetch(DB+'/approved_users/'+uid+'.json',{method:'PUT',body:JSON.stringify(u),headers:{'Content-Type':'application/json'}});
     await fetch(DB+'/pending_users/'+uid+'.json',{method:'DELETE'});
-    alert(u.name+' 학생 승인 완료!');
-    loadPendingList();
+    alert((u.name||'학생')+' 학생 승인 완료!');
+    await loadPendingList();
+    checkPendingCount();
   }catch(e){alert('오류가 발생했습니다.');}
 }
 async function rejectUser(uid){
-  if(!confirm('거절하면 해당 계정이 삭제됩니다. 계속할까요?'))return;
+  if(!confirm('거절하면 해당 학생 가입 신청이 삭제됩니다. 계속할까요?'))return;
   await fetch(DB+'/pending_users/'+uid+'.json',{method:'DELETE'});
-  loadPendingList();
+  await loadPendingList();
+  checkPendingCount();
 }
 async function deleteUser(uid,name){
-  if(!confirm(name+' 계정을 삭제할까요? 복구할 수 없습니다.'))return;
+  if(!confirm(name+' 학생 계정을 삭제할까요? 복구할 수 없습니다.'))return;
   await fetch(DB+'/approved_users/'+uid+'.json',{method:'DELETE'});
-  alert(name+' 계정이 삭제됐습니다.');
+  alert(name+' 학생 계정이 삭제됐습니다.');
   loadApprovedList();
 }
 async function resetPassword(uid,name){
@@ -642,15 +709,44 @@ async function resetPassword(uid,name){
     alert(name+' 비밀번호 초기화 완료. 새 비밀번호: '+newPw);
   }catch(e){alert('오류가 발생했습니다.');}
 }
+
+async function approveTeacher(uid){
+  try{
+    const r=await fetch(DB+'/teacher_accounts/'+uid+'.json?_='+Date.now());
+    const u=await r.json();
+    if(!u){alert('선생님 가입 정보를 찾을 수 없습니다.');return;}
+    await fetch(DB+'/teacher_accounts/'+uid+'.json',{method:'PATCH',body:JSON.stringify({approved:true,approvedAt:new Date().toISOString(),revokedAt:null}),headers:{'Content-Type':'application/json'}});
+    alert((u.name||'선생님')+' 선생님 승인 완료!');
+    await loadPendingList();
+    checkPendingCount();
+  }catch(e){console.error(e);alert('선생님 승인 중 오류가 발생했습니다.');}
+}
+async function revokeTeacher(uid,name){
+  if(!confirm(name+' 선생님의 앱 사용 권한을 해제할까요?\n계정은 유지되며 다시 승인할 수 있습니다.'))return;
+  try{
+    await fetch(DB+'/teacher_accounts/'+uid+'.json',{method:'PATCH',body:JSON.stringify({approved:false,revokedAt:new Date().toISOString()}),headers:{'Content-Type':'application/json'}});
+    alert(name+' 선생님 권한을 해제했습니다.');
+    await loadApprovedList();
+    checkPendingCount();
+  }catch(e){console.error(e);alert('권한 해제 중 오류가 발생했습니다.');}
+}
+
 function updatePendingBadge(cnt){
   const badge=document.getElementById('pendingBadge');
   if(badge){badge.textContent=cnt;badge.style.display=cnt>0?'block':'none';}
+  const c=document.getElementById('pendingCount');
+  if(c)c.textContent=cnt?'('+cnt+')':'';
 }
 async function checkPendingCount(){
   try{
-    const r=await fetch(DB+'/pending_users.json?_='+Date.now());
-    const data=await r.json();
-    updatePendingBadge(data?Object.keys(data).length:0);
+    const [sr,tr]=await Promise.all([
+      fetch(DB+'/pending_users.json?_='+Date.now()),
+      fetch(DB+'/teacher_accounts.json?_='+Date.now())
+    ]);
+    const students=(await sr.json())||{};
+    const teachers=(await tr.json())||{};
+    const tCnt=Object.values(teachers).filter(u=>u&&u.role==='teacher'&&u.approved!==true).length;
+    updatePendingBadge(Object.keys(students).length+tCnt);
   }catch(e){}
 }
 
@@ -1567,6 +1663,8 @@ buildMonthButtons();
 
   // 3. 렌더
   renderSB();
+  checkPendingCount();
+  setInterval(checkPendingCount,60000);
 })();
 </script>
 </body>
