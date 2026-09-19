@@ -343,6 +343,15 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 .process-sheet-card{padding-bottom:calc(20px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}.process-sheet-title{font-size:22px;font-weight:950;letter-spacing:-.7px}.process-sheet-desc{font-size:11px;color:var(--tx2);line-height:1.6;margin-top:5px}.process-field{margin-top:16px}.process-field label{display:block;font-size:10px;font-weight:900;color:var(--tx2);margin-bottom:7px}.process-field input,.process-field textarea{width:100%;border:1px solid var(--bd);background:#F7F6F3;border-radius:14px;padding:13px 14px;font-size:13px;outline:none;color:var(--tx)}.process-field textarea{min-height:72px;resize:none;line-height:1.6}.process-field input:focus,.process-field textarea:focus{border-color:#111;background:#fff}.process-project-name{font-size:17px;font-weight:950;background:#F4F3EF;border-radius:15px;padding:13px 14px}.photo-picker{height:180px;border:1.5px dashed #D5D4CE;border-radius:19px;background:#F7F6F3;display:grid;place-items:center;overflow:hidden;position:relative;cursor:pointer}.photo-picker.has-photo{border-style:solid;background:#111}.photo-picker img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}.photo-picker.has-photo img{display:block}.photo-picker-copy{display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--tx2);font-size:11px;font-weight:850;position:relative;z-index:1}.photo-picker.has-photo .photo-picker-copy{display:none}.photo-picker svg{width:27px;height:27px;stroke:#111;fill:none;stroke-width:1.6}.photo-picker input{display:none}.t-choice{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.t-chip{border:1px solid var(--bd);background:#fff;border-radius:13px;padding:12px 8px;font-size:12px;font-weight:900;color:var(--tx2)}.t-chip.on{background:#111;color:#fff;border-color:#111}.process-storage-note{font-size:9px;line-height:1.55;color:var(--tx3);margin-top:10px}.process-save{width:100%;border:0;background:var(--red);color:#fff;border-radius:15px;padding:14px;font-size:12px;font-weight:950;margin-top:18px}.process-save:disabled{opacity:.45}
 @media(max-width:380px){.process-title{font-size:28px}.process-today-num{font-size:38px}.project-visual{height:190px}}
 
+
+/* ── v17 PROCESS SLIDER ── */
+.process-viewer{position:fixed;inset:0;z-index:160;display:none;background:#0E0E0F;color:#fff}.process-viewer.on{display:flex;flex-direction:column;animation:pvFade .22s ease both}.pv-top{height:62px;display:flex;align-items:center;justify-content:space-between;padding:8px 14px 6px;flex:none}.pv-close{width:38px;height:38px;border:0;border-radius:13px;background:rgba(255,255,255,.09);color:#fff;font-size:17px;display:grid;place-items:center}.pv-head{min-width:0;text-align:center;flex:1;padding:0 12px}.pv-kicker{font-size:8px;font-weight:950;letter-spacing:.12em;color:rgba(255,255,255,.42)}.pv-title{font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}.pv-count{width:38px;text-align:center;font-size:10px;font-weight:900;color:rgba(255,255,255,.6)}
+.pv-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:pan-y}.pv-track{width:100%;height:100%;display:flex;transition:transform .34s cubic-bezier(.22,.8,.3,1);will-change:transform}.pv-slide{min-width:100%;height:100%;padding:8px 14px 12px;display:flex;align-items:center;justify-content:center}.pv-photo-wrap{width:100%;height:100%;max-height:66vh;border-radius:22px;overflow:hidden;background:#19191B;display:flex;align-items:center;justify-content:center}.pv-photo{width:100%;height:100%;object-fit:contain;display:block}.pv-arrow{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;border-radius:50%;background:rgba(15,15,15,.62);backdrop-filter:blur(10px);color:#fff;font-size:24px;display:grid;place-items:center;z-index:3}.pv-arrow.prev{left:22px}.pv-arrow.next{right:22px}.pv-arrow:disabled{opacity:.2}.pv-arrow:active{transform:translateY(-50%) scale(.92)}
+.pv-bottom{flex:none;padding:10px 18px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(14,14,15,0),#0E0E0F 16%)}.pv-progress{display:flex;gap:5px;justify-content:center;margin-bottom:13px}.pv-dot{width:5px;height:5px;border-radius:99px;background:rgba(255,255,255,.22);transition:width .22s,background .22s}.pv-dot.on{width:18px;background:#fff}.pv-meta-row{display:flex;align-items:flex-end;justify-content:space-between;gap:14px}.pv-step{font-size:20px;font-weight:950;letter-spacing:-.65px}.pv-date{font-size:10px;color:rgba(255,255,255,.48);margin-top:3px}.pv-tbox{text-align:right}.pv-total{font-size:20px;font-weight:950}.pv-total span{font-size:10px;font-weight:850;color:rgba(255,255,255,.48);margin-left:4px}.pv-session-t{font-size:9px;color:rgba(255,255,255,.48);margin-top:3px}.pv-note{font-size:11px;line-height:1.55;color:rgba(255,255,255,.7);margin-top:11px;padding-top:11px;border-top:1px solid rgba(255,255,255,.09);min-height:29px}.pv-note.empty{color:rgba(255,255,255,.3)}
+.completed-item{cursor:pointer;transition:transform .16s,background .2s}.completed-item:active{transform:scale(.985);background:#F7F6F3}.completed-open{width:27px;height:27px;border-radius:9px;background:#F2F1ED;display:grid;place-items:center;color:var(--tx2);font-size:15px;flex:none}.project-visual{cursor:pointer}.project-thumb{cursor:pointer}.project-process-hint{font-size:9px;color:var(--tx3);font-weight:850;margin-top:9px;display:flex;align-items:center;gap:5px}.project-process-hint:before{content:'↔';font-size:12px;color:var(--red)}
+@keyframes pvFade{from{opacity:0}to{opacity:1}}
+@media(max-width:380px){.pv-photo-wrap{max-height:62vh}.pv-bottom{padding-left:15px;padding-right:15px}.pv-arrow.prev{left:17px}.pv-arrow.next{right:17px}}
+
 </style>
 </head>
 <body>
@@ -537,6 +546,25 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="process-viewer" id="processViewer" aria-hidden="true">
+  <div class="pv-top">
+    <button class="pv-close" type="button" onclick="closeProcessViewer()" aria-label="닫기">✕</button>
+    <div class="pv-head"><div class="pv-kicker" id="pvKicker">PROCESS</div><div class="pv-title" id="pvTitle"></div></div>
+    <div class="pv-count" id="pvCount">1/1</div>
+  </div>
+  <div class="pv-stage" id="pvStage">
+    <div class="pv-track" id="pvTrack"></div>
+    <button class="pv-arrow prev" id="pvPrev" type="button" onclick="moveProcessViewer(-1)" aria-label="이전 과정">‹</button>
+    <button class="pv-arrow next" id="pvNext" type="button" onclick="moveProcessViewer(1)" aria-label="다음 과정">›</button>
+  </div>
+  <div class="pv-bottom">
+    <div class="pv-progress" id="pvProgress"></div>
+    <div class="pv-meta-row"><div><div class="pv-step" id="pvStep"></div><div class="pv-date" id="pvDate"></div></div><div class="pv-tbox"><div class="pv-total" id="pvTotal"></div><div class="pv-session-t" id="pvSessionT"></div></div></div>
+    <div class="pv-note" id="pvNote"></div>
+  </div>
+</div>
+
 <div class="lb" id="lb" onclick="closeLb()"><button class="lb-x" onclick="closeLb()">✕</button><img id="lbImg" src=""><div class="lb-cap" id="lbCap"></div></div>
 
 <script>
@@ -860,15 +888,45 @@ async function openPracticeImage(imageId,caption=''){
 const _oldCloseLb=typeof closeLb==='function'?closeLb:null;
 function closePracticeLbUrl(){const lb=document.getElementById('lb');const u=lb?.dataset?.tempUrl;if(u){URL.revokeObjectURL(u);delete lb.dataset.tempUrl;}}
 
+
+let processViewerProject=null,processViewerIndex=0,processViewerUrls=[],processViewerTouchX=0,processViewerTouchY=0;
+function clearProcessViewerUrls(){processViewerUrls.forEach(u=>{try{URL.revokeObjectURL(u)}catch(e){}});processViewerUrls=[];}
+function cumulativePracticeT(sessions,index){return sessions.slice(0,index+1).reduce((a,b)=>a+(Number(b.t)||0),0);}
+async function openProjectProcess(projectId,startIndex=0){
+  const p=getPracticeStore().projects.find(x=>x.id===projectId);if(!p||(p.sessions||[]).length===0){showToast('아직 과정 사진이 없어요','info');return;}
+  clearProcessViewerUrls();processViewerProject=p;processViewerIndex=Math.max(0,Math.min(Number(startIndex)||0,p.sessions.length-1));
+  const track=document.getElementById('pvTrack');track.innerHTML='';
+  for(const s of p.sessions){const b=await getPracticeImage(s.imageId);if(!b){processViewerUrls.push('');continue;}const u=URL.createObjectURL(b);processViewerUrls.push(u);const slide=document.createElement('div');slide.className='pv-slide';slide.innerHTML=`<div class="pv-photo-wrap"><img class="pv-photo" src="${u}" alt="${escPractice(p.title)} 과정"></div>`;track.appendChild(slide);}
+  if(!track.children.length){clearProcessViewerUrls();showToast('과정 사진을 불러오지 못했어요','info');return;}
+  document.getElementById('pvTitle').textContent=p.title;document.getElementById('pvKicker').textContent=p.status==='done'?'COMPLETED PROCESS':'WORK IN PROGRESS';
+  document.getElementById('pvProgress').innerHTML=p.sessions.map((_,i)=>`<span class="pv-dot${i===processViewerIndex?' on':''}" onclick="goProcessViewer(${i})"></span>`).join('');
+  const viewer=document.getElementById('processViewer');viewer.classList.add('on');viewer.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';updateProcessViewer(false);haptic('light');
+}
+function updateProcessViewer(animate=true){
+  const p=processViewerProject;if(!p)return;const sessions=p.sessions||[],i=processViewerIndex,s=sessions[i];if(!s)return;
+  const track=document.getElementById('pvTrack');if(!animate)track.style.transition='none';track.style.transform=`translateX(-${i*100}%)`;if(!animate){requestAnimationFrame(()=>track.style.transition='');}
+  document.getElementById('pvCount').textContent=`${i+1}/${sessions.length}`;document.getElementById('pvStep').textContent=`${i+1}번째 과정`;document.getElementById('pvDate').textContent=fmtShortDate(s.createdAt);
+  document.getElementById('pvTotal').innerHTML=`${cumulativePracticeT(sessions,i)}T<span>누적</span>`;document.getElementById('pvSessionT').textContent=`이번 기록 +${Number(s.t)||0}T`;
+  const note=document.getElementById('pvNote');note.textContent=s.note||'메모 없음';note.className='pv-note'+(s.note?'':' empty');
+  document.getElementById('pvPrev').disabled=i<=0;document.getElementById('pvNext').disabled=i>=sessions.length-1;
+  document.querySelectorAll('#pvProgress .pv-dot').forEach((d,idx)=>d.classList.toggle('on',idx===i));
+}
+function goProcessViewer(index){if(!processViewerProject)return;const max=(processViewerProject.sessions||[]).length-1;processViewerIndex=Math.max(0,Math.min(index,max));updateProcessViewer();haptic('light');}
+function moveProcessViewer(dir){goProcessViewer(processViewerIndex+dir);}
+function closeProcessViewer(){const v=document.getElementById('processViewer');v.classList.remove('on');v.setAttribute('aria-hidden','true');document.body.style.overflow='';processViewerProject=null;processViewerIndex=0;clearProcessViewerUrls();}
+function initProcessViewerSwipe(){const stage=document.getElementById('pvStage');if(!stage||stage.dataset.swipeReady)return;stage.dataset.swipeReady='1';stage.addEventListener('touchstart',e=>{const t=e.changedTouches[0];processViewerTouchX=t.clientX;processViewerTouchY=t.clientY;},{passive:true});stage.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-processViewerTouchX,dy=t.clientY-processViewerTouchY;if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.25){moveProcessViewer(dx<0?1:-1);}},{passive:true});}
+document.addEventListener('keydown',e=>{const v=document.getElementById('processViewer');if(!v?.classList.contains('on'))return;if(e.key==='ArrowLeft')moveProcessViewer(-1);else if(e.key==='ArrowRight')moveProcessViewer(1);else if(e.key==='Escape')closeProcessViewer();});
+setTimeout(initProcessViewerSwipe,0);
+
 async function renderPracticeProjectCard(p){
   const sessions=p.sessions||[],last=sessions[sessions.length-1],total=projectTotalT(p);
   const latestUrl=last?await imageUrlFor(last.imageId):'';
-  const thumbs=[];for(const [i,s] of sessions.entries()){const u=await imageUrlFor(s.imageId);thumbs.push(`<div class="project-step" onclick="openPracticeImage('${s.imageId}','${escPractice(p.title)} · ${i+1}회 · ${s.t}T')"><div class="project-thumb">${u?`<img src="${u}" alt="${escPractice(p.title)} ${i+1}회 과정">`:''}<span class="project-thumb-num">${s.t}T</span></div><div class="project-step-label">${i+1}회</div></div>`);}
-  return `<div class="project-card"><div class="project-visual${latestUrl?'':' empty'}" ${last?`onclick="openPracticeImage('${last.imageId}','${escPractice(p.title)} · 현재 ${total}T')"`:''}>${latestUrl?`<img src="${latestUrl}" alt="${escPractice(p.title)} 현재 과정">`:`<svg viewBox="0 0 24 24"><path d="M4 7h4l1.5-2h5L16 7h4v12H4Z"/><circle cx="12" cy="13" r="3.5"/></svg>`}<span class="project-badge">진행 중 · ${sessions.length}회</span></div><div class="project-info"><div class="project-top"><div><div class="project-title">${escPractice(p.title)}</div><div class="project-meta">${sessions.length?`${fmtShortDate(sessions[0].createdAt)} 시작 · 최근 ${fmtShortDate(last.createdAt)}`:'아직 과정 기록 없음'}</div></div><div class="project-total">${total}T<span>누적</span></div></div>${thumbs.length?`<div class="project-timeline">${thumbs.join('')}</div>`:''}<div class="project-actions"><button class="project-add" type="button" onclick="openPracticeSheet('add','${p.id}')">+ 오늘 과정 추가</button><button class="project-done" type="button" onclick="completePracticeProject('${p.id}')">완료</button></div></div></div>`;
+  const thumbs=[];for(const [i,s] of sessions.entries()){const u=await imageUrlFor(s.imageId);thumbs.push(`<div class="project-step" onclick="event.stopPropagation();openProjectProcess('${p.id}',${i})"><div class="project-thumb">${u?`<img src="${u}" alt="${escPractice(p.title)} ${i+1}회 과정">`:''}<span class="project-thumb-num">${s.t}T</span></div><div class="project-step-label">${i+1}회</div></div>`);}
+  return `<div class="project-card"><div class="project-visual${latestUrl?'':' empty'}" ${sessions.length?`onclick="openProjectProcess('${p.id}',${sessions.length-1})"`:''}>${latestUrl?`<img src="${latestUrl}" alt="${escPractice(p.title)} 현재 과정">`:`<svg viewBox="0 0 24 24"><path d="M4 7h4l1.5-2h5L16 7h4v12H4Z"/><circle cx="12" cy="13" r="3.5"/></svg>`}<span class="project-badge">진행 중 · ${sessions.length}회</span></div><div class="project-info"><div class="project-top"><div><div class="project-title">${escPractice(p.title)}</div><div class="project-meta">${sessions.length?`${fmtShortDate(sessions[0].createdAt)} 시작 · 최근 ${fmtShortDate(last.createdAt)}`:'아직 과정 기록 없음'}</div></div><div class="project-total">${total}T<span>누적</span></div></div>${thumbs.length?`<div class="project-timeline">${thumbs.join('')}</div><div class="project-process-hint">사진을 눌러 과정을 슬라이드로 보기</div>`:''}<div class="project-actions"><button class="project-add" type="button" onclick="openPracticeSheet('add','${p.id}')">+ 오늘 과정 추가</button><button class="project-done" type="button" onclick="completePracticeProject('${p.id}')">완료</button></div></div></div>`;
 }
 async function renderCompletedPractice(p){
   const sessions=p.sessions||[],last=sessions[sessions.length-1],u=last?await imageUrlFor(last.imageId):'';
-  return `<div class="completed-item" ${last?`onclick="openPracticeImage('${last.imageId}','${escPractice(p.title)} · 총 ${projectTotalT(p)}T')"`:''}><div class="completed-thumb">${u?`<img src="${u}" alt="${escPractice(p.title)} 완료 이미지">`:''}</div><div class="completed-copy"><div class="completed-title">${escPractice(p.title)}</div><div class="completed-meta">${sessions.length}회 작업 · ${p.completedAt?fmtShortDate(p.completedAt):''}</div></div><div class="completed-total">${projectTotalT(p)}T</div></div>`;
+  return `<div class="completed-item" onclick="openProjectProcess('${p.id}',${Math.max(0,sessions.length-1)})"><div class="completed-thumb">${u?`<img src="${u}" alt="${escPractice(p.title)} 완료 이미지">`:''}</div><div class="completed-copy"><div class="completed-title">${escPractice(p.title)}</div><div class="completed-meta">${sessions.length}회 과정 · ${p.completedAt?fmtShortDate(p.completedAt):''}</div></div><div class="completed-total">${projectTotalT(p)}T</div><div class="completed-open">›</div></div>`;
 }
 async function loadPracticeTracker(){
   if(!document.getElementById('activePracticeProjects')||!me)return;clearPracticeObjectUrls();const s=getPracticeStore(),projects=s.projects||[];const allSessions=projects.flatMap(p=>(p.sessions||[]).map(x=>({...x,projectId:p.id})));
