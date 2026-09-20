@@ -586,6 +586,37 @@ html,body{background:linear-gradient(180deg,#ECE8E0 0%,#F3F1EC 16%,#F3F1EC 100%)
 #pane-home>.process-head .process-desc{max-width:92%}
 @media(max-width:380px){.demo-card{min-width:130px!important;width:130px!important}.demo-cover{height:72px!important}}
 
+
+/* v19 stronger academy / student separation */
+.academy-updates{
+  background:linear-gradient(135deg,#D8D2C8 0%,#E3DDD4 55%,#DCD6CD 100%)!important;
+  border-top:1px solid rgba(17,17,17,.08)!important;
+  border-bottom:1px solid rgba(17,17,17,.10)!important;
+  padding:12px 14px 16px!important;
+}
+.academy-zone-head{align-items:center!important;margin-bottom:8px!important}
+.academy-zone-kicker{font-size:9px!important;letter-spacing:.18em!important;color:#111!important}
+.academy-zone-kicker:before{content:"";display:inline-block;width:7px;height:7px;border-radius:2px;background:var(--red);margin-right:7px;transform:rotate(45deg)}
+.academy-zone-note{color:#6E675F!important;font-size:9px!important;font-weight:900!important}
+.student-workspace{
+  background:#F8F7F3;
+  border-top:10px solid #F0ECE5;
+  padding-bottom:10px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+.student-zone-start{
+  background:#F8F7F3!important;
+  padding-top:20px!important;
+}
+.student-zone-start:before{top:6px!important}
+.student-workspace .process-head,
+.student-workspace .process-cloud-row{background:#F8F7F3}
+.student-workspace .process-today,
+.student-workspace .process-week,
+.student-workspace .process-section-head,
+.student-workspace .process-projects,
+.student-workspace .completed-list{position:relative}
+
 </style>
 </head>
 <body>
@@ -649,7 +680,7 @@ html,body{background:linear-gradient(180deg,#ECE8E0 0%,#F3F1EC 16%,#F3F1EC 100%)
   <main class="scr" id="mainScr">
     <section class="pane on" id="pane-home">
       <div class="academy-updates" id="academyUpdates" style="display:none">
-        <div class="academy-zone-head"><div><div class="academy-zone-kicker">FROM ACADEMY</div><div class="academy-zone-title">학원에서</div></div><div class="academy-zone-note">공지 · 시범자료</div></div>
+        <div class="academy-zone-head"><div class="academy-zone-kicker">ACADEMY UPDATE</div><div class="academy-zone-note">공지 · 시범자료</div></div>
         <div class="au-notice top-banner" id="teacherNoticeMini" style="display:none" onclick="this.classList.toggle('open')">
           <div class="au-notice-glow"></div>
           <div class="au-notice-top"><span class="au-kicker">공지사항</span><span class="au-badge" id="teacherNoticeClass">전체</span><span class="au-badge hot" id="teacherNoticeUrgent" style="display:none">긴급</span></div>
@@ -662,6 +693,7 @@ html,body{background:linear-gradient(180deg,#ECE8E0 0%,#F3F1EC 16%,#F3F1EC 100%)
         </div>
       </div>
 
+      <div class="student-workspace">
       <div class="student-zone-start"><div><div class="student-zone-kicker">MY PRACTICE</div><div class="student-zone-title">내 실기 기록</div></div><span class="student-zone-badge">STUDENT</span></div>
 
       <div class="process-head">
@@ -690,6 +722,7 @@ html,body{background:linear-gradient(180deg,#ECE8E0 0%,#F3F1EC 16%,#F3F1EC 100%)
       <div id="completedPracticeSection" style="display:none">
         <div class="process-section-head"><div class="process-section-title">완료한 작품</div><div class="process-section-action" id="completedPracticeCount"></div></div>
         <div class="completed-list" id="completedPracticeProjects"></div>
+      </div>
       </div>
     </section>
 
