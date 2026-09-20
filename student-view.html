@@ -832,7 +832,7 @@ html,body{background:#F8F7F3!important}
     <div class="field"><label>반</label>
       <select id="sCls"><option value="">반 선택</option><option>입시반</option><option>예비반</option><option>중등반</option><option>취미반</option></select>
     </div>
-    <div class="field"><label>비밀번호</label><input type="password" id="sPw" placeholder="비밀번호 입력"></div><div style="font-size:10px;color:var(--tx3);line-height:1.55;margin:-5px 2px 12px">가입 후 관리자 승인이 완료되면 로그인할 수 있어요.</div>
+    <div class="field"><label>비밀번호 <span style="font-weight:700;color:var(--tx3)">(6자 이상)</span></label><input type="password" id="sPw" placeholder="6자 이상 입력"></div><div style="font-size:10px;color:var(--tx3);line-height:1.55;margin:-5px 2px 12px">가입 후 관리자 승인이 완료되면 로그인할 수 있어요.</div>
     <div class="field"><label>비밀번호 확인</label><input type="password" id="sPw2" placeholder="비밀번호 다시 입력" onkeydown="if(event.key==='Enter')doSignup()"></div>
     <button class="auth-btn" onclick="doSignup()">가입 신청</button>
     <button class="auth-link" onclick="showAuth('vLogin')">이미 계정이 있어요</button>
@@ -1132,7 +1132,7 @@ async function hashPw(pw,name){const b=await crypto.subtle.digest('SHA-256',new 
 function mkUid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function authEmailFor(uid){return `student.${String(uid).replace(/[^a-zA-Z0-9._-]/g,'')}@hwa1.app`;}
 // Firebase Auth는 기본적으로 6자 이상의 비밀번호가 필요합니다.
-// 학원 앱의 기존 4자 비밀번호 정책은 그대로 두고, Firebase 내부에서만 안전한 접두어를 붙여 사용합니다.
+// 신규 가입은 6자 이상을 사용하며, 기존 계정 호환을 위해 Firebase 내부 비밀번호 변환 방식은 유지합니다.
 function firebasePasswordFor(pw){return `Hwa1!${String(pw)}`;}
 function waitForAuthReady(){return new Promise(resolve=>{const unsub=fbAuth.onAuthStateChanged(u=>{unsub();resolve(u);},()=>resolve(null));});}
 function firebaseAuthMessage(err){
@@ -1218,7 +1218,7 @@ async function doSignup(){
   const pw=document.getElementById('sPw').value,pw2=document.getElementById('sPw2').value;
   const msg=document.getElementById('signupMsg');msg.className='auth-msg';
   if(!name||!cls||!pw){msg.className='auth-msg err';msg.textContent='모든 항목을 입력하세요.';return;}
-  if(pw.length<4){msg.className='auth-msg err';msg.textContent='비밀번호는 4자 이상이어야 합니다.';return;}
+  if(pw.length<6){msg.className='auth-msg err';msg.textContent='비밀번호는 6자 이상이어야 합니다.';return;}
   if(pw!==pw2){msg.className='auth-msg err';msg.textContent='비밀번호가 일치하지 않습니다.';return;}
   try{
     const [ar,pr]=await Promise.all([fetch(`${DB}/approved_users.json?_=${Date.now()}`),fetch(`${DB}/pending_users.json?_=${Date.now()}`)]);
