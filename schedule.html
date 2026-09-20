@@ -947,6 +947,22 @@ function renderDiscountBtns(){
     b.classList.toggle('on', parseInt(b.dataset.rate)===drSp);
   });
 }
+function getHobbyWeekly(use4wk,cls,stu,mon){
+  if(use4wk){
+    const d=getData(cls,stu,mon);
+    const dts={};
+    (d.lessons||[]).forEach(l=>{
+      const dw=new Date(YEAR,mon-1,l.day).getDay();
+      if(!dts[dw])dts[dw]=new Set();
+      dts[dw].add(l.tim);
+    });
+    return Object.values(dts).reduce((s,t)=>s+t.size,0)||1;
+  } else {
+    const d=getData(cls,stu,mon);
+    const actual=(d.lessons||[]).length;
+    return actual>0?Math.round(actual/4):1;
+  }
+}
 function calcFeeRaw(){
   // 고정수강료/할인율 미적용 순수 계산
   if(!curStu)return null;
