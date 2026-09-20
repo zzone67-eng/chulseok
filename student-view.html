@@ -1210,21 +1210,38 @@ function cloudDeleteErrorMessage(e){
   if(code==='storage/retry-limit-exceeded')return '네트워크 문제로 삭제하지 못했습니다. 다시 시도해주세요.';
   return '클라우드 사진을 삭제하지 못했습니다. 다시 시도해주세요.';
 }
+async function queueLegacyStorageCleanup(items=[]){
+  const u=fbAuth.currentUser;if(!u||!items.length)return;
+  try{
+    const ref=fbRtdb.ref(`legacy_storage_cleanup/${u.uid}`);
+    for(const item of items){
+      const key=practiceId('cleanup');
+      await ref.child(key).set({path:item.path||'',ownerUid:item.ownerUid||storagePathOwner(item.path),title:item.title||'',projectId:item.projectId||'',sessionId:item.sessionId||'',requestedAt:new Date().toISOString(),requestedBy:u.uid});
+    }
+  }catch(e){console.warn('legacy cleanup queue',e);}
+}
 async function deletePracticeProject(id){
   const store=getPracticeStore(),p=store.projects.find(x=>x.id===id);if(!p)return;
   if(!confirm(`“${p.title}” 작품과 모든 과정 사진을 삭제할까요?
-클라우드 사진과 기록이 모두 삭제됩니다.`))return;
-  setCloudStatus('syncing','클라우드 삭제 중');
+현재 계정 사진은 클라우드에서도 함께 삭제됩니다.`))return;
+  setCloudStatus('syncing','삭제 중');
   try{
-    for(const shot of (p.sessions||[])) await deleteStoragePath(shot.imagePath);
+    const u=fbAuth.currentUser,legacy=[];
     for(const shot of (p.sessions||[])){
+      const owner=storagePathOwner(shot.imagePath);
+      if(shot.imagePath&&u&&owner&&owner!==u.uid){
+        legacy.push({path:shot.imagePath,ownerUid:owner,title:p.title,projectId:p.id,sessionId:shot.id});
+      }else{
+        await deleteStoragePath(shot.imagePath);
+      }
       try{await deletePracticeImageLocal(shot.imageId||shot.id);}catch(e){console.warn('local image delete',e);}
     }
+    if(legacy.length)await queueLegacyStorageCleanup(legacy);
     store.projects=store.projects.filter(x=>x.id!==id);
     await savePracticeStore(store);
     closeProcessViewer();await loadPracticeTracker();haptic('medium');
     setCloudStatus('on','클라우드 저장됨');
-    showToast('클라우드에서 작품과 사진을 모두 삭제했어요','ok');
+    showToast(legacy.length?`작품 기록을 삭제했어요 · 이전 계정 사진 ${legacy.length}장은 정리 대기`:'클라우드에서 작품과 사진을 모두 삭제했어요',legacy.length?'info':'ok');
   }catch(e){
     console.error('project cloud delete failed',e);
     setCloudStatus('err','삭제 실패');
@@ -1235,9 +1252,11 @@ async function deleteCurrentPracticeSession(){
   const p=processViewerProject;if(!p)return;const shot=(p.sessions||[])[processViewerIndex];if(!shot)return;
   if(!confirm(`${processViewerIndex+1}번째 과정 사진을 삭제할까요?
 이 기록의 ${Number(shot.t)||0}T도 함께 삭제됩니다.`))return;
-  setCloudStatus('syncing','클라우드 삭제 중');
+  setCloudStatus('syncing','삭제 중');
   try{
-    await deleteStoragePath(shot.imagePath);
+    const u=fbAuth.currentUser,owner=storagePathOwner(shot.imagePath),isLegacy=!!(shot.imagePath&&u&&owner&&owner!==u.uid);
+    if(isLegacy)await queueLegacyStorageCleanup([{path:shot.imagePath,ownerUid:owner,title:p.title,projectId:p.id,sessionId:shot.id}]);
+    else await deleteStoragePath(shot.imagePath);
     try{await deletePracticeImageLocal(shot.imageId||shot.id);}catch(e){console.warn('local image delete',e);}
     const store=getPracticeStore(),live=store.projects.find(x=>x.id===p.id);if(!live)return;
     live.sessions=(live.sessions||[]).filter(x=>x.id!==shot.id);
@@ -1246,7 +1265,7 @@ async function deleteCurrentPracticeSession(){
     await savePracticeStore(store);
     closeProcessViewer();await loadPracticeTracker();haptic('medium');
     setCloudStatus('on','클라우드 저장됨');
-    showToast('클라우드에서 과정 사진을 삭제했어요','ok');
+    showToast(isLegacy?'과정 기록을 삭제했어요 · 이전 계정 사진은 정리 대기':'클라우드에서 과정 사진을 삭제했어요',isLegacy?'info':'ok');
   }catch(e){
     console.error('session cloud delete failed',e);
     setCloudStatus('err','삭제 실패');
