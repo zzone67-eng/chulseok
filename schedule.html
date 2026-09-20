@@ -979,10 +979,23 @@ function calcFeeRaw(){
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
-    // 실제 타임수 기반 주당 횟수 판단 (4주 기준)
-    const weeklyT=actualReg>0?Math.round(actualReg/5):1; // 5주 달 대비 보수적으로 판단
-    const isWeekly2=weeklyT>=2;
-    const wRate=isWeekly2?50000:25000;
+    // 4주 기준 ON: 요일 패턴으로 주당 횟수 판단, OFF: 실제 타임수/4
+    let hobWeeklyT;
+    if(use4wk){
+      // 이미 위에서 계산한 dayTimSet 재활용 불가하므로 재계산
+      const d2b=getData(curCls,curStu,mon);
+      const dtsB={};
+      (d2b.lessons||[]).forEach(l=>{
+        const dw=new Date(YEAR,mon-1,l.day).getDay();
+        if(!dtsB[dw])dtsB[dw]=new Set();
+        dtsB[dw].add(l.tim);
+      });
+      hobWeeklyT=Object.values(dtsB).reduce((s,t)=>s+t.size,0)||1;
+    } else {
+      hobWeeklyT=actualReg>0?Math.round(actualReg/4):1;
+    }
+    const isWeekly2=hobWeeklyT>=2;
+    const wRate=25000;
     fee=abs===0?(isWeekly2?200000:100000)+sp*wRate:Math.max(0,actualReg-abs)*wRate+sp*wRate;
   }
   return {fee,rate,reg,sp,abs,finalT,actualReg};
@@ -1187,10 +1200,22 @@ function calcFee(){
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
-    // 실제 타임수로 주당 횟수 판단 (5주 달 기준)
-    const wkT=actualReg>0?Math.round(actualReg/5):1;
+    // 4주 기준 ON: 요일 패턴으로 주당 횟수, OFF: 실제/4
+    let wkT;
+    if(use4wk){
+      const d3b=getData(curCls,curStu,mon);
+      const dtsC={};
+      (d3b.lessons||[]).forEach(l=>{
+        const dw=new Date(YEAR,mon-1,l.day).getDay();
+        if(!dtsC[dw])dtsC[dw]=new Set();
+        dtsC[dw].add(l.tim);
+      });
+      wkT=Object.values(dtsC).reduce((s,t)=>s+t.size,0)||1;
+    } else {
+      wkT=actualReg>0?Math.round(actualReg/4):1;
+    }
     const isW2=wkT>=2;
-    const weekRate=25000; // 타임당 단가 고정
+    const weekRate=25000;
     const base=isW2?200000:100000;
     if(abs===0){
       fee=base+sp*weekRate;
@@ -1209,8 +1234,20 @@ function calcFee(){
     const spFee=Math.round(sp*rate*(1-drSp/100));
     fee=regFee+spFee;
     if(curCls==='취미반'&&s){
-      const wkT2=actualReg>0?Math.round(actualReg/5):1;
-      const wRate=25000; // 타임당 단가 고정
+      let wkT2;
+      if(use4wk){
+        const d3c=getData(curCls,curStu,mon);
+        const dtsD={};
+        (d3c.lessons||[]).forEach(l=>{
+          const dw=new Date(YEAR,mon-1,l.day).getDay();
+          if(!dtsD[dw])dtsD[dw]=new Set();
+          dtsD[dw].add(l.tim);
+        });
+        wkT2=Object.values(dtsD).reduce((s,t)=>s+t.size,0)||1;
+      } else {
+        wkT2=actualReg>0?Math.round(actualReg/4):1;
+      }
+      const wRate=25000;
       const baseFee=abs===0?(wkT2>=2?200000:100000):Math.max(0,actualReg-abs)*wRate;
       fee=Math.round(baseFee*(1-drReg/100))+Math.round(sp*wRate*(1-drSp/100));
     }
