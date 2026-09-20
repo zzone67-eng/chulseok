@@ -639,6 +639,28 @@ html,body{background:#F8F7F3!important}
 }
 .student-zone-start,.student-workspace .process-head,.student-workspace .process-cloud-row{background:#F8F7F3!important}
 .student-workspace .process-today,.student-workspace .process-week,.student-workspace .project-card,.student-workspace .completed-item{background-color:#fff}
+
+/* NAV FINAL — fully rounded pill */
+.tabbar{
+  padding:10px 14px calc(12px + env(safe-area-inset-bottom)) !important;
+  overflow:visible !important;
+}
+.tabbar-pill{
+  height:76px !important;
+  padding:7px !important;
+  border-radius:999px !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+}
+.tbtn,
+.tbtn.on{
+  border-radius:999px !important;
+  overflow:hidden !important;
+}
+@media(min-width:560px){
+  .tabbar-pill,.tbtn,.tbtn.on{border-radius:999px !important;}
+}
+
 </style>
 </head>
 <body>
