@@ -416,14 +416,58 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 .scr{padding-bottom:128px}
 @media(min-width:560px){.tabbar-pill,.tbtn,.tbtn.on{border-radius:999px!important}}
 
+
+/* ── HWA+ ACADEMY IDENTITY ───────────────────────────────────────── */
+:root{
+  --bg:#F2F0EB;
+  --sf:#FFFEFC;
+  --sf2:#F7F5F1;
+  --sf3:#ECE9E3;
+  --bd:#E2DED6;
+  --bd2:#D2CDC4;
+  --tx:#121212;
+  --tx2:#6C6861;
+  --tx3:#A19B92;
+  --red:#F0443E;
+  --acc:#F0443E;
+  --black:#111111;
+  --granite:#151515;
+  --stone:#E9E5DE;
+}
+body{background:#E9E6E0}
+.app{background:
+  radial-gradient(circle at 8% 4%,rgba(17,17,17,.018) 0 1px,transparent 1.2px) 0 0/18px 18px,
+  radial-gradient(circle at 82% 22%,rgba(17,17,17,.014) 0 1px,transparent 1.1px) 0 0/26px 26px,
+  var(--bg)}
+.hdr{background:rgba(242,240,235,.93)!important;border-bottom:1px solid rgba(17,17,17,.035)}
+.hdr-brand{gap:10px!important}.hwa-header-mark{width:38px;height:38px;border-radius:12px;object-fit:cover;flex:none;box-shadow:0 5px 14px rgba(17,17,17,.08)}
+.hdr-date{letter-spacing:.04em!important}.hdr-user{font-size:17px!important;letter-spacing:-.55px!important}
+.hdr-logout{background:#FFFEFC!important;border-color:rgba(17,17,17,.08)!important}
+.hwa-auth-brand{display:flex;align-items:center;gap:12px;width:100%;max-width:360px;margin:0 auto 16px}.hwa-auth-brand img{width:50px;height:50px;border-radius:15px;object-fit:cover;box-shadow:0 8px 20px rgba(17,17,17,.1)}.hwa-auth-role{font-size:9px;font-weight:950;letter-spacing:.16em;color:var(--red)}.hwa-auth-name{font-size:19px;font-weight:950;letter-spacing:-.55px;margin-top:2px}.auth-sub{display:none!important}.auth-card{background:rgba(255,254,252,.98)!important;border-color:rgba(17,17,17,.07)!important}
+.process-head{padding-top:22px!important}.process-kicker,.page-kicker,.tool-kicker{color:var(--red)!important;letter-spacing:.16em!important}.process-title{letter-spacing:-1.4px!important}
+.process-today,.sch-hero-card{background:
+  radial-gradient(circle at 18% 24%,rgba(255,255,255,.11) 0 1px,transparent 1.15px) 0 0/22px 22px,
+  radial-gradient(circle at 70% 66%,rgba(255,255,255,.07) 0 1px,transparent 1.2px) 0 0/31px 31px,
+  linear-gradient(145deg,#171717,#0D0D0D)!important;
+  border:1px solid rgba(255,255,255,.04);box-shadow:0 20px 42px rgba(18,18,18,.14)!important}
+.process-today:after{background:radial-gradient(circle,rgba(240,68,62,.50),rgba(240,68,62,0) 68%)!important}
+.process-primary{border-radius:16px!important}.process-primary .plus{background:var(--red)!important;border-radius:9px!important}
+.process-week,.academy-updates,.schedule-calendar-card,.sch-next-card,.project-card,.completed-item,.tool-card{background:rgba(255,254,252,.97)!important;border-color:rgba(17,17,17,.07)!important;box-shadow:0 8px 26px rgba(17,17,17,.035)!important}
+.process-section-head{position:relative;padding-left:11px}.process-section-head:before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:4px;height:16px;border-radius:999px;background:var(--red)}
+.process-section-action{color:var(--red)!important}.project-badge{background:rgba(17,17,17,.86)!important}.project-add{background:var(--granite)!important}.project-menu,.completed-delete{background:#FFF4F2!important;border-color:#F0D5D1!important;color:var(--red)!important}
+.cloud-pill.on{background:#F0F6F2!important;color:#347352!important}.cloud-pill.err{background:#FFF0EE!important}
+.tabbar-pill{background:rgba(255,254,252,.96)!important;border-color:rgba(17,17,17,.07)!important}.tbtn{position:relative}.tbtn.on{background:var(--granite)!important}.tbtn.on:after{content:"";position:absolute;top:8px;right:calc(50% - 16px);width:6px;height:6px;border-radius:2px;background:var(--red);transform:rotate(45deg)}
+.sch-hero-card:after{background:radial-gradient(circle,rgba(240,68,62,.42),rgba(240,68,62,0) 70%)!important}
+.tool-tab.on,.t-chip.on{background:var(--granite)!important}.feedback-save,.goal-sheet-save{background:var(--red)!important}
+@media(min-width:560px){.app{box-shadow:0 28px 70px rgba(17,17,17,.16)!important}}
+
 </style>
 </head>
 <body>
 
 <!-- 로그인 -->
 <div class="auth on" id="vLogin">
-  <div class="auth-logo">STUDENT</div>
-  <div class="auth-sub">학생 시간표</div>
+  <div class="hwa-auth-brand"><img src="logo.png" alt="화강암 플러스"><div><div class="hwa-auth-role">STUDENT</div><div class="hwa-auth-name">화강암 플러스</div></div></div>
   <div class="auth-card">
     <div class="auth-title">로그인</div>
     <div class="auth-msg" id="loginMsg"></div>
@@ -436,8 +480,7 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 
 <!-- 회원가입 -->
 <div class="auth" id="vSignup">
-  <div class="auth-logo">STUDENT</div>
-  <div class="auth-sub">회원가입</div>
+  <div class="hwa-auth-brand"><img src="logo.png" alt="화강암 플러스"><div><div class="hwa-auth-role">STUDENT</div><div class="hwa-auth-name">화강암 플러스</div></div></div>
   <div class="auth-card">
     <div class="auth-title">계정 만들기</div>
     <div class="auth-msg" id="signupMsg"></div>
@@ -467,6 +510,7 @@ body{background:#EAE7E1}.app{background:var(--bg)}
 <div class="app" id="vApp">
   <header class="hdr">
     <div class="hdr-brand">
+      <img class="hwa-header-mark" src="logo.png" alt="">
       <div class="hdr-meta">
         <div class="hdr-date" id="hdrDate">오늘</div>
         <div class="hdr-user" id="hdrUser"></div>
