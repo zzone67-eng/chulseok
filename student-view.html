@@ -753,6 +753,58 @@ html,body{background:#F8F7F3!important}
 /* intro removed: keep cloud sync row compact */
 #pane-home>.process-cloud-row{margin-top:10px!important}
 
+
+/* ========================= TOOLS DETAIL UPDATE ========================= */
+
+/* Header: remove translucent white/blur overlay */
+.hdr{
+  background:#F8F7F3!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  box-shadow:none!important;
+}
+.hdr.scrolled{
+  background:#F8F7F3!important;
+  box-shadow:none!important;
+  border-bottom:1px solid rgba(17,17,17,.05)!important;
+}
+.hdr-date{position:relative;z-index:2}
+
+/* timer date + records */
+#pane-routine .timer-topline{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important}
+#pane-routine .timer-date{font-size:9px!important;font-weight:850!important;color:rgba(255,255,255,.55)!important;white-space:nowrap!important}
+#pane-routine .timer-history-wrap{
+  margin-top:10px!important;background:#fff!important;border:1px solid rgba(17,17,17,.07)!important;
+  border-radius:22px!important;padding:15px!important;box-shadow:0 9px 24px rgba(17,17,17,.035)!important
+}
+#pane-routine .timer-history-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;font-size:12px!important;font-weight:950!important}
+#pane-routine .timer-history-head>div:last-child{font-size:9px!important;color:var(--red)!important;font-weight:900!important}
+#pane-routine .timer-history{display:grid!important;gap:0!important;margin-top:8px!important}
+#pane-routine .timer-history-item{display:grid!important;grid-template-columns:1fr auto!important;gap:12px!important;align-items:center!important;padding:11px 1px!important;border-top:1px solid #EEEAE4!important}
+#pane-routine .timer-history-item:first-child{border-top:0!important}
+#pane-routine .timer-history-date{font-size:11px!important;font-weight:900!important;color:#111!important}
+#pane-routine .timer-history-time{font-size:9px!important;color:var(--tx3)!important;margin-top:3px!important}
+#pane-routine .timer-history-duration{font-size:15px!important;font-weight:950!important;color:#111!important;white-space:nowrap!important}
+#pane-routine .timer-history-empty{padding:16px 2px 5px!important;font-size:10px!important;color:var(--tx3)!important}
+
+/* feedback delete */
+#pane-routine .feedback-item-top{align-items:flex-start!important}
+#pane-routine .feedback-item-side{display:flex!important;align-items:center!important;gap:6px!important;flex:none!important}
+#pane-routine .feedback-delete{
+  width:28px!important;height:28px!important;border:1px solid #F0D7D3!important;border-radius:10px!important;
+  background:#FFF4F2!important;color:var(--red)!important;display:grid!important;place-items:center!important;padding:0!important
+}
+#pane-routine .feedback-delete svg{width:14px!important;height:14px!important;stroke:currentColor!important;fill:none!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+#pane-routine .feedback-delete:active{transform:scale(.92)!important}
+
+/* D-day CTA: clearly separated from background */
+#pane-routine .tool-dday-card .dday-edit{
+  width:calc(100% - 24px)!important;margin:0 12px 12px!important;min-height:48px!important;
+  border:0!important;border-radius:15px!important;background:#111!important;color:#fff!important;
+  font-size:11px!important;font-weight:950!important;box-shadow:0 8px 18px rgba(17,17,17,.12)!important
+}
+#pane-routine .tool-dday-card .dday-edit:active{transform:scale(.985)!important;background:#242424!important}
+
 </style>
 </head>
 <body>
@@ -879,11 +931,15 @@ html,body{background:#F8F7F3!important}
 
       <div class="tool-view on" id="toolViewTimer">
         <div class="tool-card tool-timer-card" id="timerCard">
-          <div class="timer-status" id="timerStateLabel">READY</div>
+          <div class="timer-topline"><div class="timer-status" id="timerStateLabel">READY</div><div class="timer-date" id="timerTodayDate"></div></div>
           <div class="timer-display" id="timerDisplay">00:00:00</div>
           <div class="timer-actions"><button class="timer-btn timer-primary" id="timerStartBtn" onclick="toggleTimer()">시작</button><button class="timer-btn timer-secondary" onclick="resetTimer()">초기화</button></div>
           <button class="timer-finish" onclick="finishTimer()">작업 종료 · 기록 저장</button>
           <div class="timer-meta"><div class="timer-stat"><div class="timer-stat-label">이번 주 집중</div><div class="timer-stat-val" id="weekFocusTime">0분</div></div><div class="timer-stat"><div class="timer-stat-label">이번 주 세션</div><div class="timer-stat-val" id="weekSessionCount">0회</div></div></div>
+        </div>
+        <div class="timer-history-wrap">
+          <div class="timer-history-head"><div>집중 기록</div><div id="timerHistoryCount"></div></div>
+          <div class="timer-history" id="timerHistory"></div>
         </div>
       </div>
 
@@ -1935,6 +1991,8 @@ function renderTimer(){
   const state=document.getElementById('timerStateLabel'),focusState=document.getElementById('workFocusState'),card=document.getElementById('timerCard');
   const label=routineTimerRunning?'FOCUSING':routineTimerSeconds?'PAUSED':'READY';
   if(state)state.textContent=label;if(focusState)focusState.textContent=label;if(card)card.classList.toggle('is-running',routineTimerRunning);
+  const td=document.getElementById('timerTodayDate');
+  if(td)td.textContent=new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'});
 }
 function toggleTimer(){
   if(routineTimerRunning){clearInterval(routineTimerId);routineTimerRunning=false;renderTimer();haptic('light');return;}
@@ -1947,7 +2005,23 @@ function finishTimer(){
   if(routineTimerSeconds<=0){showToast('타이머를 먼저 시작해주세요','info');return;}
   if(routineTimerId)clearInterval(routineTimerId);routineTimerRunning=false;
   const st=getRoutineStore();st.sessions=st.sessions||[];st.sessions.unshift({createdAt:new Date().toISOString(),seconds:routineTimerSeconds});saveRoutineStore(st);
-  const mins=Math.max(1,Math.round(routineTimerSeconds/60));routineTimerSeconds=0;renderTimer();renderRoutineStats();haptic('medium');showToast(`${mins}분 작업 기록을 저장했어요`,'ok');
+  const mins=Math.max(1,Math.round(routineTimerSeconds/60));routineTimerSeconds=0;renderTimer();renderRoutineStats();renderTimerHistory();haptic('medium');showToast(`${mins}분 작업 기록을 저장했어요`,'ok');
+}
+function formatSessionDuration(sec){
+  const mins=Math.max(1,Math.round((Number(sec)||0)/60));
+  if(mins>=60){const h=Math.floor(mins/60),m=mins%60;return m?`${h}시간 ${m}분`:`${h}시간`;}
+  return `${mins}분`;
+}
+function renderTimerHistory(){
+  const el=document.getElementById('timerHistory'),count=document.getElementById('timerHistoryCount');if(!el)return;
+  const sessions=(getRoutineStore().sessions||[]).slice(0,12);
+  if(count)count.textContent=sessions.length?`${sessions.length}개 기록`:'';
+  if(!sessions.length){el.innerHTML='<div class="timer-history-empty">아직 저장된 집중 기록이 없습니다.</div>';return;}
+  el.innerHTML=sessions.map(x=>{
+    const d=new Date(x.createdAt),date=Number.isNaN(d.getTime())?'':d.toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'});
+    const time=Number.isNaN(d.getTime())?'':d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="timer-history-item"><div><div class="timer-history-date">${date}</div><div class="timer-history-time">${time} · 작업 종료</div></div><div class="timer-history-duration">${formatSessionDuration(x.seconds)}</div></div>`;
+  }).join('');
 }
 function toggleFeedbackTag(btn,tag){btn.classList.toggle('on');if(btn.classList.contains('on')){if(!selectedFeedbackTags.includes(tag))selectedFeedbackTags.push(tag);}else selectedFeedbackTags=selectedFeedbackTags.filter(t=>t!==tag);haptic('light');}
 function saveFeedback(){
@@ -1965,9 +2039,16 @@ function renderRoutineStats(){
   const hft=document.getElementById('historyWeekFocus');if(hft)hft.textContent=timeText;
   const hsc=document.getElementById('historyWeekSessions');if(hsc)hsc.textContent=`${sessions.length}회`;
 }
+function deleteFeedback(index){
+  const st=getRoutineStore(),all=st.feedbacks||[];if(!all[index])return;
+  if(!confirm('이 피드백 메모를 삭제할까요?'))return;
+  all.splice(index,1);st.feedbacks=all;saveRoutineStore(st);
+  renderFeedbackHistory();renderFeedbackPatterns();loadNextCanvas();haptic('light');showToast('피드백 메모를 삭제했어요','ok');
+}
 function renderFeedbackHistory(){
-  const el=document.getElementById('feedbackHistory');if(!el)return;const f=(getRoutineStore().feedbacks||[]).slice(0,5);if(!f.length){el.innerHTML='<div class="routine-empty">아직 피드백 기록이 없습니다.</div>';return;}
-  el.innerHTML=f.map(x=>`<div class="feedback-item"><div class="feedback-item-top"><div class="feedback-item-tags">${(x.tags||[]).join(' · ')||'피드백'}</div><div class="feedback-item-date">${fmtShortDate(x.createdAt)}</div></div><div class="feedback-item-note">${x.note}</div></div>`).join('');
+  const el=document.getElementById('feedbackHistory');if(!el)return;const all=getRoutineStore().feedbacks||[],f=all.slice(0,5);if(!f.length){el.innerHTML='<div class="routine-empty">아직 피드백 기록이 없습니다.</div>';return;}
+  const trash='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M7 7l1 12h8l1-12"/><path d="M10 11v5M14 11v5"/></svg>';
+  el.innerHTML=f.map((x,i)=>`<div class="feedback-item"><div class="feedback-item-top"><div class="feedback-item-tags">${escapeHtml((x.tags||[]).join(' · ')||'피드백')}</div><div class="feedback-item-side"><div class="feedback-item-date">${fmtShortDate(x.createdAt)}</div><button class="feedback-delete" type="button" onclick="deleteFeedback(${i})" aria-label="피드백 삭제">${trash}</button></div></div><div class="feedback-item-note">${escapeHtml(x.note)}</div></div>`).join('');
 }
 function renderFeedbackPatterns(){
   const el=document.getElementById('feedbackPatterns');if(!el)return;
@@ -1984,13 +2065,13 @@ function switchWorkView(view,btn){
   if(isHistory){renderRoutineStats();renderFeedbackHistory();renderFeedbackPatterns();}
   haptic('light');
 }
-function loadRoutine(){loadGoalPin();renderTimer();renderRoutineStats();renderFeedbackHistory();renderFeedbackPatterns();}
+function loadRoutine(){loadGoalPin();renderTimer();renderRoutineStats();renderTimerHistory();renderFeedbackHistory();renderFeedbackPatterns();}
 function switchToolView(view,btn){
   document.querySelectorAll('.tool-view').forEach(v=>v.classList.remove('on'));
   document.querySelectorAll('.tool-tab').forEach(b=>b.classList.remove('on'));
   const target=document.getElementById('toolView'+view.charAt(0).toUpperCase()+view.slice(1));if(target)target.classList.add('on');
   if(btn)btn.classList.add('on');
-  if(view==='timer'){renderTimer();renderRoutineStats();}
+  if(view==='timer'){renderTimer();renderRoutineStats();renderTimerHistory();}
   if(view==='feedback'){renderFeedbackHistory();}
   if(view==='dday'){loadGoalPin();}
   haptic('light');
