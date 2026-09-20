@@ -548,6 +548,44 @@ html,body{background:linear-gradient(180deg,#ECE8E0 0%,#F3F1EC 16%,#F3F1EC 100%)
 .demo-teacher{font-size:9px;color:var(--tx2);font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .demo-datetime{font-size:8px;color:var(--tx3);font-weight:800;white-space:nowrap}
 
+
+/* v18 academy / student workspace separation */
+#pane-home{background:var(--bg)}
+.academy-updates{margin:0!important;padding:12px 14px 14px!important;background:linear-gradient(180deg,#ECE8E1 0%,#F1EEE8 100%)!important;border-top:1px solid rgba(17,17,17,.05)!important;border-bottom:1px solid rgba(17,17,17,.06)!important;border-radius:0!important;box-shadow:none!important}
+.academy-zone-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:0 2px 9px}
+.academy-zone-kicker{font-size:8px;font-weight:950;letter-spacing:.15em;color:var(--red)}
+.academy-zone-title{font-size:17px;font-weight:950;letter-spacing:-.55px;margin-top:2px}
+.academy-zone-note{font-size:9px;font-weight:850;color:var(--tx3);padding-bottom:2px}
+.au-notice.top-banner{border-radius:15px!important;padding:10px 12px!important;margin-bottom:10px!important;box-shadow:0 8px 18px rgba(17,17,17,.12)!important}
+.au-notice.top-banner .au-notice-title{font-size:12px!important}
+.au-notice.top-banner .au-notice-title-row{margin-top:4px!important}
+.au-notice.top-banner .au-arr{width:21px!important;height:21px!important;font-size:16px!important}
+.academy-demo-row{background:transparent!important;border:none!important;border-radius:0!important;padding:0!important;box-shadow:none!important}
+.academy-updates .au-head.compact{margin:0 2px 7px!important;align-items:center!important}
+.academy-updates .au-title{font-size:11px!important;letter-spacing:-.2px!important}
+.academy-updates .au-sub{display:none!important}
+.academy-updates .au-new{font-size:7px!important;padding:3px 6px!important;background:#111!important}
+.demo-strip{gap:8px!important;padding:0 1px 2px!important}
+.demo-card{min-width:138px!important;width:138px!important;border-radius:14px!important;box-shadow:none!important}
+.demo-cover{height:76px!important}
+.demo-cover .demo-count{right:6px!important;bottom:6px!important;font-size:7px!important;padding:3px 5px!important}
+.demo-copy{padding:8px 8px 9px!important}
+.demo-meta{font-size:7px!important;margin-bottom:3px!important}
+.demo-title{font-size:10px!important;line-height:1.3!important;min-height:26px!important;-webkit-line-clamp:2!important}
+.demo-subline{display:block!important;margin-top:5px!important}
+.demo-teacher{font-size:7px!important;margin-bottom:2px!important}
+.demo-datetime{font-size:7px!important}
+.student-zone-start{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:0;padding:18px 18px 7px;background:var(--bg);position:relative}
+.student-zone-start:before{content:"";position:absolute;left:18px;top:0;width:34px;height:4px;border-radius:99px;background:var(--red)}
+.student-zone-kicker{font-size:8px;font-weight:950;letter-spacing:.15em;color:var(--red)}
+.student-zone-title{font-size:18px;font-weight:950;letter-spacing:-.6px;margin-top:2px}
+.student-zone-badge{font-size:7px;font-weight:950;letter-spacing:.12em;color:var(--tx3);border:1px solid var(--bd);background:#fff;padding:5px 7px;border-radius:999px}
+#pane-home>.process-head{padding-top:5px!important}
+#pane-home>.process-head .process-kicker{display:none!important}
+#pane-home>.process-head .process-title{font-size:28px!important}
+#pane-home>.process-head .process-desc{max-width:92%}
+@media(max-width:380px){.demo-card{min-width:130px!important;width:130px!important}.demo-cover{height:72px!important}}
+
 </style>
 </head>
 <body>
@@ -611,6 +649,7 @@ html,body{background:linear-gradient(180deg,#ECE8E0 0%,#F3F1EC 16%,#F3F1EC 100%)
   <main class="scr" id="mainScr">
     <section class="pane on" id="pane-home">
       <div class="academy-updates" id="academyUpdates" style="display:none">
+        <div class="academy-zone-head"><div><div class="academy-zone-kicker">FROM ACADEMY</div><div class="academy-zone-title">학원에서</div></div><div class="academy-zone-note">공지 · 시범자료</div></div>
         <div class="au-notice top-banner" id="teacherNoticeMini" style="display:none" onclick="this.classList.toggle('open')">
           <div class="au-notice-glow"></div>
           <div class="au-notice-top"><span class="au-kicker">공지사항</span><span class="au-badge" id="teacherNoticeClass">전체</span><span class="au-badge hot" id="teacherNoticeUrgent" style="display:none">긴급</span></div>
@@ -622,6 +661,8 @@ html,body{background:linear-gradient(180deg,#ECE8E0 0%,#F3F1EC 16%,#F3F1EC 100%)
           <div class="demo-strip" id="teacherDemoStrip"></div>
         </div>
       </div>
+
+      <div class="student-zone-start"><div><div class="student-zone-kicker">MY PRACTICE</div><div class="student-zone-title">내 실기 기록</div></div><span class="student-zone-badge">STUDENT</span></div>
 
       <div class="process-head">
         <div class="process-kicker">PRACTICE LOG</div>
