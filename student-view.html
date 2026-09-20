@@ -461,6 +461,60 @@ body{background:#E9E6E0}
 .tool-tab.on,.t-chip.on{background:var(--granite)!important}.feedback-save,.goal-sheet-save{background:var(--red)!important}
 @media(min-width:560px){.app{box-shadow:0 28px 70px rgba(17,17,17,.16)!important}}
 
+
+/* ========================= v16 : ART+ identity refresh (student) ========================= */
+:root{
+  --bg:#F3F1EC !important;
+  --sf:#FFFFFF !important;
+  --sf2:#F7F4EF !important;
+  --sf3:#EFEAE2 !important;
+  --bd:#E6E0D6 !important;
+  --bd2:#D8D0C4 !important;
+  --tx:#111111 !important;
+  --tx2:#68635D !important;
+  --tx3:#A39A8E !important;
+  --red:#FF3B30 !important;
+  --academy-red:#FF3B30 !important;
+  --black:#0F0F10 !important;
+  --green:#20835C !important;
+}
+html,body{background:linear-gradient(180deg,#ECE8E0 0%,#F3F1EC 16%,#F3F1EC 100%)!important;color:var(--tx)!important}
+.app,.auth{background:var(--bg)!important}
+.auth-card,.goal-card,.routine-card,.next-canvas,.work-focus-card,.history-summary-card,.history-pattern-card,.history-list-card,.schedule-calendar-card,.sch-next-card,.home-class-card,.week-motive,.mission-card,.notice-bar,.ntc-card,.asgn-card,.brief-card,.work-target-line,.work-focus-card,.feedback-composer,.feedback-item,.cls-item,.goal-card,.work-segment,.work-view .empty-card,.status-card,.home-today-card,.dash-card{border-color:rgba(17,17,17,.07)!important;box-shadow:0 10px 28px rgba(17,17,17,.045)!important}
+.auth-brand-icon,.brand img,.hdr-logo{box-shadow:0 10px 24px rgba(17,17,17,.12)!important}
+.brand-sub,.auth-sub{font-weight:800!important;letter-spacing:.02em}
+.brand-sub:before,.auth-sub:before{content:"ART+ · ";color:var(--red);font-weight:950}
+.hdr{background:rgba(243,241,236,.94)!important;border-bottom:1px solid rgba(17,17,17,.05)!important;backdrop-filter:blur(14px)}
+.hdr-kicker,.kicker,.home-schedule-kicker,.tool-kicker,.sch-hero-label,.work-focus-top,.composer-kicker{color:var(--red)!important;letter-spacing:.15em!important}
+.hdr-name,.page-title,.home-schedule-title,.sch-next-title,.home-class-main,.goal-motto,.work-focus-text,.history-title,.brief-focus,.nc-title{letter-spacing:-.9px!important}
+.page-title,.home-schedule-title,.section-title{position:relative}
+.page-title:after,.home-schedule-title:after,.section-title:after{content:"";display:inline-block;width:9px;height:9px;margin-left:8px;border-radius:2px;background:var(--red);transform:translateY(-2px) rotate(45deg)}
+.icon-btn,.goal-edit-btn,.notice-bar .nb-arr,.tbtn,.tbtn.on,.nc-go,.brief-start,.timer-primary,.feedback-save,.save-btn,.mission-btn,.goal-edit-btn.on{transition:all .18s ease}
+.home-today-card,.work-timer-card,.brief-card,.sch-hero-card{background:linear-gradient(145deg,#0E0E10,#18181B)!important;color:#fff!important;border:1px solid rgba(255,255,255,.04)!important;box-shadow:0 18px 40px rgba(17,17,17,.14)!important;position:relative;overflow:hidden}
+.home-today-card:before,.work-timer-card:before,.brief-card:before,.sch-hero-card:before{content:"";position:absolute;right:-42px;top:-44px;width:160px;height:160px;border-radius:32px;background:radial-gradient(circle,rgba(255,59,48,.5),rgba(255,59,48,0) 68%)}
+.home-today-card > *, .work-timer-card > *, .brief-card > *, .sch-hero-card > *{position:relative;z-index:1}
+.home-today-card .home-today-kicker,.home-today-card .home-today-meta,.work-timer-card .timer-status,.brief-date,.sch-pill,.sch-hero-label{color:rgba(255,255,255,.75)!important}
+.primary,.publish,.feedback-save,.save-btn{background:linear-gradient(135deg,#151515,#0F0F10)!important;color:#fff!important;box-shadow:0 10px 24px rgba(17,17,17,.14)}
+.publish{background:linear-gradient(135deg,#FF5146,#FF3B30)!important;box-shadow:0 12px 28px rgba(255,59,48,.22)!important}
+.publish:hover,.primary:hover,.save-btn:hover,.feedback-save:hover{transform:translateY(-1px)}
+.goal-edit-btn,.work-target-chip,.focus-chip,.nb-icon,.pattern-pill,.nc-badge,.home-class-link,.week-motive-count{color:var(--red)!important}
+.focus-chip,.work-target-chip{background:#FFF1EF!important;border-color:#FFD9D5!important}
+.nb-icon,.pattern-pill,.badge.red,.nb-hot{background:#FFF1EF!important;color:var(--red)!important}
+.nb-cls{background:#F6F3EE!important;color:var(--tx2)!important}
+.work-seg-btn.on,.ftab.on,.goal-edit-btn.on,.tbtn.on,.home-class-card.active,.tab.on{background:#111!important;color:#fff!important;border-color:#111!important}
+.tabbar{background:linear-gradient(to top,var(--bg) 72%,rgba(243,241,236,0))!important}
+.tabbar-pill,.tab-pill{height:72px!important;border-radius:28px!important;background:rgba(255,255,255,.96)!important;border-color:rgba(17,17,17,.06)!important;box-shadow:0 18px 40px rgba(17,17,17,.12)!important}
+.tbtn,.tab{font-weight:900!important}
+.tbtn.on,.tab.on{position:relative}
+.tbtn.on:after,.tab.on:after{content:"";position:absolute;top:8px;right:calc(50% - 18px);width:7px;height:7px;border-radius:2px;background:var(--red);transform:rotate(45deg)}
+.notice-bar{background:rgba(255,255,255,.82)!important}
+.next-canvas:before{width:5px!important;background:var(--red)!important}
+.task-cb.done{background:var(--red)!important;border-color:var(--red)!important}
+.timer-finish{color:var(--red)!important;border-color:rgba(17,17,17,.08)!important}
+.week-bar.on,.cd.selected .cd-dot,.home-class-link svg,.icon-btn svg{color:inherit;stroke:currentColor}
+.cd.selected{outline:2px solid #111!important;color:#111!important}
+.cd.selected .cd-num,.cd.selected{color:#111!important}
+
 </style>
 </head>
 <body>
