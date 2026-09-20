@@ -689,7 +689,33 @@ async function cleanupTeacherUploads(paths){
 }
 
 function practiceTotalT(p){return (p?.sessions||[]).reduce((a,s)=>a+(Number(s.t)||0),0)}
-function studentEntries(){return Object.entries(studentPracticeData||{}).map(([uid,x])=>({uid,data:x||{},profile:x?.profile||{}})).filter(x=>x.profile?.name).sort((a,b)=>String(a.profile.cls||'').localeCompare(String(b.profile.cls||''),'ko')||String(a.profile.name||'').localeCompare(String(b.profile.name||''),'ko'))}
+function studentLogicalKey(profile){
+  const name=String(profile?.name||'').trim().replace(/\s+/g,' '),cls=String(profile?.cls||'').trim().replace(/\s+/g,' ');
+  return (cls+'|'+name).toLocaleLowerCase('ko-KR');
+}
+function studentEntryActivity(x){
+  let t=0;for(const p of (Array.isArray(x?.projects)?x.projects:[])){for(const ss of (p?.sessions||[])){const v=Date.parse(ss?.createdAt||'');if(Number.isFinite(v))t=Math.max(t,v)}const pv=Date.parse(p?.updatedAt||p?.createdAt||'');if(Number.isFinite(pv))t=Math.max(t,pv)}
+  const xv=Date.parse(x?.updatedAt||x?.profile?.updatedAt||'');if(Number.isFinite(xv))t=Math.max(t,xv);return t;
+}
+function studentEntries(){
+  const groups=new Map();
+  Object.entries(studentPracticeData||{}).forEach(([uid,x])=>{
+    x=x||{};const profile=x.profile||{};if(!profile.name)return;const key=studentLogicalKey(profile);if(!key)return;
+    if(!groups.has(key))groups.set(key,[]);groups.get(key).push({uid,data:x,profile});
+  });
+  return [...groups.values()].map(list=>{
+    list.sort((a,b)=>studentEntryActivity(b.data)-studentEntryActivity(a.data)||(b.data?.projects?.length||0)-(a.data?.projects?.length||0));
+    const primary=list[0],projectMap=new Map();
+    list.forEach(entry=>{(Array.isArray(entry.data?.projects)?entry.data.projects:[]).forEach((p,i)=>{
+      if(!p)return;const pid=String(p.id||'legacy_'+i),existing=projectMap.get(pid),candidate={...p,_sourceUid:entry.uid};
+      if(!existing){projectMap.set(pid,candidate);return;}
+      const exSessions=existing.sessions||[],caSessions=candidate.sessions||[];
+      const exTime=Math.max(0,...exSessions.map(s=>Date.parse(s?.createdAt||'')||0)),caTime=Math.max(0,...caSessions.map(s=>Date.parse(s?.createdAt||'')||0));
+      if(caSessions.length>exSessions.length||(caSessions.length===exSessions.length&&caTime>exTime))projectMap.set(pid,candidate);
+    })});
+    return {uid:primary.uid,uids:list.map(x=>x.uid),profile:primary.profile||{},data:{...primary.data,projects:[...projectMap.values()]}};
+  }).sort((a,b)=>String(a.profile.cls||'').localeCompare(String(b.profile.cls||''),'ko')||String(a.profile.name||'').localeCompare(String(b.profile.name||''),'ko'));
+}
 function pickStudentClass(v,b){studentClassFilter=v;document.querySelectorAll('#studentClassFilter button').forEach(x=>x.classList.remove('on'));b.classList.add('on');const visible=studentEntries().filter(x=>v==='전체'||x.profile.cls===v);if(!visible.some(x=>x.uid===selectedStudentUid))selectedStudentUid=visible[0]?.uid||'';renderStudentPractice()}
 function selectPracticeStudent(uid){selectedStudentUid=uid;renderStudentPractice();document.getElementById('mainScr').scrollTo({top:0,behavior:'smooth'})}
 function renderStudentPractice(){
@@ -699,13 +725,13 @@ function renderStudentPractice(){
   if(!visible.length){picker.innerHTML='';document.getElementById('studentSummary').classList.remove('on');document.getElementById('studentActiveWorks').innerHTML='<div class="student-empty">아직 작품 기록이 연결된 학생이 없습니다.<br>학생이 최신 학생앱을 한 번 열면 자동으로 표시됩니다.</div>';document.getElementById('studentDoneWorks').innerHTML='';document.getElementById('studentActiveCount').textContent='';document.getElementById('studentDoneCount').textContent='';return}
   if(!visible.some(x=>x.uid===selectedStudentUid))selectedStudentUid=visible[0].uid;
   picker.innerHTML=visible.map(x=>`<button class="student-chip${x.uid===selectedStudentUid?' on':''}" onclick="selectPracticeStudent('${x.uid}')"><div class="student-chip-name">${esc(x.profile.name)}</div><div class="student-chip-cls">${esc(x.profile.cls||'반 미지정')}</div></button>`).join('');
-  const cur=studentPracticeData[selectedStudentUid]||{},profile=cur.profile||{},projects=Array.isArray(cur.projects)?cur.projects:[];
+  const entry=all.find(x=>x.uid===selectedStudentUid)||visible[0],cur=entry?.data||{},profile=entry?.profile||{},projects=Array.isArray(cur.projects)?cur.projects:[];
   const active=projects.filter(p=>p.status!=='done'),done=projects.filter(p=>p.status==='done');
   const totalT=projects.reduce((a,p)=>a+practiceTotalT(p),0),totalSessions=projects.reduce((a,p)=>a+(p.sessions||[]).length,0);
   const sm=document.getElementById('studentSummary');sm.classList.add('on');sm.innerHTML=`<div class="student-summary-top"><div><div class="student-summary-name">${esc(profile.name||'학생')}</div><div class="student-summary-cls">${esc(profile.cls||'')}</div></div></div><div class="student-summary-stats"><div class="student-summary-stat"><b>${projects.length}</b><span>전체 작품</span></div><div class="student-summary-stat"><b>${totalSessions}</b><span>과정 기록</span></div><div class="student-summary-stat"><b>${totalT}T</b><span>누적 작업</span></div></div>`;
   document.getElementById('studentActiveCount').textContent=active.length?active.length+'개':'';document.getElementById('studentDoneCount').textContent=done.length?done.length+'개':'';
-  document.getElementById('studentActiveWorks').innerHTML=active.length?active.map(p=>studentWorkCard(selectedStudentUid,p,profile)).join(''):'<div class="student-empty">진행 중인 작품이 없습니다.</div>';
-  document.getElementById('studentDoneWorks').innerHTML=done.length?done.map(p=>studentWorkCard(selectedStudentUid,p,profile)).join(''):'<div class="student-empty">완료한 작품이 없습니다.</div>';
+  document.getElementById('studentActiveWorks').innerHTML=active.length?active.map(p=>studentWorkCard(p._sourceUid||selectedStudentUid,p,profile)).join(''):'<div class="student-empty">진행 중인 작품이 없습니다.</div>';
+  document.getElementById('studentDoneWorks').innerHTML=done.length?done.map(p=>studentWorkCard(p._sourceUid||selectedStudentUid,p,profile)).join(''):'<div class="student-empty">완료한 작품이 없습니다.</div>';
 }
 function studentWorkCard(uid,p,profile){const ss=p.sessions||[],last=ss[ss.length-1]||{},cover=last.imageUrl||'',total=practiceTotalT(p);return `<div class="student-work" onclick="openTeacherProcess('${uid}','${p.id}',${Math.max(0,ss.length-1)})"><div class="student-work-cover">${cover?`<img src="${cover}" alt="${esc(p.title||'작품')}">`:`<svg class="student-work-placeholder" viewBox="0 0 24 24"><path d="M4 7h4l1.5-2h5L16 7h4v12H4Z"/><circle cx="12" cy="13" r="3.5"/></svg>`}<span class="student-work-badge">${p.status==='done'?'완료':'진행 중'} · ${ss.length}회</span></div><div class="student-work-info"><div class="student-work-head"><div><div class="student-work-title">${esc(p.title||'실기 작품')}</div><div class="student-work-meta">${ss.length?dt(ss[0].createdAt)+' 시작 · 최근 '+dt(last.createdAt):'과정 기록 없음'}</div></div><div class="student-work-total">${total}T<span>누적</span></div></div><div class="student-work-progress">${ss.slice(0,8).map((_,i)=>`<i class="student-work-dot on"></i>`).join('')}</div></div></div>`}
 async function studentShotUrl(s){if(s?.imageUrl)return s.imageUrl;if(s?.imagePath){try{return await storage.ref(s.imagePath).getDownloadURL()}catch(e){return ''}}return ''}
