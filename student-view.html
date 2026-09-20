@@ -838,7 +838,7 @@ async function checkApproval(){
   if(d&&d.name===me.name){localStorage.removeItem('hwa_user');me=null;showAuth('vLogin');const msg=document.getElementById('loginMsg');msg.className='auth-msg err';msg.textContent='승인이 완료됐어요. 가입할 때 입력한 비밀번호로 로그인해주세요.';}
   else alert('아직 승인 대기 중입니다.');
 }
-async function doLogout(){try{await fbAuth.signOut();}catch(e){}localStorage.removeItem('hwa_user');me=null;location.reload();}
+async function doLogout(){stopPracticeRealtime();try{await fbAuth.signOut();}catch(e){}localStorage.removeItem('hwa_user');me=null;location.reload();}
 
 // ── 앱 진입 ──
 async function enterApp(){
@@ -852,6 +852,7 @@ async function enterApp(){
   const r=await fetch(`${DB}/schedule_backup.json?_=${Date.now()}`);
   sch=r.ok?(await r.json()||{}):{};
   await loadPracticeStoreFromCloud();
+  initPracticeRealtime();
   renderHome();
   renderSchTab();
   loadNotices();
@@ -932,17 +933,29 @@ let practiceSheetMode='add', practiceProjectId='', practiceSelectedT=1, practice
 let practiceObjectUrls=[];
 let practiceCache={projects:[]};
 let practiceCloudReady=false;
+let practiceRealtimeRef=null,practiceRealtimeHandler=null,practiceRealtimeSig='';
 function practiceStoreKey(){return 'hwa_practice_process_'+(me?.uid||'guest');}
+function normalizePracticeStore(v){
+  const src=(v&&typeof v==='object')?v:{};
+  return {projects:Array.isArray(src.projects)?src.projects:[],profile:(src.profile&&typeof src.profile==='object')?src.profile:{},_cloudInitialized:src._cloudInitialized===true,_updatedAt:Number(src._updatedAt)||0};
+}
+function practiceCloudPayload(s){
+  return {projects:Array.isArray(s?.projects)?s.projects:[],profile:{name:me?.name||s?.profile?.name||'',cls:me?.cls||s?.profile?.cls||'',memberUid:me?.uid||s?.profile?.memberUid||''},_cloudInitialized:true,_updatedAt:Date.now()};
+}
 function readLocalPracticeStore(){try{const s=JSON.parse(localStorage.getItem(practiceStoreKey())||'{"projects":[]}');if(!Array.isArray(s.projects))s.projects=[];return s;}catch(e){return {projects:[]};}}
 function getPracticeStore(){return practiceCache&&Array.isArray(practiceCache.projects)?practiceCache:{projects:[]};}
 function practiceCloudRef(){const u=fbAuth.currentUser;if(!u)return null;return fbRtdb.ref(`practice_artworks/${u.uid}`);}
 function setCloudStatus(state,text){const el=document.getElementById('cloudStatus');if(!el)return;el.className='cloud-pill'+(state?' '+state:'');el.textContent=text||'클라우드';}
 async function savePracticeStore(s){
-  practiceCache=s;localStorage.setItem(practiceStoreKey(),JSON.stringify(s));
+  const payload=practiceCloudPayload(s);
+  practiceCache=payload;localStorage.setItem(practiceStoreKey(),JSON.stringify(payload));
   const ref=practiceCloudRef();if(!ref)return;
   setCloudStatus('syncing','저장 중');
-  try{await ref.set(s);practiceCloudReady=true;setCloudStatus('on','클라우드 저장됨');}
-  catch(e){console.error(e);setCloudStatus('err','동기화 오류');throw e;}
+  try{
+    await ref.set(payload);
+    practiceRealtimeSig=JSON.stringify(payload);
+    practiceCloudReady=true;setCloudStatus('on','클라우드 저장됨');
+  }catch(e){console.error(e);setCloudStatus('err','동기화 오류');throw e;}
 }
 function practiceId(prefix='p'){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);}
 function escPractice(v=''){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
@@ -963,6 +976,7 @@ function clearPracticeObjectUrls(){practiceObjectUrls.forEach(u=>{if(String(u).s
 async function storageUrl(path){if(!path)return '';try{return await fbStorage.ref(path).getDownloadURL();}catch(e){console.warn('storage url',e);return '';}}
 async function imageUrlFor(ref){
   if(!ref)return '';
+  if(typeof ref==='object'&&ref.imageUrl)return ref.imageUrl;
   if(typeof ref==='object'&&ref.imagePath)return await storageUrl(ref.imagePath);
   const id=typeof ref==='object'?ref.imageId:ref;
   const b=await getPracticeImage(id);if(!b)return '';const u=URL.createObjectURL(b);practiceObjectUrls.push(u);return u;
@@ -991,16 +1005,40 @@ async function repairLegacyPracticePaths(store){
       const sid=shot.id||practiceId('shot');
       shot.id=sid;shot.imageId=shot.imageId||sid;
       shot.imagePath=await uploadPracticeBlob(blob,project.id,sid);
+      shot.imageUrl=await storageUrl(shot.imagePath);
       repaired++;changed=true;
     }
   }
   if(changed){
-    const ref=practiceCloudRef();if(ref)await ref.set(store);
-    localStorage.setItem(practiceStoreKey(),JSON.stringify(store));
+    const payload=practiceCloudPayload(store);store=payload;
+    const ref=practiceCloudRef();if(ref)await ref.set(payload);
+    localStorage.setItem(practiceStoreKey(),JSON.stringify(payload));
   }
   return {store,repaired,missing};
 }
 
+async function enrichPracticeShareData(store){
+  const u=fbAuth.currentUser;if(!u)return {store,changed:false};
+  let changed=false;
+  store=normalizePracticeStore(store);
+  const profile={name:me?.name||'',cls:me?.cls||'',memberUid:me?.uid||''};
+  if(JSON.stringify(store.profile||{})!==JSON.stringify(profile)){store.profile=profile;changed=true;}
+  for(const p of store.projects||[]){
+    for(const shot of p.sessions||[]){
+      if(!shot.imageUrl&&shot.imagePath&&storagePathOwner(shot.imagePath)===u.uid){
+        const url=await storageUrl(shot.imagePath);
+        if(url){shot.imageUrl=url;changed=true;}
+      }
+    }
+  }
+  if(changed){
+    const payload=practiceCloudPayload(store);
+    const ref=practiceCloudRef();if(ref)await ref.set(payload);
+    localStorage.setItem(practiceStoreKey(),JSON.stringify(payload));
+    return {store:payload,changed:true};
+  }
+  return {store,changed:false};
+}
 async function migrateLocalPracticeToCloud(local){
   if(!fbAuth.currentUser||!local?.projects?.length)return local;
   setCloudStatus('syncing','기존 기록 이전 중');
@@ -1010,27 +1048,73 @@ async function migrateLocalPracticeToCloud(local){
       const blob=await getPracticeImage(s.imageId||s.id);if(!blob)continue;
       const sid=s.id||practiceId('shot');s.id=sid;s.imageId=s.imageId||sid;
       s.imagePath=await uploadPracticeBlob(blob,p.id,sid);
+      s.imageUrl=await storageUrl(s.imagePath);
     }
   }
   return local;
 }
 async function loadPracticeStoreFromCloud(){
-  const local=readLocalPracticeStore();practiceCache=local;
+  const local=normalizePracticeStore(readLocalPracticeStore());practiceCache=local;
   const ref=practiceCloudRef();
   if(!ref){setCloudStatus('err','로그인 필요');return local;}
   setCloudStatus('syncing','동기화 중');
   try{
-    const snap=await ref.once('value');const cloud=snap.val();
-    if(cloud&&Array.isArray(cloud.projects))practiceCache=cloud;
-    else if(local.projects.length){practiceCache=await migrateLocalPracticeToCloud(local);await ref.set(practiceCache);}
-    else practiceCache={projects:[]};
-    const repaired=await repairLegacyPracticePaths(practiceCache);practiceCache=repaired.store;
-    localStorage.setItem(practiceStoreKey(),JSON.stringify(practiceCache));practiceCloudReady=true;
+    const snap=await ref.once('value');const raw=snap.val();
+    const cloud=normalizePracticeStore(raw);
+    // 클라우드에 한 번이라도 초기화 마커가 있으면 비어 있어도 클라우드를 최종 기준으로 사용
+    if(raw&&cloud._cloudInitialized===true){
+      practiceCache=cloud;
+    }else if(raw&&Array.isArray(raw.projects)){
+      // 예전 버전의 클라우드 데이터는 유지하면서 새 포맷으로 승격
+      practiceCache=practiceCloudPayload(cloud);
+      await ref.set(practiceCache);
+    }else if(local.projects.length){
+      // 정말 클라우드 기록이 한 번도 없을 때만 이 기기의 옛 기록을 최초 이전
+      practiceCache=await migrateLocalPracticeToCloud(local);
+      practiceCache=practiceCloudPayload(practiceCache);
+      await ref.set(practiceCache);
+    }else{
+      // 빈 상태도 명시적으로 저장해 다른 기기의 오래된 로컬 데이터가 되살아나지 않게 함
+      practiceCache=practiceCloudPayload({projects:[]});
+      await ref.set(practiceCache);
+    }
+    const repaired=await repairLegacyPracticePaths(practiceCache);practiceCache=normalizePracticeStore(repaired.store);
+    const shared=await enrichPracticeShareData(practiceCache);practiceCache=normalizePracticeStore(shared.store);
+    localStorage.setItem(practiceStoreKey(),JSON.stringify(practiceCache));practiceRealtimeSig=JSON.stringify(practiceCache);practiceCloudReady=true;
     if(repaired.missing>0)setCloudStatus('err',`이전 사진 ${repaired.missing}장 재연결 필요`);
     else if(repaired.repaired>0)setCloudStatus('on',`이전 사진 ${repaired.repaired}장 복구됨`);
     else setCloudStatus('on','클라우드 저장됨');
     return practiceCache;
   }catch(e){console.error(e);practiceCache=local;setCloudStatus('err','동기화 오류');return local;}
+}
+function stopPracticeRealtime(){
+  if(practiceRealtimeRef&&practiceRealtimeHandler){try{practiceRealtimeRef.off('value',practiceRealtimeHandler);}catch(e){}}
+  practiceRealtimeRef=null;practiceRealtimeHandler=null;
+}
+function initPracticeRealtime(){
+  stopPracticeRealtime();
+  const ref=practiceCloudRef();if(!ref)return;
+  practiceRealtimeRef=ref;
+  practiceRealtimeHandler=async snap=>{
+    const raw=snap.val();
+    // 초기 연결 전의 null 이벤트는 최초 마이그레이션 로직에 맡김
+    if(!practiceCloudReady&&raw==null)return;
+    let cloud=normalizePracticeStore(raw);
+    if(!raw||cloud._cloudInitialized!==true){
+      // 구버전 데이터는 실시간 수신 시에도 새 포맷으로 정규화
+      cloud=practiceCloudPayload(cloud);
+    }
+    const sig=JSON.stringify(cloud);
+    if(sig===practiceRealtimeSig)return;
+    practiceRealtimeSig=sig;
+    practiceCache=cloud;
+    localStorage.setItem(practiceStoreKey(),JSON.stringify(cloud));
+    practiceCloudReady=true;setCloudStatus('on','클라우드 동기화됨');
+    // 다른 기기에서 현재 보고 있던 작품이 삭제된 경우 뷰어도 닫음
+    if(processViewerProject&&!cloud.projects.some(p=>p.id===processViewerProject.id))closeProcessViewer();
+    await loadPracticeTracker();
+  };
+  ref.on('value',practiceRealtimeHandler,err=>{console.error('practice realtime',err);setCloudStatus('err','실시간 동기화 오류');});
 }
 async function compressPracticeImage(file){
   const maxSide=1200,target=420*1024;let img,src='';
@@ -1097,9 +1181,10 @@ async function savePracticeRecord(){
     const sessionId=practiceId('shot'),blob=await compressPracticeImage(practicePendingFile);
     setCloudStatus('syncing','사진 업로드 중');
     const imagePath=await uploadPracticeBlob(blob,p.id,sessionId);
+    const imageUrl=await storageUrl(imagePath);
     await putPracticeImage(sessionId,blob).catch(()=>{});
     const note=document.getElementById('practiceSessionNote').value.trim();
-    p.sessions=p.sessions||[];p.sessions.push({id:sessionId,imageId:sessionId,imagePath,createdAt:new Date().toISOString(),t:practiceSelectedT,note});p.updatedAt=new Date().toISOString();
+    p.sessions=p.sessions||[];p.sessions.push({id:sessionId,imageId:sessionId,imagePath,imageUrl,createdAt:new Date().toISOString(),t:practiceSelectedT,note});p.updatedAt=new Date().toISOString();
     await savePracticeStore(s);closePracticeSheet();await loadPracticeTracker();haptic('medium');showToast(`${practiceSelectedT}T 과정 기록을 클라우드에 저장했어요`,'ok');
   }catch(e){console.error(e);setCloudStatus('err','업로드 오류');showToast('사진 업로드에 실패했어요. 인터넷 연결을 확인해주세요.','info');}
   finally{btn.disabled=false;btn.textContent='기록 저장';}
@@ -1921,7 +2006,7 @@ function initNtcCards(){
 
 
 // ── 클라우드 연결 상태 ──
-window.addEventListener('online',()=>{if(me&&fbAuth.currentUser)loadPracticeStoreFromCloud().then(loadPracticeTracker);});
+window.addEventListener('online',()=>{if(me&&fbAuth.currentUser)loadPracticeStoreFromCloud().then(()=>{initPracticeRealtime();return loadPracticeTracker();});});
 window.addEventListener('offline',()=>setCloudStatus('err','오프라인'));
 
 // ── 초기화 ──
