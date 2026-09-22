@@ -428,28 +428,34 @@ async function syncFromFirebase(){
             const absT=sdata.abs||s.absence||0;
 
             if(s.cls==='취미반'){
-              // 취미반: 실타임 기반 주당 횟수 판단 (데이터 없으면 건너뜀)
-              if(regT===0&&spT===0){return;} // 시간표 체크 없으면 0원 유지
-              const weeklyCount=regT>0?Math.round(regT/5):1;
+              // 취미반: use4wk 시 reg4 기반, 아니면 실타임/4
+              if(regT===0&&spT===0){return;}
+              const effRegT2=(sdata.use4wk&&sdata.reg4!=null)?sdata.reg4:regT;
+              const weeklyCount=sdata.use4wk&&sdata.reg4!=null
+                ?Math.round(sdata.reg4/4)
+                :(regT>0?Math.round(regT/4):1);
               const isW2=weeklyCount>=2;
-              const wRate=25000; // 타임당 단가 (주1회/2회 무관)
+              const wRate=25000;
               const baseAmt=isW2?200000:100000;
               if(absT===0&&spT===0){
                 s.amount=baseAmt;s.days='주'+(isW2?2:1)+'회';
               }else{
-                const netT=Math.max(0,regT-absT);
+                const netT=Math.max(0,effRegT2-absT);
                 s.amount=netT*wRate+spT*wRate;
-                s.days=absT>0?`실수업 ${regT}T - 결석 ${absT}회 = ${netT}T`:`${regT}T`;
+                s.days=absT>0?`실수업 ${effRegT2}T - 결석 ${absT}회 = ${netT}T`:`${effRegT2}T`;
               }
-              s.totalT=Math.max(0,regT-absT)+spT;
+              s.totalT=Math.max(0,effRegT2-absT)+spT;
             }else{
               // 일반: (정규+특강-결석) × 단가
+              // use4wk 켜진 경우 reg4(4주환산 타임수) 우선 사용
               const rate=s.cls==='예비반'?30000:31250;
-              const netT=Math.max(0,regT+spT-absT);
+              const effRegT=(sdata.use4wk&&sdata.reg4!=null)?sdata.reg4:regT;
+              const netT=Math.max(0,effRegT+spT-absT);
               s.amount=netT*rate;
               s.totalT=netT;
-              if(spT>0)s.days=`정규 ${regT}T / 특강 ${spT}T${absT>0?' / 전월결석 -'+absT+'T':''} = 총 ${s.totalT}T`;
-              else s.days=`${regT}T${absT>0?' (전월결석 -'+absT+'T)':''}`;
+              const reg4Label=sdata.use4wk&&sdata.reg4!=null?` (4주환산 ${sdata.reg4}T)`:'';
+              if(spT>0)s.days=`정규 ${effRegT}T${reg4Label} / 특강 ${spT}T${absT>0?' / 전월결석 -'+absT+'T':''} = 총 ${s.totalT}T`;
+              else s.days=`${effRegT}T${reg4Label}${absT>0?' (전월결석 -'+absT+'T)':''}`;
             }
             s.absence=absT;
           });
