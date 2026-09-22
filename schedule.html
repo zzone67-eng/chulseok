@@ -1543,9 +1543,21 @@ async function syncFB(){
     Object.entries(db).forEach(([k,v])=>{
       const parts=k.split('_');
       if(parts.length>=3){
-        const m2=parts[parts.length-1],n2=parts[parts.length-2],c2=parts.slice(0,parts.length-2).join('_');
+        const m2=parseInt(parts[parts.length-1]),n2=parts[parts.length-2],c2=parts.slice(0,parts.length-2).join('_');
         const av=parseInt(localStorage.getItem('abs_'+c2+'_'+n2+'_'+m2)||'0')||0;
-        dbWithAbs2[k]={...v,abs:av};
+        const u4=localStorage.getItem('4wk_'+c2+'_'+n2+'_'+m2)==='1';
+        // use4wk 켜진 경우 요일 패턴 기반 reg 계산해서 저장
+        let reg4=null;
+        if(u4&&v.lessons&&v.lessons.length>0){
+          const dts={};
+          v.lessons.forEach(l=>{
+            const dw=new Date(YEAR,m2-1,l.day).getDay();
+            if(!dts[dw])dts[dw]=new Set();
+            dts[dw].add(l.tim);
+          });
+          reg4=Object.values(dts).reduce((s,t)=>s+t.size,0)*4;
+        }
+        dbWithAbs2[k]={...v,abs:av,use4wk:u4,...(reg4!==null?{reg4}:{})};
       } else { dbWithAbs2[k]=v; }
     });
     await fetch(DB+'/schedule_backup.json',{method:'PUT',body:JSON.stringify(Object.assign({},dbWithAbs2,{_updatedAt:nowTs})),headers:{'Content-Type':'application/json'}});
