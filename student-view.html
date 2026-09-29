@@ -1127,6 +1127,128 @@ body{
   }
 }
 
+
+/* ==================== VIEWPORT POSITION FINAL FIX ==================== */
+/* 브라우저와 홈화면(PWA)의 safe-area를 분리해서 적용 */
+html,body{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  background:var(--bg)!important;
+}
+.app,
+.app.on{
+  position:fixed!important;
+  inset:0!important;
+  width:100%!important;
+  max-width:520px!important;
+  height:100dvh!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0 auto!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:var(--bg)!important;
+}
+
+/* 일반 브라우저에서는 safe-area를 강제로 더하지 않음 */
+.hdr{
+  flex:0 0 auto!important;
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  min-height:60px!important;
+  padding:9px 14px!important;
+  margin:0!important;
+  background:var(--bg)!important;
+  border-bottom:1px solid var(--line)!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+.hdr-logo{width:40px!important;height:40px!important}
+.hdr-me{height:38px!important;min-height:38px!important}
+
+/* 스크롤 영역은 헤더 아래부터 네비 위까지 정확히 채움 */
+.scr{
+  flex:1 1 auto!important;
+  width:100%!important;
+  min-height:0!important;
+  height:auto!important;
+  margin:0!important;
+  padding:12px 0 70px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior:contain!important;
+}
+.pane{
+  width:100%!important;
+  padding-left:14px!important;
+  padding-right:14px!important;
+  margin:0!important;
+}
+
+/* 하단 네비는 실제 화면 끝에 붙임. 위로 보이게 하던 그라디언트 제거 */
+.tabbar{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  z-index:50!important;
+  margin:0!important;
+  padding:0 12px 5px!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+.tabs{
+  width:100%!important;
+  height:58px!important;
+  margin:0!important;
+  padding:5px!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  border:1px solid var(--line)!important;
+  box-shadow:0 5px 16px rgba(17,17,17,.08)!important;
+}
+.tab{
+  min-height:0!important;
+  height:48px!important;
+  padding:5px 6px!important;
+  font-size:9px!important;
+  gap:2px!important;
+}
+.tab svg{width:18px!important;height:18px!important}
+
+/* 홈화면에 추가해서 실행했을 때만 노치/홈 인디케이터 safe-area 사용 */
+body.is-standalone .hdr{
+  min-height:calc(60px + env(safe-area-inset-top))!important;
+  padding-top:calc(9px + env(safe-area-inset-top))!important;
+}
+body.is-standalone .scr{
+  padding-bottom:calc(68px + env(safe-area-inset-bottom))!important;
+}
+body.is-standalone .tabbar{
+  padding-bottom:max(3px, env(safe-area-inset-bottom))!important;
+}
+
+/* 아주 작은 화면 */
+@media(max-height:700px){
+  .hdr{min-height:56px!important;padding-top:7px!important;padding-bottom:7px!important}
+  .hdr-logo{width:38px!important;height:38px!important}
+  .tabs{height:55px!important}
+  .tab{height:45px!important}
+  .scr{padding-bottom:66px!important}
+}
+
 </style>
 </head>
 <body>
@@ -2584,6 +2706,13 @@ async function bootstrapApp(){
 window.addEventListener('online',()=>{if(me&&fbAuth.currentUser)loadPracticeStoreFromCloud().then(()=>{initPracticeRealtime();return loadPracticeTracker();});});
 window.addEventListener('offline',()=>setCloudStatus('err','오프라인'));
 window.addEventListener('DOMContentLoaded',initSwipe);
+
+(function detectStandaloneMode(){
+  const standalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+  const iosStandalone = window.navigator.standalone === true;
+  document.body.classList.toggle('is-standalone', !!(standalone || iosStandalone));
+})();
+
 bootstrapApp();
 
 </script>
