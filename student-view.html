@@ -1279,6 +1279,98 @@ body.is-standalone .hdr{
   padding-top:0!important;
 }
 
+
+/* ==================== USER REQUEST FIXES ==================== */
+/* 앱 전체 배경: 완전 화이트 */
+:root{
+  --bg:#FFFFFF!important;
+  --card:#FFFFFF!important;
+  --card2:#FAFAF8!important;
+}
+html,body,.app,.scr,.hdr{
+  background:#FFFFFF!important;
+  background-image:none!important;
+}
+.tabbar{
+  background:linear-gradient(to top,#FFFFFF 72%,rgba(255,255,255,0))!important;
+}
+
+/* 메인 주간 수업: 이동용 카드가 아니라 화면 안에서 바로 확인 */
+.today-card{cursor:default!important}
+.week-class-head .tc-more{
+  pointer-events:none!important;
+  color:var(--faint)!important;
+}
+.week-date-row{gap:4px!important}
+button.week-date{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  border:0!important;
+  padding:0!important;
+  background:transparent!important;
+  font:inherit!important;
+  cursor:pointer!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+button.week-date.selected{
+  background:#111!important;
+  color:#fff!important;
+}
+button.week-date.selected>span{color:rgba(255,255,255,.62)!important}
+button.week-date.selected>i{background:var(--accent)!important}
+button.week-date.today:not(.selected){
+  background:#F3F1ED!important;
+  color:#111!important;
+  box-shadow:inset 0 0 0 1px #111!important;
+}
+button.week-date.today:not(.selected)>span{color:var(--sub)!important}
+
+/* 완료하기 액션을 명확하게 */
+.work-actions{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto auto!important;
+  gap:7px!important;
+  align-items:center!important;
+}
+.work-actions .complete-btn{
+  min-height:42px!important;
+  padding:0 13px!important;
+  border-radius:13px!important;
+  background:#F5F3EF!important;
+  border:1px solid var(--line)!important;
+  color:#111!important;
+  font-size:10px!important;
+  font-weight:850!important;
+  white-space:nowrap!important;
+}
+
+/* 트리밍 화면: 터치 우선 */
+.crop-editor{
+  z-index:9999!important;
+  pointer-events:auto!important;
+  touch-action:none!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+}
+.crop-topbar,.crop-bottom,.crop-stage{
+  pointer-events:auto!important;
+}
+.crop-topbar button,.crop-bottom button{
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+#cropCanvas{
+  pointer-events:auto!important;
+  touch-action:none!important;
+  -webkit-user-drag:none!important;
+  -webkit-touch-callout:none!important;
+}
+.crop-stage{
+  touch-action:none!important;
+  overscroll-behavior:none!important;
+}
+
 </style>
 </head>
 <body>
@@ -1338,7 +1430,7 @@ body.is-standalone .hdr{
     <section class="pane on" id="pane-home">
       <button class="notice-bar" id="homeNotice" type="button" onclick="openNoticeSheet()"></button>
 
-      <div class="today-card" id="todayClass" onclick="switchTab('schedule')"></div>
+      <div class="today-card" id="todayClass"></div>
 
       <div class="wa-card">
         <div class="wa-card-h"><h2>진행 중<span class="cnt" id="waActiveCnt"></span></h2><span class="wa-today" id="waToday">아직 기록 전</span></div>
@@ -1945,17 +2037,21 @@ async function savePracticeRecord(){
     const imageUrl=await storageUrl(imagePath);
     await putPracticeImage(sessionId,blob).catch(()=>{});
     const note=document.getElementById('practiceSessionNote').value.trim();
-    p.sessions=p.sessions||[];p.sessions.push({id:sessionId,imageId:sessionId,imagePath,imageUrl,createdAt:new Date().toISOString(),t:practiceSelectedT,note});p.updatedAt=new Date().toISOString();
-    await savePracticeStore(s);closePracticeSheet();await loadPracticeTracker();haptic('medium');showToast(`${p.title} · ${p.sessions[p.sessions.length-1].t}T 기록을 저장했어요`,'ok');
+    const nowIso=new Date().toISOString();
+    p.sessions=p.sessions||[];
+    p.sessions.push({id:sessionId,imageId:sessionId,imagePath,imageUrl,createdAt:nowIso,t:practiceSelectedT,note,final:practiceSheetMode==='complete'});
+    p.updatedAt=nowIso;
+    const completing=practiceSheetMode==='complete';
+    if(completing){p.status='done';p.completedAt=nowIso;}
+    await savePracticeStore(s);closePracticeSheet();await loadPracticeTracker();haptic('medium');
+    showToast(completing?`${p.title} 작품을 완료했어요`:`${p.title} · ${p.sessions[p.sessions.length-1].t}T 기록을 저장했어요`,'ok');
   }catch(e){console.error(e);setCloudStatus('err','업로드 오류');showToast('사진 업로드에 실패했어요. 인터넷 연결을 확인해주세요.','info');}
-  finally{btn.disabled=false;btn.textContent='저장';}
+  finally{btn.disabled=false;btn.textContent=practiceSheetMode==='complete'?'마지막 사진 저장하고 완료':'저장';}
 }
 async function completePracticeProject(id){
-  const s=getPracticeStore(),p=s.projects.find(x=>x.id===id);if(!p)return;if(!(p.sessions||[]).length){showToast('과정 사진을 먼저 기록해주세요','info');return;}
-  if(!confirm(`“${p.title}” 작품을 완료할까요?`))return;
-  p.status='done';p.completedAt=new Date().toISOString();p.updatedAt=p.completedAt;
-  try{await savePracticeStore(s);await loadPracticeTracker();haptic('medium');showToast(`총 ${projectTotalT(p)}T 작업으로 완료했어요`,'ok');}
-  catch(e){showToast('완료 상태를 저장하지 못했어요','info');}
+  const p=getPracticeStore().projects.find(x=>x.id===id);if(!p)return;
+  if(!(p.sessions||[]).length){showToast('과정 사진을 먼저 기록해주세요','info');return;}
+  openPracticeSheet('complete',id);
 }
 async function deleteStoragePath(path){
   if(!path)return;
@@ -2112,12 +2208,37 @@ function dayMap(y,m){
 function slotTimes(info){return [...new Set([...(info.r||[]),...(info.s||[])])].sort();}
 
 // ── 홈: 다음 수업 ──
+let homeWeekDays=[],homeWeekSelectedKey='';
+function homeWeekSummaryHtml(x){
+  if(!x)return '';
+  const label=`${x.m}/${x.day} (${DY[x.d.getDay()]})`;
+  if(x.info){
+    const ts=x.slots||[];
+    return `<div class="week-class-summary">
+      <div><span class="week-now-label">${label}</span><b>${ts.length}타임</b></div>
+      <span class="week-now-time">${ts.map(t=>{
+        const sp=x.info.s?.includes(t)&&!x.info.r?.includes(t);
+        return `${t}T ${TM[String(t)]||''}${sp?' · 특강':''}`;
+      }).join(' · ')}</span>
+    </div>`;
+  }
+  return `<div class="week-class-summary empty-day">
+    <div><span class="week-now-label">${label}</span><b>수업 없음</b></div>
+    <span class="week-now-time">예정된 수업이 없어요</span>
+  </div>`;
+}
+function selectHomeWeekDay(key){
+  homeWeekSelectedKey=key;
+  const x=homeWeekDays.find(v=>v.key===key);if(!x)return;
+  document.querySelectorAll('#homeWeekDates .week-date').forEach(el=>el.classList.toggle('selected',el.dataset.key===key));
+  const detail=document.getElementById('homeWeekDetail');if(detail)detail.innerHTML=homeWeekSummaryHtml(x);
+  haptic('light');
+}
 function renderTodayClass(){
   const box=document.getElementById('todayClass');if(!box)return;
   const now=new Date();
   const todayKey=ds(now.getFullYear(),now.getMonth()+1,now.getDate());
 
-  // 월요일 시작 일주일
   const monday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   const offset=(now.getDay()+6)%7;
   monday.setDate(monday.getDate()-offset);
@@ -2132,41 +2253,29 @@ function renderTodayClass(){
     const slots=info?slotTimes(info):[];
     week.push({d,y,m,day,key,info,slots});
   }
-
-  const today=week.find(x=>x.key===todayKey);
-  let summary='';
-  if(today?.info){
-    const ts=today.slots;
-    summary=`<div class="week-class-summary">
-      <div><span class="week-now-label">오늘 수업</span><b>${ts.length}타임</b></div>
-      <span class="week-now-time">${ts.map(t=>`${t}T ${TM[String(t)]||''}`).join(' · ')}</span>
-    </div>`;
-  }else{
-    const next=week.find(x=>x.d>now&&x.info);
-    summary=`<div class="week-class-summary empty-day">
-      <div><span class="week-now-label">오늘</span><b>수업 없음</b></div>
-      <span class="week-now-time">${next?`이번 주 다음 수업 ${next.m}/${next.day} (${DY[next.d.getDay()]})`:'이번 주 예정된 수업이 없어요'}</span>
-    </div>`;
-  }
+  homeWeekDays=week;
+  homeWeekSelectedKey=week.some(x=>x.key===homeWeekSelectedKey)?homeWeekSelectedKey:todayKey;
+  const selected=week.find(x=>x.key===homeWeekSelectedKey)||week[0];
 
   box.innerHTML=`
     <div class="week-class-head">
-      <div><b>이번 주 수업</b><span>${now.getMonth()+1}월</span></div>
-      <span class="tc-more">시간표 ›</span>
+      <div><b>이번 주 수업</b><span>${week[0].m===week[6].m?`${week[0].m}월`:`${week[0].m}월 - ${week[6].m}월`}</span></div>
+      <span class="tc-more">날짜를 눌러 확인</span>
     </div>
-    <div class="week-date-row">
+    <div class="week-date-row" id="homeWeekDates">
       ${week.map(x=>{
         const isToday=x.key===todayKey;
+        const isSelected=x.key===homeWeekSelectedKey;
         const hasClass=!!x.info;
         const isSpecial=x.info&&x.info.s?.length&&!x.info.r?.length;
-        return `<div class="week-date${isToday?' today':''}${hasClass?' has-class':''}${isSpecial?' special':''}">
+        return `<button type="button" class="week-date${isToday?' today':''}${isSelected?' selected':''}${hasClass?' has-class':''}${isSpecial?' special':''}" data-key="${x.key}" onclick="selectHomeWeekDay('${x.key}')">
           <span>${DY[x.d.getDay()]}</span>
           <b>${x.day}</b>
           <i></i>
-        </div>`;
+        </button>`;
       }).join('')}
     </div>
-    ${summary}`;
+    <div id="homeWeekDetail">${homeWeekSummaryHtml(selected)}</div>`;
 }
 
 // ── 시간표 탭 ──
@@ -2272,18 +2381,58 @@ function drawCropEditor(){
   ctx.strokeStyle='#FFFFFF';ctx.lineWidth=Math.max(3,c.width/350);ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(cropPoints[0].x,cropPoints[0].y);for(let i=1;i<4;i++)ctx.lineTo(cropPoints[i].x,cropPoints[i].y);ctx.closePath();ctx.stroke();
   cropPoints.forEach((p,i)=>{const r=Math.max(11,c.width/75);ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle='#FF4538';ctx.fill();ctx.lineWidth=Math.max(3,c.width/400);ctx.strokeStyle='#fff';ctx.stroke();ctx.fillStyle='#fff';ctx.font=`900 ${Math.max(11,c.width/85)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(i+1),p.x,p.y)});ctx.restore();
 }
-function cropPointerPos(e){
-  const c=document.getElementById('cropCanvas'),r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};
+function cropClientPos(clientX,clientY){
+  const c=document.getElementById('cropCanvas'),r=c.getBoundingClientRect();
+  if(!r.width||!r.height)return{x:0,y:0};
+  return{x:(clientX-r.left)*c.width/r.width,y:(clientY-r.top)*c.height/r.height};
+}
+function cropPointerPos(e){return cropClientPos(e.clientX,e.clientY);}
+function beginCropDrag(clientX,clientY){
+  if(cropPoints.length!==4)return false;
+  const p=cropClientPos(clientX,clientY),c=document.getElementById('cropCanvas'),rect=c.getBoundingClientRect();
+  const radius=64*c.width/Math.max(rect.width,1);
+  let best=-1,dist=Infinity;
+  cropPoints.forEach((q,i)=>{const d=cropDist(p,q);if(d<dist){dist=d;best=i}});
+  if(best>=0&&dist<=radius){cropDragIndex=best;return true}
+  return false;
+}
+function moveCropDrag(clientX,clientY){
+  if(cropDragIndex<0)return false;
+  const c=document.getElementById('cropCanvas'),p=cropClientPos(clientX,clientY),pad=2;
+  cropPoints[cropDragIndex]={x:Math.max(pad,Math.min(c.width-pad,p.x)),y:Math.max(pad,Math.min(c.height-pad,p.y))};
+  drawCropEditor();return true;
 }
 function onCropPointerDown(e){
-  if(cropPoints.length!==4)return;const p=cropPointerPos(e),c=document.getElementById('cropCanvas'),rect=c.getBoundingClientRect();const radius=44*c.width/Math.max(rect.width,1);
-  let best=-1,dist=Infinity;cropPoints.forEach((q,i)=>{const d=cropDist(p,q);if(d<dist){dist=d;best=i}});if(dist<=radius){cropDragIndex=best;c.setPointerCapture?.(e.pointerId);e.preventDefault()}
+  if(beginCropDrag(e.clientX,e.clientY)){try{e.currentTarget.setPointerCapture?.(e.pointerId)}catch(_){}e.preventDefault();e.stopPropagation();}
 }
 function onCropPointerMove(e){
-  if(cropDragIndex<0)return;const c=document.getElementById('cropCanvas'),p=cropPointerPos(e),pad=2;cropPoints[cropDragIndex]={x:Math.max(pad,Math.min(c.width-pad,p.x)),y:Math.max(pad,Math.min(c.height-pad,p.y))};drawCropEditor();e.preventDefault();
+  if(moveCropDrag(e.clientX,e.clientY)){e.preventDefault();e.stopPropagation();}
 }
-function onCropPointerUp(e){cropDragIndex=-1;try{document.getElementById('cropCanvas').releasePointerCapture?.(e.pointerId)}catch(_){}}
-
+function onCropPointerUp(e){
+  cropDragIndex=-1;
+  try{e.currentTarget.releasePointerCapture?.(e.pointerId)}catch(_){}
+}
+function onCropTouchStart(e){
+  const t=e.touches?.[0]||e.changedTouches?.[0];if(!t)return;
+  if(beginCropDrag(t.clientX,t.clientY)){e.preventDefault();e.stopPropagation();}
+}
+function onCropTouchMove(e){
+  const t=e.touches?.[0]||e.changedTouches?.[0];if(!t)return;
+  if(moveCropDrag(t.clientX,t.clientY)){e.preventDefault();e.stopPropagation();}
+}
+function onCropTouchEnd(e){cropDragIndex=-1;if(e.cancelable)e.preventDefault();}
+function bindCropTouch(){
+  const c=document.getElementById('cropCanvas');if(!c||c.dataset.cropTouchReady)return;
+  c.dataset.cropTouchReady='1';
+  c.addEventListener('pointerdown',onCropPointerDown,{passive:false});
+  c.addEventListener('pointermove',onCropPointerMove,{passive:false});
+  c.addEventListener('pointerup',onCropPointerUp,{passive:false});
+  c.addEventListener('pointercancel',onCropPointerUp,{passive:false});
+  c.addEventListener('touchstart',onCropTouchStart,{passive:false});
+  c.addEventListener('touchmove',onCropTouchMove,{passive:false});
+  c.addEventListener('touchend',onCropTouchEnd,{passive:false});
+  c.addEventListener('touchcancel',onCropTouchEnd,{passive:false});
+}
 async function detectCropQuad(){
   const cv=await ensureOpenCv();let src=null,small=null,gray=null,blur=null,edges=null,dil=null,contours=null,hier=null,kernel=null;
   try{
@@ -2312,7 +2461,7 @@ async function autoDetectPracticeCrop(){
 }
 function resetPracticeCropPoints(){cropPoints=defaultCropPoints();document.getElementById('cropStatus').textContent='전체 영역에서 시작합니다. 모서리를 작품에 맞춰주세요.';drawCropEditor();haptic('light')}
 async function openPracticeCropper(file,{keepOriginal=true}={}){
-  if(!file)return;const token=++cropOpenToken;if(keepOriginal)practiceOriginalFile=file;const ed=document.getElementById('practiceCropEditor');ed.classList.add('on');ed.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+  if(!file)return;const token=++cropOpenToken;if(keepOriginal)practiceOriginalFile=file;const ed=document.getElementById('practiceCropEditor');ed.classList.add('on');ed.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bindCropTouch();
   document.getElementById('cropStatus').textContent='사진을 준비하고 있어요.';const btn=document.getElementById('cropApplyBtn'),top=document.querySelector('.crop-apply-top');btn.disabled=true;if(top)top.disabled=true;
   try{cropSourceCanvas=await fileToCropCanvas(file);if(token!==cropOpenToken)return;cropPoints=defaultCropPoints();requestAnimationFrame(()=>fitCropCanvas());await autoDetectPracticeCrop();btn.disabled=false;if(top)top.disabled=false;}
   catch(e){console.error(e);document.getElementById('cropStatus').textContent='사진을 불러오지 못했어요.';showToast('사진을 불러오지 못했어요','info')}
@@ -2342,7 +2491,7 @@ async function applyPracticeCrop(){
   finally{btn.disabled=false;top.disabled=false;btn.textContent='이대로 사용'}
 }
 window.addEventListener('resize',()=>{if(document.getElementById('practiceCropEditor')?.classList.contains('on'))fitCropCanvas()});
-window.addEventListener('DOMContentLoaded',()=>{const c=document.getElementById('cropCanvas');if(c){c.addEventListener('pointerdown',onCropPointerDown);c.addEventListener('pointermove',onCropPointerMove);c.addEventListener('pointerup',onCropPointerUp);c.addEventListener('pointercancel',onCropPointerUp)}});
+window.addEventListener('DOMContentLoaded',bindCropTouch);setTimeout(bindCropTouch,0);
 
 // ── 작업 기록 시트 ──
 function quickPick(e,pid){
@@ -2367,11 +2516,23 @@ function resetPracticeSheet(){
 }
 function openPracticeSheet(mode='new',projectId=''){
   resetPracticeSheet();
-  if(mode==='add'&&!getPracticeStore().projects.some(x=>x.id===projectId)){showToast('기록할 작품을 찾지 못했어요');return;}
-  practiceSheetMode=mode;practiceProjectId=mode==='add'?projectId:'';
+  if((mode==='add'||mode==='complete')&&!getPracticeStore().projects.some(x=>x.id===projectId)){showToast('기록할 작품을 찾지 못했어요');return;}
+  practiceSheetMode=mode;practiceProjectId=(mode==='add'||mode==='complete')?projectId:'';
   const p=getPracticeStore().projects.find(x=>x.id===practiceProjectId);
-  document.getElementById('recTitle').textContent=mode==='new'?'새 작품 시작':p.title;
-  document.getElementById('recSub').textContent=mode==='new'?'작품 이름과 타임을 적고 저장하세요.':`${(p.sessions||[]).length+1}회차 기록 · 타임을 고르고 저장하세요.`;
+  const titleEl=document.getElementById('recTitle'),subEl=document.getElementById('recSub'),saveBtn=document.getElementById('practiceSaveBtn');
+  if(mode==='new'){
+    titleEl.textContent='새 작품 시작';
+    subEl.textContent='작품 이름과 타임을 적고 저장하세요.';
+    saveBtn.textContent='저장';
+  }else if(mode==='complete'){
+    titleEl.textContent='완료 사진 남기기';
+    subEl.textContent=`${p.title} · 마지막 사진을 올리면 완료 작품으로 이동해요.`;
+    saveBtn.textContent='마지막 사진 저장하고 완료';
+  }else{
+    titleEl.textContent=p.title;
+    subEl.textContent=`${(p.sessions||[]).length+1}회차 기록 · 타임을 고르고 저장하세요.`;
+    saveBtn.textContent='저장';
+  }
   document.getElementById('practiceNewTitleWrap').style.display=mode==='new'?'block':'none';
   document.getElementById('practiceSheet').classList.add('on');haptic('light');
 }
@@ -2405,7 +2566,7 @@ async function renderPracticeProjectCard(p){
     <div class="work-body">
       <div class="work-head"><div><div class="work-title">${escPractice(p.title)}</div><div class="work-meta">${sessions.length?`${fmtShortDate(sessions[0].createdAt)} 시작 · 최근 ${fmtShortDate(last.createdAt)}`:'아직 기록 없음'}</div></div><div class="work-total"><b>${total}T</b><span>누적 작업</span></div></div>
       ${thumbs.length>1?`<div class="timeline">${thumbs.join('')}</div>`:''}
-      <div class="work-actions"><button class="btn btn-dark" type="button" onclick="openPracticeSheet('add','${p.id}')">＋ 오늘 기록 추가</button><button class="btn btn-line" type="button" onclick="completePracticeProject('${p.id}')">완성</button><button class="icon-btn" type="button" onclick="deletePracticeProject('${p.id}')" aria-label="작품 삭제">${ICON_TRASH}</button></div>
+      <div class="work-actions"><button class="btn btn-dark" type="button" onclick="openPracticeSheet('add','${p.id}')">＋ 오늘 기록 추가</button><button class="complete-btn" type="button" onclick="completePracticeProject('${p.id}')">완료하기</button><button class="icon-btn" type="button" onclick="deletePracticeProject('${p.id}')" aria-label="작품 삭제">${ICON_TRASH}</button></div>
     </div></div>`;
 }
 async function renderCompletedPractice(p){
