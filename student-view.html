@@ -1658,6 +1658,111 @@ body.is-standalone .scr{
 }
 .crop-help{z-index:10!important;pointer-events:none!important}
 
+
+/* ==================== CROP EDITOR AUDITED FINAL ==================== */
+#practiceCropEditor{
+  position:fixed!important;
+  inset:0!important;
+  width:100%!important;
+  height:100dvh!important;
+  z-index:2147483000!important;
+  display:none!important;
+  flex-direction:column!important;
+  margin:0!important;
+  padding:0!important;
+  transform:none!important;
+  background:#121212!important;
+  pointer-events:none!important;
+  touch-action:manipulation!important;
+  overscroll-behavior:none!important;
+  isolation:isolate!important;
+}
+#practiceCropEditor.on{
+  display:flex!important;
+  pointer-events:auto!important;
+}
+#practiceCropEditor .crop-topbar,
+#practiceCropEditor .crop-bottom{
+  position:relative!important;
+  z-index:100!important;
+  flex:none!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+#practiceCropEditor .crop-topbar button,
+#practiceCropEditor .crop-bottom button{
+  position:relative!important;
+  z-index:101!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+}
+#practiceCropEditor .crop-stage{
+  position:relative!important;
+  z-index:1!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+#practiceCropEditor #cropCanvas{
+  display:block!important;
+  pointer-events:none!important;
+  touch-action:auto!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-user-drag:none!important;
+}
+#practiceCropEditor .crop-handle-layer{
+  position:absolute!important;
+  inset:0!important;
+  z-index:50!important;
+  pointer-events:none!important;
+}
+#practiceCropEditor .crop-handle{
+  position:absolute!important;
+  z-index:51!important;
+  width:52px!important;
+  height:52px!important;
+  min-width:52px!important;
+  min-height:52px!important;
+  padding:0!important;
+  margin:0!important;
+  transform:translate(-50%,-50%)!important;
+  border-radius:999px!important;
+  border:3px solid #fff!important;
+  background:#FF4538!important;
+  color:#fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  box-shadow:0 3px 14px rgba(0,0,0,.34)!important;
+  pointer-events:auto!important;
+  touch-action:none!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-touch-callout:none!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+#practiceCropEditor .crop-help{
+  pointer-events:none!important;
+  z-index:40!important;
+}
+@media(min-width:560px){
+  #practiceCropEditor{
+    left:50%!important;
+    right:auto!important;
+    width:min(430px,100%)!important;
+    transform:translateX(-50%)!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2616,23 +2721,12 @@ function moveSchMon(dir){schM+=dir;if(schM>12){schM=1;schY++;}if(schM<1){schM=12
 function goThisMonth(){const n=new Date();schY=n.getFullYear();schM=n.getMonth()+1;schSelectedDay=null;renderSchTab();}
 
 // ── 작품 사진 자동 트리밍 ──
-let cropSourceCanvas=null,cropPoints=[],cropDragIndex=-1,cropOpenToken=0,cropCvPromise=null;
+// 휴대폰/PWA 터치 안정성을 위해 OpenCV/WASM 자동 로딩을 제거하고,
+// Canvas 기반의 가벼운 자동 영역 탐색 + 수동 4점 보정 + 로컬 원근 보정으로 구성한다.
+let cropSourceCanvas=null,cropPoints=[],cropDragIndex=-1,cropOpenToken=0;
 
-function ensureOpenCv(){
-  if(window.cv&&window.cv.Mat)return Promise.resolve(window.cv);
-  if(cropCvPromise)return cropCvPromise;
-  cropCvPromise=new Promise((resolve,reject)=>{
-    const done=()=>{
-      const wait=()=>{if(window.cv&&window.cv.Mat)resolve(window.cv);else setTimeout(wait,80)};wait();
-    };
-    const old=document.querySelector('script[data-art-cv]');if(old){done();return;}
-    const sc=document.createElement('script');sc.src='https://docs.opencv.org/4.x/opencv.js';sc.async=true;sc.dataset.artCv='1';
-    sc.onload=done;sc.onerror=()=>reject(new Error('opencv-load-failed'));document.head.appendChild(sc);
-    setTimeout(()=>reject(new Error('opencv-timeout')),12000);
-  }).catch(e=>{cropCvPromise=null;throw e;});
-  return cropCvPromise;
-}
 function cropDist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+
 function orderCropPoints(points){
   if(!points||points.length!==4)return points;
   const pts=points.map(p=>({x:+p.x,y:+p.y}));
@@ -2641,223 +2735,456 @@ function orderCropPoints(points){
   const tr=pts[diffs.indexOf(Math.max(...diffs))],bl=pts[diffs.indexOf(Math.min(...diffs))];
   const uniq=[tl,tr,br,bl];
   if(new Set(uniq.map(p=>`${p.x.toFixed(2)},${p.y.toFixed(2)}`)).size===4)return uniq;
+
   const cx=pts.reduce((a,p)=>a+p.x,0)/4,cy=pts.reduce((a,p)=>a+p.y,0)/4;
   const sorted=[...pts].sort((a,b)=>Math.atan2(a.y-cy,a.x-cx)-Math.atan2(b.y-cy,b.x-cx));
-  let start=0,best=Infinity;sorted.forEach((p,i)=>{const v=p.x+p.y;if(v<best){best=v;start=i}});
-  const r=[...sorted.slice(start),...sorted.slice(0,start)];
+  let st=0,best=Infinity;
+  sorted.forEach((p,i)=>{const v=p.x+p.y;if(v<best){best=v;st=i}});
+  const r=[...sorted.slice(st),...sorted.slice(0,st)];
   return r[1].x>r[3].x?[r[0],r[1],r[2],r[3]]:[r[0],r[3],r[2],r[1]];
 }
+
 function defaultCropPoints(){
-  if(!cropSourceCanvas)return[];const w=cropSourceCanvas.width,h=cropSourceCanvas.height,m=Math.round(Math.min(w,h)*.045);
+  if(!cropSourceCanvas)return[];
+  const w=cropSourceCanvas.width,h=cropSourceCanvas.height,m=Math.round(Math.min(w,h)*.045);
   return [{x:m,y:m},{x:w-m,y:m},{x:w-m,y:h-m},{x:m,y:h-m}];
 }
+
 async function fileToCropCanvas(file){
-  const url=URL.createObjectURL(file);try{
-    const img=new Image();img.decoding='async';img.src=url;await img.decode();
-    const maxSide=1800,scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
-    const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.naturalWidth*scale));c.height=Math.max(1,Math.round(img.naturalHeight*scale));
-    c.getContext('2d',{alpha:false}).drawImage(img,0,0,c.width,c.height);return c;
-  }finally{URL.revokeObjectURL(url)}
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image();
+    img.decoding='async';
+    img.src=url;
+    await img.decode();
+
+    const maxSide=1800;
+    const scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+    const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(img.naturalWidth*scale));
+    c.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    c.getContext('2d',{alpha:false}).drawImage(img,0,0,c.width,c.height);
+    return c;
+  }finally{
+    URL.revokeObjectURL(url);
+  }
 }
+
 function fitCropCanvas(){
-  if(!cropSourceCanvas)return;const c=document.getElementById('cropCanvas'),stage=document.getElementById('cropStage');if(!c||!stage)return;
-  c.width=cropSourceCanvas.width;c.height=cropSourceCanvas.height;
-  const availW=Math.max(1,stage.clientWidth-28),availH=Math.max(1,stage.clientHeight-28);
-  const sc=Math.min(availW/c.width,availH/c.height,1);c.style.width=Math.max(1,Math.round(c.width*sc))+'px';c.style.height=Math.max(1,Math.round(c.height*sc))+'px';
-  drawCropEditor();requestAnimationFrame(syncCropHandles);
+  if(!cropSourceCanvas)return;
+  const c=document.getElementById('cropCanvas'),stage=document.getElementById('cropStage');
+  if(!c||!stage)return;
+
+  c.width=cropSourceCanvas.width;
+  c.height=cropSourceCanvas.height;
+
+  const availW=Math.max(1,stage.clientWidth-28);
+  const availH=Math.max(1,stage.clientHeight-28);
+  const sc=Math.min(availW/c.width,availH/c.height,1);
+
+  c.style.width=Math.max(1,Math.round(c.width*sc))+'px';
+  c.style.height=Math.max(1,Math.round(c.height*sc))+'px';
+  drawCropEditor();
+  requestAnimationFrame(syncCropHandles);
 }
+
 function drawCropEditor(){
-  const c=document.getElementById('cropCanvas');if(!c||!cropSourceCanvas)return;const ctx=c.getContext('2d');
-  ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(cropSourceCanvas,0,0,c.width,c.height);
-  if(cropPoints.length!==4)return;
-  ctx.save();ctx.fillStyle='rgba(0,0,0,.48)';ctx.beginPath();ctx.rect(0,0,c.width,c.height);ctx.moveTo(cropPoints[0].x,cropPoints[0].y);for(let i=1;i<4;i++)ctx.lineTo(cropPoints[i].x,cropPoints[i].y);ctx.closePath();ctx.fill('evenodd');
-  ctx.strokeStyle='#FFFFFF';ctx.lineWidth=Math.max(3,c.width/350);ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(cropPoints[0].x,cropPoints[0].y);for(let i=1;i<4;i++)ctx.lineTo(cropPoints[i].x,cropPoints[i].y);ctx.closePath();ctx.stroke();
+  const c=document.getElementById('cropCanvas');
+  if(!c||!cropSourceCanvas)return;
+  const ctx=c.getContext('2d');
+
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.drawImage(cropSourceCanvas,0,0,c.width,c.height);
+  if(cropPoints.length!==4){syncCropHandles();return;}
+
+  ctx.save();
+  ctx.fillStyle='rgba(0,0,0,.48)';
+  ctx.beginPath();
+  ctx.rect(0,0,c.width,c.height);
+  ctx.moveTo(cropPoints[0].x,cropPoints[0].y);
+  for(let i=1;i<4;i++)ctx.lineTo(cropPoints[i].x,cropPoints[i].y);
+  ctx.closePath();
+  ctx.fill('evenodd');
+
+  ctx.strokeStyle='#FFFFFF';
+  ctx.lineWidth=Math.max(3,c.width/350);
+  ctx.lineJoin='round';
+  ctx.beginPath();
+  ctx.moveTo(cropPoints[0].x,cropPoints[0].y);
+  for(let i=1;i<4;i++)ctx.lineTo(cropPoints[i].x,cropPoints[i].y);
+  ctx.closePath();
+  ctx.stroke();
   ctx.restore();
+
   syncCropHandles();
 }
+
 function cropClientPos(clientX,clientY){
-  const c=document.getElementById('cropCanvas'),r=c.getBoundingClientRect();
+  const c=document.getElementById('cropCanvas');
+  const r=c.getBoundingClientRect();
   if(!r.width||!r.height)return{x:0,y:0};
-  return{x:(clientX-r.left)*c.width/r.width,y:(clientY-r.top)*c.height/r.height};
+  return {
+    x:(clientX-r.left)*c.width/r.width,
+    y:(clientY-r.top)*c.height/r.height
+  };
 }
+
 function syncCropHandles(){
   const c=document.getElementById('cropCanvas');
   const stage=document.getElementById('cropStage');
   const layer=document.getElementById('cropHandleLayer');
   if(!c||!stage||!layer||cropPoints.length!==4)return;
+
   const cr=c.getBoundingClientRect(),sr=stage.getBoundingClientRect();
   if(!cr.width||!cr.height)return;
+
   layer.querySelectorAll('.crop-handle').forEach((h,i)=>{
     const p=cropPoints[i];if(!p)return;
-    const x=(cr.left-sr.left)+(p.x/c.width)*cr.width;
-    const y=(cr.top-sr.top)+(p.y/c.height)*cr.height;
-    h.style.left=x+'px';
-    h.style.top=y+'px';
+    h.style.left=((cr.left-sr.left)+(p.x/c.width)*cr.width)+'px';
+    h.style.top=((cr.top-sr.top)+(p.y/c.height)*cr.height)+'px';
   });
 }
+
 function setCropDragPoint(clientX,clientY){
   if(cropDragIndex<0||cropPoints.length!==4)return;
-  const c=document.getElementById('cropCanvas'),p=cropClientPos(clientX,clientY),pad=2;
+  const c=document.getElementById('cropCanvas');
+  const p=cropClientPos(clientX,clientY),pad=2;
   cropPoints[cropDragIndex]={
     x:Math.max(pad,Math.min(c.width-pad,p.x)),
     y:Math.max(pad,Math.min(c.height-pad,p.y))
   };
   drawCropEditor();
 }
-function startCropHandleDrag(index,clientX,clientY,e){
-  cropDragIndex=Number(index);
-  const ed=document.getElementById('practiceCropEditor');
-  ed?.classList.add('crop-dragging');
-  setCropDragPoint(clientX,clientY);
-  if(e?.cancelable)e.preventDefault();
-  e?.stopPropagation?.();
-}
-function stopCropHandleDrag(e){
-  if(cropDragIndex<0)return;
-  cropDragIndex=-1;
-  document.getElementById('practiceCropEditor')?.classList.remove('crop-dragging');
-  if(e?.cancelable)e.preventDefault();
-}
+
 function bindCropTouch(){
   const layer=document.getElementById('cropHandleLayer');
-  if(!layer||layer.dataset.cropTouchReady)return;
-  layer.dataset.cropTouchReady='1';
+  if(!layer||layer.dataset.cropReady==='1')return;
+  layer.dataset.cropReady='1';
 
   const handles=[...layer.querySelectorAll('.crop-handle')];
 
-  // 최신 iPhone/Android: Pointer Events만 사용해서 버튼 탭과 충돌하지 않게 함
+  const begin=(handle,x,y,e)=>{
+    cropDragIndex=Number(handle.dataset.cropIndex);
+    document.getElementById('practiceCropEditor')?.classList.add('crop-dragging');
+    setCropDragPoint(x,y);
+    if(e?.cancelable)e.preventDefault();
+    e?.stopPropagation?.();
+  };
+  const move=(index,x,y,e)=>{
+    if(cropDragIndex!==index)return;
+    setCropDragPoint(x,y);
+    if(e?.cancelable)e.preventDefault();
+    e?.stopPropagation?.();
+  };
+  const end=(e)=>{
+    if(cropDragIndex<0)return;
+    cropDragIndex=-1;
+    document.getElementById('practiceCropEditor')?.classList.remove('crop-dragging');
+    if(e?.cancelable)e.preventDefault();
+  };
+
   if(window.PointerEvent){
     handles.forEach(handle=>{
+      const index=Number(handle.dataset.cropIndex);
       handle.addEventListener('pointerdown',e=>{
-        cropDragIndex=Number(handle.dataset.cropIndex);
-        document.getElementById('practiceCropEditor')?.classList.add('crop-dragging');
         try{handle.setPointerCapture(e.pointerId)}catch(_){}
-        setCropDragPoint(e.clientX,e.clientY);
-        e.preventDefault();
-        e.stopPropagation();
+        begin(handle,e.clientX,e.clientY,e);
       },{passive:false});
-      handle.addEventListener('pointermove',e=>{
-        if(cropDragIndex!==Number(handle.dataset.cropIndex))return;
-        setCropDragPoint(e.clientX,e.clientY);
-        e.preventDefault();
-        e.stopPropagation();
-      },{passive:false});
-      const finish=e=>{
-        if(cropDragIndex===Number(handle.dataset.cropIndex))cropDragIndex=-1;
-        document.getElementById('practiceCropEditor')?.classList.remove('crop-dragging');
-        try{handle.releasePointerCapture(e.pointerId)}catch(_){}
-      };
-      handle.addEventListener('pointerup',finish,{passive:true});
-      handle.addEventListener('pointercancel',finish,{passive:true});
+      handle.addEventListener('pointermove',e=>move(index,e.clientX,e.clientY,e),{passive:false});
+      handle.addEventListener('pointerup',end,{passive:false});
+      handle.addEventListener('pointercancel',end,{passive:false});
     });
-    return;
+  }else{
+    handles.forEach(handle=>{
+      const index=Number(handle.dataset.cropIndex);
+      handle.addEventListener('touchstart',e=>{
+        const t=e.touches?.[0];if(t)begin(handle,t.clientX,t.clientY,e);
+      },{passive:false});
+      handle.addEventListener('touchmove',e=>{
+        const t=e.touches?.[0];if(t)move(index,t.clientX,t.clientY,e);
+      },{passive:false});
+      handle.addEventListener('touchend',end,{passive:false});
+      handle.addEventListener('touchcancel',end,{passive:false});
+    });
+  }
+}
+
+function cropUiYield(){
+  return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+}
+
+function lightweightDetectCrop(){
+  if(!cropSourceCanvas)return null;
+
+  const src=cropSourceCanvas,max=280;
+  const scale=Math.min(1,max/Math.max(src.width,src.height));
+  const w=Math.max(40,Math.round(src.width*scale));
+  const h=Math.max(40,Math.round(src.height*scale));
+
+  const c=document.createElement('canvas');
+  c.width=w;c.height=h;
+  const ctx=c.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(src,0,0,w,h);
+
+  const data=ctx.getImageData(0,0,w,h).data;
+  const gray=new Uint8Array(w*h);
+  for(let i=0,p=0;i<data.length;i+=4,p++){
+    gray[p]=(data[i]*.299+data[i+1]*.587+data[i+2]*.114)|0;
   }
 
-  // 구형 iOS fallback: 핸들 자체에서만 touch 이벤트 차단
-  handles.forEach(handle=>{
-    handle.addEventListener('touchstart',e=>{
-      const t=e.touches&&e.touches[0];if(!t)return;
-      cropDragIndex=Number(handle.dataset.cropIndex);
-      document.getElementById('practiceCropEditor')?.classList.add('crop-dragging');
-      setCropDragPoint(t.clientX,t.clientY);
-      e.preventDefault();e.stopPropagation();
-    },{passive:false});
-    handle.addEventListener('touchmove',e=>{
-      if(cropDragIndex!==Number(handle.dataset.cropIndex))return;
-      const t=e.touches&&e.touches[0];if(!t)return;
-      setCropDragPoint(t.clientX,t.clientY);
-      e.preventDefault();e.stopPropagation();
-    },{passive:false});
-    const finish=()=>{
-      cropDragIndex=-1;
-      document.getElementById('practiceCropEditor')?.classList.remove('crop-dragging');
-    };
-    handle.addEventListener('touchend',finish,{passive:true});
-    handle.addEventListener('touchcancel',finish,{passive:true});
-  });
-}
-async function detectCropQuad(){
-  const cv=await ensureOpenCv();let src=null,small=null,gray=null,blur=null,edges=null,dil=null,contours=null,hier=null,kernel=null;
-  try{
-    src=cv.imread(cropSourceCanvas);const max=560,scale=Math.min(1,max/Math.max(src.cols,src.rows));
-    small=new cv.Mat();if(scale<1)cv.resize(src,small,new cv.Size(Math.round(src.cols*scale),Math.round(src.rows*scale)),0,0,cv.INTER_AREA);else src.copyTo(small);
-    gray=new cv.Mat();cv.cvtColor(small,gray,cv.COLOR_RGBA2GRAY);blur=new cv.Mat();cv.GaussianBlur(gray,blur,new cv.Size(5,5),0);
-    edges=new cv.Mat();cv.Canny(blur,edges,45,135);kernel=cv.Mat.ones(3,3,cv.CV_8U);dil=new cv.Mat();cv.dilate(edges,dil,kernel);
-    contours=new cv.MatVector();hier=new cv.Mat();cv.findContours(dil,contours,hier,cv.RETR_LIST,cv.CHAIN_APPROX_SIMPLE);
-    let best=null,bestArea=0;const fullArea=small.cols*small.rows;
-    for(let i=0;i<contours.size();i++){
-      const cnt=contours.get(i);const area=Math.abs(cv.contourArea(cnt));if(area<fullArea*.12||area<=bestArea){cnt.delete();continue}
-      const peri=cv.arcLength(cnt,true),approx=new cv.Mat();cv.approxPolyDP(cnt,approx,.018*peri,true);
-      if(approx.rows===4&&cv.isContourConvex(approx)){
-        const a=Math.abs(cv.contourArea(approx));if(a>bestArea){const d=approx.data32S,b=[];for(let k=0;k<4;k++)b.push({x:d[k*2]/scale,y:d[k*2+1]/scale});best=orderCropPoints(b);bestArea=a}
-      }
-      approx.delete();cnt.delete();
+  const col=new Float64Array(w),row=new Float64Array(h);
+  for(let y=2;y<h-2;y++){
+    for(let x=2;x<w-2;x++){
+      col[x]+=Math.abs(gray[y*w+x+1]-gray[y*w+x-1]);
+      row[y]+=Math.abs(gray[(y+1)*w+x]-gray[(y-1)*w+x]);
     }
-    return best;
-  }finally{[src,small,gray,blur,edges,dil,contours,hier,kernel].forEach(x=>{try{x&&x.delete()}catch(_){}})}
+  }
+
+  const bestIn=(arr,a,b)=>{
+    let bi=a,bv=-1;
+    for(let i=Math.max(1,a);i<=Math.min(arr.length-2,b);i++){
+      const score=arr[i]+arr[i-1]*.55+arr[i+1]*.55;
+      if(score>bv){bv=score;bi=i}
+    }
+    return bi;
+  };
+
+  const left=bestIn(col,Math.round(w*.025),Math.round(w*.42));
+  const right=bestIn(col,Math.round(w*.58),Math.round(w*.975));
+  const top=bestIn(row,Math.round(h*.025),Math.round(h*.42));
+  const bottom=bestIn(row,Math.round(h*.58),Math.round(h*.975));
+
+  if(right-left<w*.35||bottom-top<h*.35)return null;
+
+  const sx=src.width/w,sy=src.height/h;
+  return [
+    {x:left*sx,y:top*sy},
+    {x:right*sx,y:top*sy},
+    {x:right*sx,y:bottom*sy},
+    {x:left*sx,y:bottom*sy}
+  ];
 }
+
 async function autoDetectPracticeCrop(){
-  if(!cropSourceCanvas)return;const status=document.getElementById('cropStatus');if(status)status.textContent='작품의 네 모서리를 찾고 있어요.';
-  try{const pts=await detectCropQuad();cropPoints=pts&&pts.length===4?pts:defaultCropPoints();if(status)status.textContent=pts?'자동으로 작품 영역을 찾았어요.':'경계를 정확히 못 찾았어요. 점을 직접 맞춰주세요.';}
-  catch(e){console.warn('crop auto detect',e);cropPoints=defaultCropPoints();if(status)status.textContent='자동 감지를 사용할 수 없어 직접 조정할 수 있어요.';}
-  drawCropEditor();
+  if(!cropSourceCanvas)return;
+  const status=document.getElementById('cropStatus');
+  if(status)status.textContent='작품 영역을 빠르게 찾고 있어요.';
+  await cropUiYield();
+
+  try{
+    const pts=lightweightDetectCrop();
+    cropPoints=pts&&pts.length===4?pts:defaultCropPoints();
+    drawCropEditor();
+    if(status)status.textContent=pts
+      ?'작품 영역을 찾았어요. 필요하면 빨간 점을 조정해주세요.'
+      :'경계가 뚜렷하지 않아 전체 영역에서 시작해요. 빨간 점을 조정해주세요.';
+    haptic('light');
+  }catch(e){
+    console.warn('crop detect',e);
+    cropPoints=defaultCropPoints();
+    drawCropEditor();
+    if(status)status.textContent='빨간 점을 작품 네 모서리에 맞춰주세요.';
+  }
 }
-function resetPracticeCropPoints(){cropPoints=defaultCropPoints();document.getElementById('cropStatus').textContent='전체 영역에서 시작합니다. 모서리를 작품에 맞춰주세요.';drawCropEditor();haptic('light')}
+
+function resetPracticeCropPoints(){
+  if(!cropSourceCanvas)return;
+  cropPoints=defaultCropPoints();
+  const status=document.getElementById('cropStatus');
+  if(status)status.textContent='전체 사진에서 시작해요. 빨간 점을 작품에 맞춰주세요.';
+  drawCropEditor();
+  haptic('light');
+}
+
 async function openPracticeCropper(file,{keepOriginal=true}={}){
   if(!file)return;
+
   const token=++cropOpenToken;
   if(keepOriginal)practiceOriginalFile=file;
+
   const ed=document.getElementById('practiceCropEditor');
-  ed.classList.add('on');ed.setAttribute('aria-hidden','false');
-  bindCropTouch();
   const status=document.getElementById('cropStatus');
-  const btn=document.getElementById('cropApplyBtn'),top=document.querySelector('.crop-apply-top');
+  const btn=document.getElementById('cropApplyBtn');
+  const top=document.querySelector('.crop-apply-top');
+
+  ed.classList.add('on');
+  ed.setAttribute('aria-hidden','false');
+  bindCropTouch();
+
   if(status)status.textContent='사진을 준비하고 있어요.';
-  btn.disabled=true;if(top)top.disabled=true;
+  if(btn)btn.disabled=true;
+  if(top)top.disabled=true;
+
   try{
     cropSourceCanvas=await fileToCropCanvas(file);
     if(token!==cropOpenToken)return;
+
     cropPoints=defaultCropPoints();
     fitCropCanvas();
-    btn.disabled=false;if(top)top.disabled=false;
-    if(status)status.textContent='모서리를 직접 조정하거나 자동 맞춤을 사용할 수 있어요.';
-    // 화면과 버튼을 먼저 터치 가능하게 만든 뒤 자동 감지를 실행
-    setTimeout(async()=>{
-      if(token!==cropOpenToken||!ed.classList.contains('on'))return;
-      try{await autoDetectPracticeCrop()}catch(e){console.warn(e)}
-    },180);
+
+    if(btn)btn.disabled=false;
+    if(top)top.disabled=false;
+    if(status)status.textContent='빨간 점을 조정하거나 자동 맞춤을 눌러주세요.';
+    try{document.activeElement?.blur?.()}catch(_){}
   }catch(e){
     console.error(e);
     if(status)status.textContent='사진을 불러오지 못했어요.';
+    if(btn)btn.disabled=false;
+    if(top)top.disabled=false;
     showToast('사진을 불러오지 못했어요','info');
   }
 }
-function cancelPracticeCrop(){++cropOpenToken;document.getElementById('practiceCropEditor').classList.remove('on');document.getElementById('practiceCropEditor').setAttribute('aria-hidden','true');document.body.style.overflow='';cropDragIndex=-1;document.getElementById('practiceCropEditor')?.classList.remove('crop-dragging');}
-function reopenPracticeCropper(){if(practiceOriginalFile)openPracticeCropper(practiceOriginalFile,{keepOriginal:false});else showToast('원본 사진을 다시 선택해주세요','info')}
 
-async function cropWithOpenCv(){
-  const cv=await ensureOpenCv();const pts=orderCropPoints(cropPoints),[tl,tr,br,bl]=pts;
-  let w=Math.max(cropDist(tl,tr),cropDist(bl,br)),h=Math.max(cropDist(tl,bl),cropDist(tr,br));w=Math.max(60,Math.round(w));h=Math.max(60,Math.round(h));
-  let src=null,srcPts=null,dstPts=null,M=null,dst=null,rot=null;try{
-    src=cv.imread(cropSourceCanvas);srcPts=cv.matFromArray(4,1,cv.CV_32FC2,[tl.x,tl.y,tr.x,tr.y,br.x,br.y,bl.x,bl.y]);dstPts=cv.matFromArray(4,1,cv.CV_32FC2,[0,0,w-1,0,w-1,h-1,0,h-1]);M=cv.getPerspectiveTransform(srcPts,dstPts);dst=new cv.Mat();cv.warpPerspective(src,dst,M,new cv.Size(w,h),cv.INTER_LINEAR,cv.BORDER_REPLICATE,new cv.Scalar(0,0,0,0));let final=dst;
-    if(h>w){rot=new cv.Mat();cv.rotate(dst,rot,cv.ROTATE_90_CLOCKWISE);final=rot}
-    const out=document.createElement('canvas');cv.imshow(out,final);return await new Promise((resolve,reject)=>out.toBlob(b=>b?resolve(b):reject(new Error('crop-blob-failed')),'image/jpeg',.92));
-  }finally{[src,srcPts,dstPts,M,dst,rot].forEach(x=>{try{x&&x.delete()}catch(_){}})}
+function cancelPracticeCrop(){
+  ++cropOpenToken;
+  const ed=document.getElementById('practiceCropEditor');
+  ed.classList.remove('on');
+  ed.setAttribute('aria-hidden','true');
+  cropDragIndex=-1;
+  ed.classList.remove('crop-dragging');
 }
-async function cropFallback(){
-  const pts=cropPoints,minX=Math.max(0,Math.floor(Math.min(...pts.map(p=>p.x)))),maxX=Math.min(cropSourceCanvas.width,Math.ceil(Math.max(...pts.map(p=>p.x)))),minY=Math.max(0,Math.floor(Math.min(...pts.map(p=>p.y)))),maxY=Math.min(cropSourceCanvas.height,Math.ceil(Math.max(...pts.map(p=>p.y))));
-  let w=Math.max(1,maxX-minX),h=Math.max(1,maxY-minY),out=document.createElement('canvas'),ctx=out.getContext('2d',{alpha:false});
-  if(h>w){out.width=h;out.height=w;ctx.translate(h,0);ctx.rotate(Math.PI/2);ctx.drawImage(cropSourceCanvas,minX,minY,w,h,0,0,w,h)}else{out.width=w;out.height=h;ctx.drawImage(cropSourceCanvas,minX,minY,w,h,0,0,w,h)}
-  return await new Promise((resolve,reject)=>out.toBlob(b=>b?resolve(b):reject(new Error('crop-fallback-failed')),'image/jpeg',.92));
+
+function reopenPracticeCropper(){
+  if(practiceOriginalFile)openPracticeCropper(practiceOriginalFile,{keepOriginal:false});
+  else showToast('원본 사진을 다시 선택해주세요','info');
 }
+
+function cropAffineForTriangle(s0,s1,s2,d0,d1,d2){
+  const den=s0.x*(s1.y-s2.y)+s1.x*(s2.y-s0.y)+s2.x*(s0.y-s1.y);
+  if(Math.abs(den)<1e-6)return null;
+
+  const a=(d0.x*(s1.y-s2.y)+d1.x*(s2.y-s0.y)+d2.x*(s0.y-s1.y))/den;
+  const c=(d0.x*(s2.x-s1.x)+d1.x*(s0.x-s2.x)+d2.x*(s1.x-s0.x))/den;
+  const e=(d0.x*(s1.x*s2.y-s2.x*s1.y)+d1.x*(s2.x*s0.y-s0.x*s2.y)+d2.x*(s0.x*s1.y-s1.x*s0.y))/den;
+
+  const b=(d0.y*(s1.y-s2.y)+d1.y*(s2.y-s0.y)+d2.y*(s0.y-s1.y))/den;
+  const d=(d0.y*(s2.x-s1.x)+d1.y*(s0.x-s2.x)+d2.y*(s1.x-s0.x))/den;
+  const f=(d0.y*(s1.x*s2.y-s2.x*s1.y)+d1.y*(s2.x*s0.y-s0.x*s2.y)+d2.y*(s0.x*s1.y-s1.x*s0.y))/den;
+
+  return {a,b,c,d,e,f};
+}
+
+function drawCropTriangle(ctx,source,s0,s1,s2,d0,d1,d2){
+  const t=cropAffineForTriangle(s0,s1,s2,d0,d1,d2);
+  if(!t)return;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(d0.x,d0.y);
+  ctx.lineTo(d1.x,d1.y);
+  ctx.lineTo(d2.x,d2.y);
+  ctx.closePath();
+  ctx.clip();
+
+  ctx.setTransform(t.a,t.b,t.c,t.d,t.e,t.f);
+  ctx.drawImage(source,0,0);
+  ctx.restore();
+}
+
+function bilinearCropPoint(tl,tr,br,bl,u,v){
+  const top={x:tl.x+(tr.x-tl.x)*u,y:tl.y+(tr.y-tl.y)*u};
+  const bottom={x:bl.x+(br.x-bl.x)*u,y:bl.y+(br.y-bl.y)*u};
+  return {
+    x:top.x+(bottom.x-top.x)*v,
+    y:top.y+(bottom.y-top.y)*v
+  };
+}
+
+async function cropWithoutOpenCv(){
+  const [tl,tr,br,bl]=orderCropPoints(cropPoints);
+
+  let w=Math.round(Math.max(cropDist(tl,tr),cropDist(bl,br)));
+  let h=Math.round(Math.max(cropDist(tl,bl),cropDist(tr,br)));
+  w=Math.max(80,w);h=Math.max(80,h);
+
+  const maxSide=1800;
+  const fit=Math.min(1,maxSide/Math.max(w,h));
+  w=Math.max(80,Math.round(w*fit));
+  h=Math.max(80,Math.round(h*fit));
+
+  const warped=document.createElement('canvas');
+  warped.width=w;warped.height=h;
+  const ctx=warped.getContext('2d',{alpha:false});
+  ctx.fillStyle='#fff';
+  ctx.fillRect(0,0,w,h);
+
+  const grid=8;
+  for(let gy=0;gy<grid;gy++){
+    const v0=gy/grid,v1=(gy+1)/grid;
+    for(let gx=0;gx<grid;gx++){
+      const u0=gx/grid,u1=(gx+1)/grid;
+
+      const s00=bilinearCropPoint(tl,tr,br,bl,u0,v0);
+      const s10=bilinearCropPoint(tl,tr,br,bl,u1,v0);
+      const s11=bilinearCropPoint(tl,tr,br,bl,u1,v1);
+      const s01=bilinearCropPoint(tl,tr,br,bl,u0,v1);
+
+      const d00={x:u0*w,y:v0*h};
+      const d10={x:u1*w,y:v0*h};
+      const d11={x:u1*w,y:v1*h};
+      const d01={x:u0*w,y:v1*h};
+
+      drawCropTriangle(ctx,cropSourceCanvas,s00,s10,s11,d00,d10,d11);
+      drawCropTriangle(ctx,cropSourceCanvas,s00,s11,s01,d00,d11,d01);
+    }
+  }
+
+  let finalCanvas=warped;
+  if(h>w){
+    const rot=document.createElement('canvas');
+    rot.width=h;rot.height=w;
+    const rctx=rot.getContext('2d',{alpha:false});
+    rctx.fillStyle='#fff';
+    rctx.fillRect(0,0,rot.width,rot.height);
+    rctx.translate(h,0);
+    rctx.rotate(Math.PI/2);
+    rctx.drawImage(warped,0,0);
+    finalCanvas=rot;
+  }
+
+  return await new Promise((resolve,reject)=>{
+    finalCanvas.toBlob(
+      blob=>blob?resolve(blob):reject(new Error('crop-blob-failed')),
+      'image/jpeg',
+      .9
+    );
+  });
+}
+
 async function applyPracticeCrop(){
-  if(!cropSourceCanvas||cropPoints.length!==4)return;const btn=document.getElementById('cropApplyBtn'),top=document.querySelector('.crop-apply-top');btn.disabled=true;top.disabled=true;btn.textContent='사진 정리 중…';document.getElementById('cropStatus').textContent='원근과 방향을 정리하고 있어요.';
-  try{let blob;try{blob=await cropWithOpenCv()}catch(e){console.warn('perspective fallback',e);blob=await cropFallback()}blob.name='artwork-cropped.jpg';setPracticeFile(blob);cancelPracticeCrop();showToast('작품 영역을 정리했어요','ok');haptic('medium')}
-  catch(e){console.error(e);showToast('사진 보정에 실패했어요. 다시 시도해주세요','info')}
-  finally{btn.disabled=false;top.disabled=false;btn.textContent='이대로 사용'}
+  if(!cropSourceCanvas||cropPoints.length!==4)return;
+
+  const btn=document.getElementById('cropApplyBtn');
+  const top=document.querySelector('.crop-apply-top');
+  const status=document.getElementById('cropStatus');
+
+  if(btn){btn.disabled=true;btn.textContent='사진 정리 중…'}
+  if(top)top.disabled=true;
+  if(status)status.textContent='작품 영역과 방향을 정리하고 있어요.';
+
+  try{
+    await cropUiYield();
+    const blob=await cropWithoutOpenCv();
+    blob.name='artwork-cropped.jpg';
+    setPracticeFile(blob);
+    cancelPracticeCrop();
+    showToast('작품 영역을 정리했어요','ok');
+    haptic('medium');
+  }catch(e){
+    console.error(e);
+    showToast('사진 보정에 실패했어요. 다시 시도해주세요','info');
+    if(status)status.textContent='다시 시도하거나 전체 영역을 선택해주세요.';
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='이대로 사용'}
+    if(top)top.disabled=false;
+  }
 }
-window.addEventListener('resize',()=>{if(document.getElementById('practiceCropEditor')?.classList.contains('on'))fitCropCanvas()});
-window.addEventListener('DOMContentLoaded',bindCropTouch);setTimeout(bindCropTouch,0);
+
+window.addEventListener('resize',()=>{
+  if(document.getElementById('practiceCropEditor')?.classList.contains('on'))fitCropCanvas();
+},{passive:true});
+window.addEventListener('DOMContentLoaded',bindCropTouch);
+setTimeout(bindCropTouch,0);
 
 // ── 작업 기록 시트 ──
 function quickPick(e,pid){
