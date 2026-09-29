@@ -580,6 +580,190 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 @media(min-width:560px){.tabbar{border-radius:0 0 28px 28px}}
 .scr.home{background:#fff}
 
+/* ===== interactions ===== */
+.pc-img,.dn,.pc-up,.pc-done,.pc-new,.dh,.wk,.nt-bar,.btn,.tag,.t-seg button,.dg,.more-btn,.hdr-me,.sch-row,.cd[data-day]{transition:transform .16s cubic-bezier(.2,.8,.2,1),opacity .2s,background-color .2s,box-shadow .2s}
+.pc-img:active,.dn:active,.dg:active,.pc-new:active{transform:scale(.97)}
+.pc-up:active,.pc-done:active,.btn:active,.more-btn:active,.nt-bar:active,.hdr-me:active,.t-seg button:active,.tag:active{transform:scale(.95)}
+.wk:active{transform:scale(.9)}
+.brand-mark{transition:font-size .25s ease}
+.hdr.dark.scrolled .brand-mark{font-size:24px}
+.hdr.dark.scrolled .brand-mark i{font-size:19px;vertical-align:11px}
+/* notice accordion */
+.nt-drop{display:block!important;max-height:0;overflow:hidden;padding:0 20px;transition:max-height .38s cubic-bezier(.2,.8,.2,1),padding .38s}
+.nt.open .nt-drop{max-height:640px;padding-bottom:16px}
+.nt-item{opacity:0;transform:translateY(-6px);transition:opacity .3s,transform .3s}
+.nt.open .nt-item{opacity:1;transform:none}
+.nt.open .nt-item:nth-child(2){transition-delay:.06s}.nt.open .nt-item:nth-child(3){transition-delay:.12s}
+/* week */
+.wk.sel .n{animation:pop .32s cubic-bezier(.2,1.6,.4,1)}
+.wk.sel:before{animation:drop .3s ease}
+@keyframes pop{0%{transform:scale(.7)}100%{transform:scale(1)}}
+@keyframes drop{0%{transform:translateY(-6px);opacity:0}100%{transform:none;opacity:1}}
+.week-info.swap{animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* demo hero */
+.dh img{transform:scale(1.02);transition:transform 6s ease-out}
+.dh.on img{transform:scale(1.1)}
+.dh-c,.dh-k{transition:opacity .5s,transform .5s}
+.dh:not(.on) .dh-c{opacity:0;transform:translateY(10px)}
+.dh-dots i{cursor:pointer}
+/* carousel depth */
+.pc{transition:transform .12s linear,opacity .12s linear;will-change:transform}
+/* reveal */
+.rv{opacity:0;transform:translateY(18px)}
+.rv.in{opacity:1;transform:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+/* success pulse */
+.pc.pulse .pc-img{animation:pulse 1.1s ease}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(30,154,90,.55)}70%{box-shadow:0 0 0 14px rgba(30,154,90,0)}100%{box-shadow:0 4px 14px rgba(0,0,0,.14)}}
+.pc.leaving{transform:scale(.85)!important;opacity:0!important;transition:transform .35s ease,opacity .35s ease}
+.dn.pulse-in{animation:popIn .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes popIn{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
+/* tab indicator */
+.tabs.pill{position:relative}
+.tabs.pill .tab{position:relative;z-index:1;background:transparent!important;transition:color .25s}
+.tabs.pill .tab.on{color:var(--black)}
+.tab-ind{position:absolute;top:5px;bottom:5px;left:5px;border-radius:999px;background:#fff;z-index:0;transition:transform .38s cubic-bezier(.3,1.3,.5,1),width .38s}
+.tabs.pill .tab svg{transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.tabs.pill .tab.on svg{transform:translateY(-1px) scale(1.08)}
+/* sheet drag */
+.sheet-card.dragging{transition:none!important;animation:none}
+.sheet-card.snap{transition:transform .25s ease}
+.sheet.closing .sheet-card{transform:translateY(100%)!important;transition:transform .22s ease}
+.sheet.closing .sheet-bg{opacity:0;transition:opacity .22s}
+/* confetti */
+.cf{position:fixed;z-index:600;width:8px;height:12px;border-radius:2px;pointer-events:none;top:0;left:0}
+/* toast */
+.toast{transition:opacity .25s,transform .35s cubic-bezier(.2,1.4,.4,1)}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+
+/* ===== v4 other tabs (dark top) ===== */
+.scr{padding-top:0!important;background:#fff!important}
+.hdr.dark{border:0!important;box-shadow:none!important;margin-bottom:-1px}
+.pane:not(#pane-home){padding:0!important;background:#fff!important;min-height:100%}
+.p-top{background:var(--black);color:#fff;padding:14px 20px 24px}
+.p-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.p-title h1{font-size:26px;font-weight:800;letter-spacing:-.6px}
+.p-title span{font-size:12px;color:rgba(255,255,255,.55);font-weight:600}
+.p-link{color:#fff;font-size:13px;font-weight:700;height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.3)}
+.p-stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:22px}
+.p-stats.four{grid-template-columns:repeat(4,1fr)}
+.p-stats>div{display:flex;flex-direction:column;gap:6px;padding:0 12px;border-left:1px solid rgba(255,255,255,.15)}
+.p-stats>div:first-child{border-left:0;padding-left:2px}
+.p-stats span{order:1;font-size:12px;color:rgba(255,255,255,.55);font-weight:600}
+.p-stats b{order:2;font-size:26px;font-weight:800;letter-spacing:-.6px;color:#fff}
+.p-stats.four b{font-size:22px}
+.p-stats b small{font-size:13px;color:rgba(255,255,255,.55);margin-left:2px}
+.p-stats .neg b{color:#FF6A62}
+.p-week{margin-top:22px}
+.p-week .wd-bar{background:rgba(255,255,255,.15)}
+.p-week .wd-bar.has{background:#fff}
+.p-week .wd.today .wd-bar.has{background:#FF3B30}
+.p-week .wd-t{color:#fff}
+.p-week .wd-l{color:rgba(255,255,255,.5)}
+.p-week .wd.today .wd-l{color:#fff}
+.p-week-cap{text-align:right;font-size:12px;color:rgba(255,255,255,.5);margin-top:10px}
+.p-month{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:18px}
+.p-month b{font-size:19px;font-weight:800;min-width:120px;text-align:center}
+.p-month button{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.3);color:#fff;font-size:18px}
+.p-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:18px;padding:4px;border-radius:999px;background:#fff;background:rgba(255,255,255,.1)}
+.p-seg button{height:40px;border-radius:999px;color:rgba(255,255,255,.75);font-size:14px;font-weight:700;transition:background .25s,color .25s}
+.p-seg button.on{background:#fff;color:var(--black)}
+.p-body{padding:8px 0 20px;background:#fff}
+.p-body>.h-sec-h:first-child{margin-top:20px}
+.h-sec-h .cnt{font-size:14px;color:var(--faint);font-weight:700;margin-left:6px}
+.h-sec-h.flush{padding:0 4px;margin:30px 0 12px}
+.pill-btn{position:relative;display:inline-flex;align-items:center;height:34px;padding:0 14px;border-radius:999px;background:var(--black);color:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.pill-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.wk-list{padding:0 16px}
+.wk-item{margin-bottom:28px}
+.wk-list .pc-new{margin:0}
+.wk-item .timeline{margin:12px 0 0;padding:0 2px}
+.pc-act.three{grid-template-columns:1fr 34% 50px}
+.pc-del{height:50px;border-radius:10px;border:1.5px solid #E2E2E2;display:grid;place-items:center;color:#999}
+.pc-del svg,.dn-del svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+.dn-del{position:absolute;right:8px;top:8px;z-index:2;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;display:grid;place-items:center}
+.dn-grid.flush{padding:0 16px}
+/* schedule body */
+.p-body .cal{margin:10px 12px 0;padding:8px 4px}
+.cal-dh{color:#9A9A9A}
+.cd{color:#B5B5B5;font-weight:600;border-radius:50%;max-height:46px}
+.cd.lesson,.cd.special{color:#111;font-weight:800}
+.cd.lesson .pip{background:#FF3B30}
+.cd.special .pip{background:transparent;box-shadow:inset 0 0 0 1.5px #FF3B30}
+.cd.today{box-shadow:none;text-decoration:underline;text-underline-offset:3px}
+.cd.selected{background:#111;color:#fff;text-decoration:none}
+.cd.selected .pip{background:#fff}
+.cal-legend{margin-top:14px}
+.day-card{margin:18px 16px 0;padding:18px;border-radius:18px;background:var(--black);color:#fff}
+.day-card .l{color:rgba(255,255,255,.55)}
+.day-card .slot{background:rgba(255,255,255,.08)}
+.day-card .slot span{color:rgba(255,255,255,.75)}
+.day-card .none{color:rgba(255,255,255,.6)}
+.sch-list{margin:0 16px;border-top:1px solid #EEE}
+.sch-row{padding:14px 4px;border-bottom:1px solid #EEE}
+/* tools body */
+.p-body .tool-view{margin-top:0;padding:18px 16px 0}
+.timer-card{padding:26px 18px 20px;border-radius:22px;border:1px solid #EEE;text-align:center;background:#fff}
+.timer-display{font-size:58px}
+.btn-grey{background:#8C8C8C;color:#fff}
+.timer-card .btn{border-radius:12px}
+.mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:14px;border:1px solid #EEE;border-radius:18px;padding:14px 0}
+.mini-stats>div{display:flex;flex-direction:column;gap:4px;padding:0 18px}
+.mini-stats>div+div{border-left:1px solid #EEE}
+.mini-stats span{font-size:12px;color:var(--faint);font-weight:600}
+.mini-stats b{font-size:20px;font-weight:800}
+.list-card{border:1px solid #EEE;border-radius:18px;background:#fff}
+.fb-card{padding:18px;border:1px solid #EEE;border-radius:22px;background:#fff}
+.fb-card .tag.on{background:#111;border-color:#111}
+.dday-card{padding:30px 18px 20px;border-radius:22px;background:var(--black);color:#fff;text-align:center}
+.dday-num{color:#fff!important;font-size:64px}
+.dday-card.is-empty .dday-num{color:rgba(255,255,255,.25)!important}
+.dday-goal{color:#fff}
+.dday-date{color:rgba(255,255,255,.6)}
+.dday-card.is-empty .dday-goal{color:rgba(255,255,255,.7)}
+.dday-card .btn-dark{background:#fff;color:#111}
+/* drag scroll */
+.drag-x{cursor:grab}
+.drag-x.dragging{cursor:grabbing;scroll-snap-type:none!important;scroll-behavior:auto}
+.drag-x.dragging *{pointer-events:none}
+.pc-dots{display:flex;justify-content:center;gap:6px;margin-top:14px}
+.pc-dots i{width:7px;height:7px;border-radius:99px;background:#D6D6D6;transition:width .2s,background .2s;cursor:pointer}
+.pc-dots i.on{width:18px;background:#111}
+
+/* ===== my works stats header ===== */
+.p-week-h{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:rgba(255,255,255,.55);margin-bottom:4px}
+.p-week-h span{font-weight:600;color:rgba(255,255,255,.4)}
+/* ===== sheet photo (landscape) ===== */
+.photo-pick{height:auto;aspect-ratio:1.52/1;background:#F4F4F4;border-color:#D8D8D8}
+.photo-pick img{object-fit:contain;background:#111}
+.photo-acts{position:absolute;top:8px;right:8px;z-index:3;display:none;gap:6px}
+.photo-pick.has~.photo-acts{display:flex}
+.photo-acts button{height:30px;padding:0 11px;border-radius:999px;background:rgba(20,20,20,.78);color:#fff;font-size:12px;font-weight:700}
+/* ===== crop editor ===== */
+.crop-editor{position:fixed;inset:0;z-index:1000;display:none;flex-direction:column;background:#0B0B0B;color:#fff;overscroll-behavior:none}
+.crop-editor.on{display:flex;animation:fade .2s ease}
+.crop-topbar{flex:none;display:flex;align-items:center;gap:12px;padding:12px 14px;padding-top:max(12px,env(safe-area-inset-top))}
+.crop-back{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;font-size:16px;flex:none}
+.crop-headcopy{flex:1;min-width:0}
+.crop-headcopy b{display:block;font-size:16px;font-weight:800}
+.crop-headcopy span{display:block;margin-top:3px;font-size:12px;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crop-apply-top{height:38px;padding:0 16px;border-radius:999px;background:#fff;color:#111;font-size:13px;font-weight:800;flex:none}
+.crop-stage{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;display:grid;place-items:center}
+#cropCanvas{display:block;pointer-events:none;user-select:none;-webkit-user-select:none;border-radius:4px}
+.crop-handle-layer{position:absolute;inset:0;z-index:5;pointer-events:none}
+.crop-handle{position:absolute;width:48px;height:48px;transform:translate(-50%,-50%);border-radius:50%;background:transparent;pointer-events:auto;touch-action:none;-webkit-touch-callout:none;cursor:grab}
+.crop-handle:after{content:"";position:absolute;left:50%;top:50%;width:22px;height:22px;transform:translate(-50%,-50%);border-radius:50%;background:#fff;border:3px solid #FF3B30;box-shadow:0 2px 10px rgba(0,0,0,.45);transition:transform .15s}
+.crop-handle:active:after{transform:translate(-50%,-50%) scale(1.3)}
+.crop-help{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:4;padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.6);font-size:12px;font-weight:600;white-space:nowrap;pointer-events:none;transition:opacity .2s}
+.crop-editor.crop-dragging .crop-help{opacity:0}
+.crop-bottom{flex:none;padding:14px 16px calc(16px + env(safe-area-inset-bottom))}
+.crop-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.crop-tools button{height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.25);color:#fff;font-size:14px;font-weight:700}
+.crop-note{font-size:12px;line-height:1.5;color:rgba(255,255,255,.5);text-align:center;margin:12px 0}
+.crop-apply{width:100%;height:54px;border-radius:14px;background:#fff;color:#111;font-size:16px;font-weight:800}
+.crop-apply:disabled,.crop-apply-top:disabled{opacity:.4}
+@media(min-width:560px){.crop-editor{left:50%;right:auto;width:min(520px,100%);transform:translateX(-50%)}}
+
 .pv-photo-wrap{width:100%;height:100%;display:grid;place-items:center}
 </style>
 </head>
@@ -653,6 +837,7 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
       <div class="h-body">
         <div class="h-sec-h"><h2>진행중</h2><span class="wa-today" id="waToday"></span></div>
         <div class="pc-track" id="homeWorks"></div>
+        <div class="pc-dots" id="workDots"></div>
 
         <div id="homeDoneCard">
           <div class="h-sec-h" style="margin-top:34px"><h2>완료한 그림</h2></div>
@@ -664,93 +849,89 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 
     <!-- 내 작품 -->
     <section class="pane" id="pane-works">
-      <div class="page-h"><h1>내 작품</h1><p>수업마다 남긴 사진으로 작품이 완성되는 과정을 모아봐요.</p></div>
-      <div class="stat-row">
-        <div class="stat"><div class="stat-l">오늘</div><div class="stat-v" id="todayPracticeT">0<small>T</small></div></div>
-        <div class="stat"><div class="stat-l">이번 주</div><div class="stat-v" id="practiceWeekTotal">0<small>T</small></div></div>
-        <div class="stat"><div class="stat-l">진행 중</div><div class="stat-v" id="activeCountStat">0<small>개</small></div></div>
+      <div class="p-top">
+        <div class="p-title"><h1>내 작품</h1><span>1T = 수업 1타임(3시간 30분)</span></div>
+        <div class="p-stats">
+          <div><span>완료한 작품</span><b id="statDone">0<small>개</small></b></div>
+          <div><span>진행중인 작품</span><b id="activeCountStat">0<small>개</small></b></div>
+          <div><span>총 타임수</span><b id="statTotalT">0<small>T</small></b></div>
+        </div>
+        <div class="p-week"><div class="p-week-h">이번 주 작업량<span id="todayPracticeCount">오늘 0회 기록</span></div><div class="week-bars" id="practiceWeekBars"></div></div>
       </div>
-      <div class="card week-card">
-        <div class="week-top"><span>요일별 작업량</span><span id="todayPracticeCount">오늘 0회 기록</span></div>
-        <div class="week-bars" id="practiceWeekBars"></div>
-      </div>
-      <div class="t-help"><b>T</b>= 수업 1타임(3시간 30분). 기록할 때 이번 수업에 쓴 타임을 고르면 자동으로 쌓여요.</div>
-
-      <div class="sec">
-        <div class="sec-h"><h2>진행 중<span class="cnt" id="activeCount"></span></h2><button class="chip-btn" type="button" onclick="openPracticeSheet('new')">＋ 새 작품</button></div>
-        <div id="activePracticeProjects"></div>
-      </div>
-      <div class="sec" id="completedPracticeSection" style="display:none">
-        <div class="sec-h"><h2>완료한 작품<span class="cnt" id="completedPracticeCount"></span></h2></div>
-        <div id="completedPracticeProjects"></div>
+      <div class="p-body">
+        <div class="h-sec-h"><h2>진행중<span class="cnt" id="activeCount"></span></h2><label class="pill-btn"><input type="file" accept="image/*" onchange="quickPick(event,'')">＋ 새 작품</label></div>
+        <div class="wk-list" id="activePracticeProjects"></div>
+        <div id="completedPracticeSection" style="display:none">
+          <div class="h-sec-h" style="margin-top:30px"><h2>완료한 그림<span class="cnt" id="completedPracticeCount"></span></h2></div>
+          <div class="dn-grid flush" id="completedPracticeProjects"></div>
+        </div>
       </div>
     </section>
 
     <!-- 시간표 -->
     <section class="pane" id="pane-schedule">
-      <div class="page-h"><h1>시간표</h1><p>날짜를 누르면 그날 수업 시간을 볼 수 있어요.</p></div>
-      <div class="card month-sum">
-        <div class="month-sum-top">
-          <div class="month-nav"><button onclick="moveSchMon(-1)" aria-label="이전 달">‹</button><b id="schTitle"></b><button onclick="moveSchMon(1)" aria-label="다음 달">›</button></div>
-          <button class="link-btn" onclick="goThisMonth()">이번 달</button>
+      <div class="p-top">
+        <div class="p-title"><h1>시간표</h1><button class="p-link" onclick="goThisMonth()">이번 달</button></div>
+        <div class="p-month"><button onclick="moveSchMon(-1)" aria-label="이전 달">‹</button><b id="schTitle"></b><button onclick="moveSchMon(1)" aria-label="다음 달">›</button></div>
+        <div class="p-stats four" id="schHero"></div>
+      </div>
+      <div class="p-body">
+        <div class="cal">
+          <div class="cal-dh"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+          <div class="cal-body" id="schCalBody"></div>
+          <div class="cal-legend"><span><i style="background:#FF3B30"></i>정규 수업</span><span><i style="box-shadow:inset 0 0 0 1.5px #FF3B30"></i>특강</span><span><i style="background:#111"></i>선택</span></div>
         </div>
-        <div class="sum-grid" id="schHero"></div>
-      </div>
-      <div class="card cal">
-        <div class="cal-dh"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
-        <div class="cal-body" id="schCalBody"></div>
-        <div class="cal-legend"><span><i style="background:var(--ink)"></i>정규 수업</span><span><i style="background:var(--accent)"></i>특강</span><span><i style="box-shadow:inset 0 0 0 1.5px var(--ink)"></i>오늘</span></div>
-      </div>
-      <div class="card day-card" id="schNext"></div>
-      <div class="sec">
-        <div class="sec-h"><h2>이번 달 수업<span class="cnt" id="schDayCount"></span></h2></div>
-        <div class="card" id="schList"></div>
+        <div class="day-card" id="schNext"></div>
+        <div class="h-sec-h" style="margin-top:30px"><h2>이번 달 수업<span class="cnt" id="schDayCount"></span></h2></div>
+        <div class="sch-list" id="schList"></div>
       </div>
     </section>
 
     <!-- 도구 -->
     <section class="pane" id="pane-tools">
-      <div class="page-h"><h1>도구</h1><p>필요할 때 꺼내 쓰는 개인 도구예요. 기록은 이 기기에만 저장돼요.</p></div>
-      <div class="seg" role="tablist">
-        <button class="on" id="toolTabTimer" type="button" onclick="switchToolView('timer',this)">집중 타이머</button>
-        <button id="toolTabFeedback" type="button" onclick="switchToolView('feedback',this)">피드백 메모</button>
-        <button id="toolTabDday" type="button" onclick="switchToolView('dday',this)">시험 D-day</button>
-      </div>
-
-      <div class="tool-view on" id="toolViewTimer">
-        <div class="tool-intro">자습이나 연습 시간을 잴 때 쓰세요. ‘끝내고 저장’을 누르면 집중 기록에 남아요.</div>
-        <div class="card timer-card" id="timerCard">
-          <div class="timer-state"><i></i><span id="timerStateLabel">대기 중</span></div>
-          <div class="timer-display" id="timerDisplay">00:00:00</div>
-          <div class="timer-actions"><button class="btn btn-dark" id="timerStartBtn" onclick="toggleTimer()">시작</button><button class="btn btn-line" onclick="resetTimer()">초기화</button></div>
-          <button class="btn btn-accent timer-save" onclick="finishTimer()">끝내고 저장</button>
+      <div class="p-top">
+        <div class="p-title"><h1>도구</h1><span>기록은 이 기기에만 저장돼요</span></div>
+        <div class="p-seg" role="tablist">
+          <button class="on" id="toolTabTimer" type="button" onclick="switchToolView('timer',this)">집중 타이머</button>
+          <button id="toolTabFeedback" type="button" onclick="switchToolView('feedback',this)">피드백 메모</button>
+          <button id="toolTabDday" type="button" onclick="switchToolView('dday',this)">시험 D-day</button>
         </div>
-        <div class="mini-stats">
-          <div class="stat"><div class="stat-l">이번 주 집중</div><div class="stat-v" id="weekFocusTime" style="font-size:20px">0분</div></div>
-          <div class="stat"><div class="stat-l">이번 주 횟수</div><div class="stat-v" id="weekSessionCount" style="font-size:20px">0회</div></div>
-        </div>
-        <div class="sec"><div class="sec-h"><h2>집중 기록<span class="cnt" id="timerHistoryCount"></span></h2></div><div class="card list-card" id="timerHistory"></div></div>
       </div>
-
-      <div class="tool-view" id="toolViewFeedback">
-        <div class="tool-intro">수업 중 선생님께 들은 피드백을 잊기 전에 적어두세요. 다음 작업 전에 다시 보면 좋아요.</div>
-        <div class="card fb-card">
-          <div class="tags" id="feedbackTags">
-            <button class="tag" type="button" onclick="toggleFeedbackTag(this,'형태')">형태</button><button class="tag" type="button" onclick="toggleFeedbackTag(this,'구도')">구도</button><button class="tag" type="button" onclick="toggleFeedbackTag(this,'명암')">명암</button><button class="tag" type="button" onclick="toggleFeedbackTag(this,'색감')">색감</button><button class="tag" type="button" onclick="toggleFeedbackTag(this,'묘사')">묘사</button><button class="tag" type="button" onclick="toggleFeedbackTag(this,'완성도')">완성도</button>
+      <div class="p-body">
+        <div class="tool-view on" id="toolViewTimer">
+          <div class="timer-card" id="timerCard">
+            <div class="timer-state"><i></i><span id="timerStateLabel">대기 중</span></div>
+            <div class="timer-display" id="timerDisplay">00:00:00</div>
+            <div class="timer-actions"><button class="btn btn-dark" id="timerStartBtn" onclick="toggleTimer()">시작</button><button class="btn btn-line" onclick="resetTimer()">초기화</button></div>
+            <button class="btn btn-grey timer-save" onclick="finishTimer()">끝내고 저장</button>
           </div>
-          <textarea id="feedbackNote" placeholder="예: 주제부 명암 대비를 더 강하게"></textarea>
-          <button class="btn btn-dark" onclick="saveFeedback()">메모 저장</button>
+          <div class="mini-stats">
+            <div><span>이번 주 집중</span><b id="weekFocusTime">0분</b></div>
+            <div><span>이번 주 횟수</span><b id="weekSessionCount">0회</b></div>
+          </div>
+          <div class="h-sec-h flush"><h2>집중 기록<span class="cnt" id="timerHistoryCount"></span></h2></div>
+          <div class="list-card" id="timerHistory"></div>
         </div>
-        <div class="sec"><div class="sec-h"><h2>최근 메모</h2></div><div class="card list-card" id="feedbackHistory"></div></div>
-      </div>
 
-      <div class="tool-view" id="toolViewDday">
-        <div class="tool-intro">목표 대학과 시험일을 정해두면 남은 날짜를 보여줘요.</div>
-        <div class="card dday-card" id="goalPin">
-          <div class="dday-num" id="goalDday">D-?</div>
-          <div class="dday-goal" id="goalPinText">아직 목표가 없어요</div>
-          <div class="dday-date" id="goalDateText"></div>
-          <button class="btn btn-dark" type="button" onclick="openGoalSheet()">목표 · 시험일 설정</button>
+        <div class="tool-view" id="toolViewFeedback">
+          <div class="fb-card">
+            <div class="tags" id="feedbackTags">
+              <button class="tag" type="button" onclick="toggleFeedbackTag(this,'형태')">형태</button><button class="tag" type="button" onclick="toggleFeedbackTag(this,'구도')">구도</button><button class="tag" type="button" onclick="toggleFeedbackTag(this,'명암')">명암</button><button class="tag" type="button" onclick="toggleFeedbackTag(this,'색감')">색감</button><button class="tag" type="button" onclick="toggleFeedbackTag(this,'묘사')">묘사</button><button class="tag" type="button" onclick="toggleFeedbackTag(this,'완성도')">완성도</button>
+            </div>
+            <textarea id="feedbackNote" placeholder="수업에서 들은 피드백을 적어두세요&#10;예: 주제부 명암 대비를 더 강하게"></textarea>
+            <button class="btn btn-dark" onclick="saveFeedback()">메모 저장</button>
+          </div>
+          <div class="h-sec-h flush"><h2>최근 메모</h2></div>
+          <div class="list-card" id="feedbackHistory"></div>
+        </div>
+
+        <div class="tool-view" id="toolViewDday">
+          <div class="dday-card" id="goalPin">
+            <div class="dday-num" id="goalDday">D-?</div>
+            <div class="dday-goal" id="goalPinText">아직 목표가 없어요</div>
+            <div class="dday-date" id="goalDateText"></div>
+            <button class="btn btn-dark" type="button" onclick="openGoalSheet()">목표 · 시험일 설정</button>
+          </div>
         </div>
       </div>
     </section>
@@ -775,7 +956,7 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 
     <div style="position:relative">
       <label class="photo-pick" id="practicePhotoPicker"><input type="file" id="practicePhotoInput" accept="image/*" onchange="handlePracticePhoto(event)"><img id="practicePhotoPreview" alt="선택한 사진"><span class="ph"><svg viewBox="0 0 24 24"><path d="M4 7h4l1.5-2h5L16 7h4v12H4Z"/><circle cx="12" cy="13" r="3.5"/></svg>사진 찍기 · 앨범에서 선택</span></label>
-      <button type="button" class="photo-del" id="practicePhotoDel" onclick="clearPracticePhoto()">다시 선택</button>
+      <div class="photo-acts"><button type="button" onclick="reopenPracticeCropper()">트리밍 조정</button><button type="button" onclick="clearPracticePhoto()">다시 선택</button></div>
     </div>
     <div id="practiceNewTitleWrap" style="display:none"><div class="step-l">작품 이름</div><input class="txt" id="practiceProjectTitle" maxlength="30" placeholder="예: 기초디자인 9월 1작" style="margin-top:0"></div>
 
@@ -791,6 +972,34 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 
     <div class="hint" style="margin:12px 0 14px">사진은 내 계정에 저장되고 선생님도 볼 수 있어요.</div>
     <button class="btn btn-accent" id="practiceSaveBtn" type="button" onclick="savePracticeRecord()">저장</button>
+  </div>
+</div>
+
+
+<!-- 작품 사진 트리밍 -->
+<div class="crop-editor" id="practiceCropEditor" aria-hidden="true">
+  <div class="crop-topbar">
+    <button class="crop-back" type="button" onclick="cancelPracticeCrop()" aria-label="닫기">✕</button>
+    <div class="crop-headcopy"><b>작품 영역 맞추기</b><span id="cropStatus">작품의 네 모서리를 찾고 있어요.</span></div>
+    <button class="crop-apply-top" type="button" onclick="applyPracticeCrop()">적용</button>
+  </div>
+  <div class="crop-stage" id="cropStage">
+    <canvas id="cropCanvas"></canvas>
+    <div class="crop-handle-layer" id="cropHandleLayer" aria-hidden="true">
+      <button class="crop-handle" type="button" data-crop-index="0" aria-label="왼쪽 위 모서리"></button>
+      <button class="crop-handle" type="button" data-crop-index="1" aria-label="오른쪽 위 모서리"></button>
+      <button class="crop-handle" type="button" data-crop-index="2" aria-label="오른쪽 아래 모서리"></button>
+      <button class="crop-handle" type="button" data-crop-index="3" aria-label="왼쪽 아래 모서리"></button>
+    </div>
+    <div class="crop-help">동그라미를 끌어 작품 네 모서리에 맞춰주세요</div>
+  </div>
+  <div class="crop-bottom">
+    <div class="crop-tools">
+      <button type="button" onclick="autoDetectPracticeCrop()">자동 맞춤</button>
+      <button type="button" onclick="resetPracticeCropPoints()">전체 영역</button>
+    </div>
+    <div class="crop-note">기울어진 사진은 반듯하게 펴고, 세로로 찍은 사진은 가로로 저장돼요.</div>
+    <button class="crop-apply" id="cropApplyBtn" type="button" onclick="applyPracticeCrop()">이대로 사용</button>
   </div>
 </div>
 
@@ -1344,6 +1553,478 @@ function closeProcessViewer(){const v=document.getElementById('processViewer');v
 function initProcessViewerSwipe(){const stage=document.getElementById('pvStage');if(!stage||stage.dataset.swipeReady)return;stage.dataset.swipeReady='1';stage.addEventListener('touchstart',e=>{const t=e.changedTouches[0];processViewerTouchX=t.clientX;processViewerTouchY=t.clientY;},{passive:true});stage.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-processViewerTouchX,dy=t.clientY-processViewerTouchY;if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.25){moveProcessViewer(dx<0?1:-1);}},{passive:true});}
 document.addEventListener('keydown',e=>{const v=document.getElementById('processViewer');if(!v?.classList.contains('on'))return;if(e.key==='ArrowLeft')moveProcessViewer(-1);else if(e.key==='ArrowRight')moveProcessViewer(1);else if(e.key==='Escape')closeProcessViewer();});
 setTimeout(initProcessViewerSwipe,0);
+let practiceOriginalFile=null;
+// ── 작품 사진 자동 트리밍 ──
+// 휴대폰/PWA 터치 안정성을 위해 OpenCV/WASM 자동 로딩을 제거하고,
+// Canvas 기반의 가벼운 자동 영역 탐색 + 수동 4점 보정 + 로컬 원근 보정으로 구성한다.
+let cropSourceCanvas=null,cropPoints=[],cropDragIndex=-1,cropOpenToken=0;
+
+function cropDist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+
+function orderCropPoints(points){
+  if(!points||points.length!==4)return points;
+  const pts=points.map(p=>({x:+p.x,y:+p.y}));
+  const sums=pts.map(p=>p.x+p.y),diffs=pts.map(p=>p.x-p.y);
+  const tl=pts[sums.indexOf(Math.min(...sums))],br=pts[sums.indexOf(Math.max(...sums))];
+  const tr=pts[diffs.indexOf(Math.max(...diffs))],bl=pts[diffs.indexOf(Math.min(...diffs))];
+  const uniq=[tl,tr,br,bl];
+  if(new Set(uniq.map(p=>`${p.x.toFixed(2)},${p.y.toFixed(2)}`)).size===4)return uniq;
+
+  const cx=pts.reduce((a,p)=>a+p.x,0)/4,cy=pts.reduce((a,p)=>a+p.y,0)/4;
+  const sorted=[...pts].sort((a,b)=>Math.atan2(a.y-cy,a.x-cx)-Math.atan2(b.y-cy,b.x-cx));
+  let st=0,best=Infinity;
+  sorted.forEach((p,i)=>{const v=p.x+p.y;if(v<best){best=v;st=i}});
+  const r=[...sorted.slice(st),...sorted.slice(0,st)];
+  return r[1].x>r[3].x?[r[0],r[1],r[2],r[3]]:[r[0],r[3],r[2],r[1]];
+}
+
+function defaultCropPoints(){
+  if(!cropSourceCanvas)return[];
+  const w=cropSourceCanvas.width,h=cropSourceCanvas.height,m=Math.round(Math.min(w,h)*.045);
+  return [{x:m,y:m},{x:w-m,y:m},{x:w-m,y:h-m},{x:m,y:h-m}];
+}
+
+async function fileToCropCanvas(file){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image();
+    img.decoding='async';
+    img.src=url;
+    await img.decode();
+
+    const maxSide=1400;
+    const scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+    const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(img.naturalWidth*scale));
+    c.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    c.getContext('2d',{alpha:false}).drawImage(img,0,0,c.width,c.height);
+    return c;
+  }finally{
+    URL.revokeObjectURL(url);
+  }
+}
+
+function fitCropCanvas(){
+  if(!cropSourceCanvas)return;
+  const c=document.getElementById('cropCanvas'),stage=document.getElementById('cropStage');
+  if(!c||!stage)return;
+
+  c.width=cropSourceCanvas.width;
+  c.height=cropSourceCanvas.height;
+
+  const availW=Math.max(1,stage.clientWidth-28);
+  const availH=Math.max(1,stage.clientHeight-28);
+  const sc=Math.min(availW/c.width,availH/c.height,1);
+
+  c.style.width=Math.max(1,Math.round(c.width*sc))+'px';
+  c.style.height=Math.max(1,Math.round(c.height*sc))+'px';
+  drawCropEditor();
+  requestAnimationFrame(syncCropHandles);
+}
+
+function drawCropEditor(){
+  const c=document.getElementById('cropCanvas');
+  if(!c||!cropSourceCanvas)return;
+  const ctx=c.getContext('2d');
+
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.drawImage(cropSourceCanvas,0,0,c.width,c.height);
+  if(cropPoints.length!==4){syncCropHandles();return;}
+
+  ctx.save();
+  ctx.fillStyle='rgba(0,0,0,.48)';
+  ctx.beginPath();
+  ctx.rect(0,0,c.width,c.height);
+  ctx.moveTo(cropPoints[0].x,cropPoints[0].y);
+  for(let i=1;i<4;i++)ctx.lineTo(cropPoints[i].x,cropPoints[i].y);
+  ctx.closePath();
+  ctx.fill('evenodd');
+
+  ctx.strokeStyle='#FFFFFF';
+  ctx.lineWidth=Math.max(3,c.width/350);
+  ctx.lineJoin='round';
+  ctx.beginPath();
+  ctx.moveTo(cropPoints[0].x,cropPoints[0].y);
+  for(let i=1;i<4;i++)ctx.lineTo(cropPoints[i].x,cropPoints[i].y);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+
+  syncCropHandles();
+}
+
+function cropClientPos(clientX,clientY){
+  const c=document.getElementById('cropCanvas');
+  const r=c.getBoundingClientRect();
+  if(!r.width||!r.height)return{x:0,y:0};
+  return {
+    x:(clientX-r.left)*c.width/r.width,
+    y:(clientY-r.top)*c.height/r.height
+  };
+}
+
+function syncCropHandles(){
+  const c=document.getElementById('cropCanvas');
+  const stage=document.getElementById('cropStage');
+  const layer=document.getElementById('cropHandleLayer');
+  if(!c||!stage||!layer||cropPoints.length!==4)return;
+
+  const cr=c.getBoundingClientRect(),sr=stage.getBoundingClientRect();
+  if(!cr.width||!cr.height)return;
+
+  layer.querySelectorAll('.crop-handle').forEach((h,i)=>{
+    const p=cropPoints[i];if(!p)return;
+    h.style.left=((cr.left-sr.left)+(p.x/c.width)*cr.width)+'px';
+    h.style.top=((cr.top-sr.top)+(p.y/c.height)*cr.height)+'px';
+  });
+}
+
+function setCropDragPoint(clientX,clientY){
+  if(cropDragIndex<0||cropPoints.length!==4)return;
+  const c=document.getElementById('cropCanvas');
+  const p=cropClientPos(clientX,clientY),pad=2;
+  cropPoints[cropDragIndex]={
+    x:Math.max(pad,Math.min(c.width-pad,p.x)),
+    y:Math.max(pad,Math.min(c.height-pad,p.y))
+  };
+  drawCropEditor();
+}
+
+function bindCropTouch(){
+  const layer=document.getElementById('cropHandleLayer');
+  if(!layer||layer.dataset.cropReady==='1')return;
+  layer.dataset.cropReady='1';
+
+  const handles=[...layer.querySelectorAll('.crop-handle')];
+
+  const begin=(handle,x,y,e)=>{
+    cropDragIndex=Number(handle.dataset.cropIndex);
+    document.getElementById('practiceCropEditor')?.classList.add('crop-dragging');
+    setCropDragPoint(x,y);
+    if(e?.cancelable)e.preventDefault();
+    e?.stopPropagation?.();
+  };
+  const move=(index,x,y,e)=>{
+    if(cropDragIndex!==index)return;
+    setCropDragPoint(x,y);
+    if(e?.cancelable)e.preventDefault();
+    e?.stopPropagation?.();
+  };
+  const end=(e)=>{
+    if(cropDragIndex<0)return;
+    cropDragIndex=-1;
+    document.getElementById('practiceCropEditor')?.classList.remove('crop-dragging');
+    if(e?.cancelable)e.preventDefault();
+  };
+
+  if(window.PointerEvent){
+    handles.forEach(handle=>{
+      const index=Number(handle.dataset.cropIndex);
+      handle.addEventListener('pointerdown',e=>{
+        try{handle.setPointerCapture(e.pointerId)}catch(_){}
+        begin(handle,e.clientX,e.clientY,e);
+      },{passive:false});
+      handle.addEventListener('pointermove',e=>move(index,e.clientX,e.clientY,e),{passive:false});
+      handle.addEventListener('pointerup',end,{passive:false});
+      handle.addEventListener('pointercancel',end,{passive:false});
+    });
+  }else{
+    handles.forEach(handle=>{
+      const index=Number(handle.dataset.cropIndex);
+      handle.addEventListener('touchstart',e=>{
+        const t=e.touches?.[0];if(t)begin(handle,t.clientX,t.clientY,e);
+      },{passive:false});
+      handle.addEventListener('touchmove',e=>{
+        const t=e.touches?.[0];if(t)move(index,t.clientX,t.clientY,e);
+      },{passive:false});
+      handle.addEventListener('touchend',end,{passive:false});
+      handle.addEventListener('touchcancel',end,{passive:false});
+    });
+  }
+}
+
+function cropUiYield(){
+  return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+}
+
+function lightweightDetectCrop(){
+  if(!cropSourceCanvas)return null;
+
+  const src=cropSourceCanvas,max=280;
+  const scale=Math.min(1,max/Math.max(src.width,src.height));
+  const w=Math.max(40,Math.round(src.width*scale));
+  const h=Math.max(40,Math.round(src.height*scale));
+
+  const c=document.createElement('canvas');
+  c.width=w;c.height=h;
+  const ctx=c.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(src,0,0,w,h);
+
+  const data=ctx.getImageData(0,0,w,h).data;
+  const gray=new Uint8Array(w*h);
+  for(let i=0,p=0;i<data.length;i+=4,p++){
+    gray[p]=(data[i]*.299+data[i+1]*.587+data[i+2]*.114)|0;
+  }
+
+  const col=new Float64Array(w),row=new Float64Array(h);
+  for(let y=2;y<h-2;y++){
+    for(let x=2;x<w-2;x++){
+      col[x]+=Math.abs(gray[y*w+x+1]-gray[y*w+x-1]);
+      row[y]+=Math.abs(gray[(y+1)*w+x]-gray[(y-1)*w+x]);
+    }
+  }
+
+  const bestIn=(arr,a,b)=>{
+    let bi=a,bv=-1;
+    for(let i=Math.max(1,a);i<=Math.min(arr.length-2,b);i++){
+      const score=arr[i]+arr[i-1]*.55+arr[i+1]*.55;
+      if(score>bv){bv=score;bi=i}
+    }
+    return bi;
+  };
+
+  const left=bestIn(col,Math.round(w*.025),Math.round(w*.42));
+  const right=bestIn(col,Math.round(w*.58),Math.round(w*.975));
+  const top=bestIn(row,Math.round(h*.025),Math.round(h*.42));
+  const bottom=bestIn(row,Math.round(h*.58),Math.round(h*.975));
+
+  if(right-left<w*.35||bottom-top<h*.35)return null;
+
+  const sx=src.width/w,sy=src.height/h;
+  return [
+    {x:left*sx,y:top*sy},
+    {x:right*sx,y:top*sy},
+    {x:right*sx,y:bottom*sy},
+    {x:left*sx,y:bottom*sy}
+  ];
+}
+
+async function autoDetectPracticeCrop(){
+  if(!cropSourceCanvas)return;
+  const status=document.getElementById('cropStatus');
+  if(status)status.textContent='작품 영역을 빠르게 찾고 있어요.';
+  await cropUiYield();
+
+  try{
+    const pts=lightweightDetectCrop();
+    cropPoints=pts&&pts.length===4?pts:defaultCropPoints();
+    drawCropEditor();
+    if(status)status.textContent=pts
+      ?'작품 영역을 찾았어요. 필요하면 동그라미을 조정해주세요.'
+      :'경계가 뚜렷하지 않아 전체 영역에서 시작해요. 동그라미을 조정해주세요.';
+    haptic('light');
+  }catch(e){
+    console.warn('crop detect',e);
+    cropPoints=defaultCropPoints();
+    drawCropEditor();
+    if(status)status.textContent='동그라미을 작품 네 모서리에 맞춰주세요.';
+  }
+}
+
+function resetPracticeCropPoints(){
+  if(!cropSourceCanvas)return;
+  cropPoints=defaultCropPoints();
+  const status=document.getElementById('cropStatus');
+  if(status)status.textContent='전체 사진에서 시작해요. 동그라미을 작품에 맞춰주세요.';
+  drawCropEditor();
+  haptic('light');
+}
+
+async function openPracticeCropper(file,{keepOriginal=true}={}){
+  if(!file)return;
+
+  const token=++cropOpenToken;
+  if(keepOriginal)practiceOriginalFile=file;
+
+  const ed=document.getElementById('practiceCropEditor');
+  const status=document.getElementById('cropStatus');
+  const btn=document.getElementById('cropApplyBtn');
+  const top=document.querySelector('.crop-apply-top');
+
+  ed.classList.add('on');
+  ed.setAttribute('aria-hidden','false');
+  bindCropTouch();
+
+  if(status)status.textContent='사진을 준비하고 있어요.';
+  if(btn)btn.disabled=true;
+  if(top)top.disabled=true;
+
+  try{
+    cropSourceCanvas=await fileToCropCanvas(file);
+    if(token!==cropOpenToken)return;
+
+    cropPoints=defaultCropPoints();
+    fitCropCanvas();
+
+    if(btn)btn.disabled=false;
+    if(top)top.disabled=false;
+    if(status)status.textContent='동그라미을 조정하거나 자동 맞춤을 눌러주세요.';
+    try{document.activeElement?.blur?.()}catch(_){}
+  }catch(e){
+    console.error(e);
+    if(status)status.textContent='사진을 불러오지 못했어요.';
+    if(btn)btn.disabled=false;
+    if(top)top.disabled=false;
+    showToast('사진을 불러오지 못했어요','info');
+  }
+}
+
+function cancelPracticeCrop(){
+  ++cropOpenToken;
+  const ed=document.getElementById('practiceCropEditor');
+  ed.classList.remove('on');
+  ed.setAttribute('aria-hidden','true');
+  cropDragIndex=-1;
+  ed.classList.remove('crop-dragging');
+}
+
+function reopenPracticeCropper(){
+  if(practiceOriginalFile)openPracticeCropper(practiceOriginalFile,{keepOriginal:false});
+  else showToast('원본 사진을 다시 선택해주세요','info');
+}
+
+function cropAffineForTriangle(s0,s1,s2,d0,d1,d2){
+  const den=s0.x*(s1.y-s2.y)+s1.x*(s2.y-s0.y)+s2.x*(s0.y-s1.y);
+  if(Math.abs(den)<1e-6)return null;
+
+  const a=(d0.x*(s1.y-s2.y)+d1.x*(s2.y-s0.y)+d2.x*(s0.y-s1.y))/den;
+  const c=(d0.x*(s2.x-s1.x)+d1.x*(s0.x-s2.x)+d2.x*(s1.x-s0.x))/den;
+  const e=(d0.x*(s1.x*s2.y-s2.x*s1.y)+d1.x*(s2.x*s0.y-s0.x*s2.y)+d2.x*(s0.x*s1.y-s1.x*s0.y))/den;
+
+  const b=(d0.y*(s1.y-s2.y)+d1.y*(s2.y-s0.y)+d2.y*(s0.y-s1.y))/den;
+  const d=(d0.y*(s2.x-s1.x)+d1.y*(s0.x-s2.x)+d2.y*(s1.x-s0.x))/den;
+  const f=(d0.y*(s1.x*s2.y-s2.x*s1.y)+d1.y*(s2.x*s0.y-s0.x*s2.y)+d2.y*(s0.x*s1.y-s1.x*s0.y))/den;
+
+  return {a,b,c,d,e,f};
+}
+
+function drawCropTriangle(ctx,source,s0,s1,s2,d0,d1,d2){
+  const t=cropAffineForTriangle(s0,s1,s2,d0,d1,d2);
+  if(!t)return;
+
+  // 이음새(대각선 선) 방지를 위해 클립 삼각형을 1px 바깥으로 확장
+  const cx=(d0.x+d1.x+d2.x)/3,cy=(d0.y+d1.y+d2.y)/3;
+  const grow=p=>{const dx=p.x-cx,dy=p.y-cy,l=Math.hypot(dx,dy)||1;return {x:p.x+dx/l*1.2,y:p.y+dy/l*1.2};};
+  const g0=grow(d0),g1=grow(d1),g2=grow(d2);
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(g0.x,g0.y);
+  ctx.lineTo(g1.x,g1.y);
+  ctx.lineTo(g2.x,g2.y);
+  ctx.closePath();
+  ctx.clip();
+
+  ctx.setTransform(t.a,t.b,t.c,t.d,t.e,t.f);
+  ctx.drawImage(source,0,0);
+  ctx.restore();
+}
+
+function bilinearCropPoint(tl,tr,br,bl,u,v){
+  const top={x:tl.x+(tr.x-tl.x)*u,y:tl.y+(tr.y-tl.y)*u};
+  const bottom={x:bl.x+(br.x-bl.x)*u,y:bl.y+(br.y-bl.y)*u};
+  return {
+    x:top.x+(bottom.x-top.x)*v,
+    y:top.y+(bottom.y-top.y)*v
+  };
+}
+
+async function cropWithoutOpenCv(){
+  const [tl,tr,br,bl]=orderCropPoints(cropPoints);
+
+  let w=Math.round(Math.max(cropDist(tl,tr),cropDist(bl,br)));
+  let h=Math.round(Math.max(cropDist(tl,bl),cropDist(tr,br)));
+  w=Math.max(80,w);h=Math.max(80,h);
+
+  const maxSide=1800;
+  const fit=Math.min(1,maxSide/Math.max(w,h));
+  w=Math.max(80,Math.round(w*fit));
+  h=Math.max(80,Math.round(h*fit));
+
+  const warped=document.createElement('canvas');
+  warped.width=w;warped.height=h;
+  const ctx=warped.getContext('2d',{alpha:false});
+  ctx.fillStyle='#fff';
+  ctx.fillRect(0,0,w,h);
+
+  const grid=8;
+  for(let gy=0;gy<grid;gy++){
+    const v0=gy/grid,v1=(gy+1)/grid;
+    for(let gx=0;gx<grid;gx++){
+      const u0=gx/grid,u1=(gx+1)/grid;
+
+      const s00=bilinearCropPoint(tl,tr,br,bl,u0,v0);
+      const s10=bilinearCropPoint(tl,tr,br,bl,u1,v0);
+      const s11=bilinearCropPoint(tl,tr,br,bl,u1,v1);
+      const s01=bilinearCropPoint(tl,tr,br,bl,u0,v1);
+
+      const d00={x:u0*w,y:v0*h};
+      const d10={x:u1*w,y:v0*h};
+      const d11={x:u1*w,y:v1*h};
+      const d01={x:u0*w,y:v1*h};
+
+      drawCropTriangle(ctx,cropSourceCanvas,s00,s10,s11,d00,d10,d11);
+      drawCropTriangle(ctx,cropSourceCanvas,s00,s11,s01,d00,d11,d01);
+    }
+  }
+
+  let finalCanvas=warped;
+  if(h>w){
+    const rot=document.createElement('canvas');
+    rot.width=h;rot.height=w;
+    const rctx=rot.getContext('2d',{alpha:false});
+    rctx.fillStyle='#fff';
+    rctx.fillRect(0,0,rot.width,rot.height);
+    rctx.translate(h,0);
+    rctx.rotate(Math.PI/2);
+    rctx.drawImage(warped,0,0);
+    finalCanvas=rot;
+  }
+
+  return await new Promise((resolve,reject)=>{
+    finalCanvas.toBlob(
+      blob=>blob?resolve(blob):reject(new Error('crop-blob-failed')),
+      'image/jpeg',
+      .82
+    );
+  });
+}
+
+async function applyPracticeCrop(){
+  if(!cropSourceCanvas||cropPoints.length!==4)return;
+
+  const btn=document.getElementById('cropApplyBtn');
+  const top=document.querySelector('.crop-apply-top');
+  const status=document.getElementById('cropStatus');
+
+  if(btn){btn.disabled=true;btn.textContent='사진 정리 중…'}
+  if(top)top.disabled=true;
+  if(status)status.textContent='작품 영역과 방향을 정리하고 있어요.';
+
+  try{
+    await cropUiYield();
+    const blob=await cropWithoutOpenCv();
+    blob.name='artwork-cropped.jpg';
+    setPracticeFile(blob);
+    cancelPracticeCrop();
+    showToast('작품 영역을 정리했어요','ok');
+    haptic('medium');
+  }catch(e){
+    console.error(e);
+    showToast('사진 보정에 실패했어요. 다시 시도해주세요','info');
+    if(status)status.textContent='다시 시도하거나 전체 영역을 선택해주세요.';
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='이대로 사용'}
+    if(top)top.disabled=false;
+  }
+}
+
+window.addEventListener('resize',()=>{
+  if(document.getElementById('practiceCropEditor')?.classList.contains('on'))fitCropCanvas();
+},{passive:true});
+window.addEventListener('DOMContentLoaded',bindCropTouch);
+setTimeout(bindCropTouch,0);
+
+
 
 // ── 앱 진입 ──
 const TAB_TITLES={home:'홈',works:'내 작품',schedule:'시간표',tools:'도구'};
@@ -1459,7 +2140,7 @@ function goThisMonth(){const n=new Date();schY=n.getFullYear();schM=n.getMonth()
 function quickPick(e,pid){
   const f=e.target.files?.[0];e.target.value='';if(!f)return;
   if(!f.type.startsWith('image/')){showToast('이미지 파일을 선택해주세요');return;}
-  openPracticeSheet(pid?'add':'new',pid||'');setPracticeFile(f);
+  openPracticeSheet(pid?'add':'new',pid||'');openPracticeCropper(f);
 }
 function setPracticeFile(f){
   practicePendingFile=f;if(practicePreviewUrl)URL.revokeObjectURL(practicePreviewUrl);practicePreviewUrl=URL.createObjectURL(f);
@@ -1501,41 +2182,36 @@ function clearPracticePhoto(){
 }
 function handlePracticePhoto(e){
   const f=e.target.files?.[0];if(!f)return;if(!f.type.startsWith('image/')){showToast('이미지 파일을 선택해주세요');return;}
-  setPracticeFile(f);haptic('light');
+  openPracticeCropper(f);haptic('light');
 }
 
 
 // ── 작품 카드 ──
 const ICON_TRASH='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 12h8l1-12M10 11v5M14 11v5"/></svg>';
 async function renderPracticeProjectCard(p){
-  const sessions=p.sessions||[],last=sessions[sessions.length-1],total=projectTotalT(p);
+  const ss=p.sessions||[],last=ss[ss.length-1],total=projectTotalT(p);
   const latestUrl=last?await imageUrlFor(last):'';
-  const thumbs=[];for(const [i,s] of sessions.entries()){const u=await imageUrlFor(s);thumbs.push(`<div class="tl" onclick="openProjectProcess('${p.id}',${i})"><div class="tl-img">${u?`<img src="${u}" alt="${i+1}회차">`:''}<span>${Number(s.t)||0}T</span></div><div class="tl-l">${i+1}회</div></div>`);}
-  return `<div class="card work">
-    <div class="work-cover" ${sessions.length?`onclick="openProjectProcess('${p.id}',${sessions.length-1})"`:''}>${latestUrl?`<img src="${latestUrl}" alt="${escPractice(p.title)} 현재 상태">`:`<svg viewBox="0 0 24 24"><path d="M4 7h4l1.5-2h5L16 7h4v12H4Z"/><circle cx="12" cy="13" r="3.5"/></svg>`}<span class="badge">${sessions.length}회 기록</span>${sessions.length>1?`<span class="view">▶ 과정 넘겨보기</span>`:''}</div>
-    <div class="work-body">
-      <div class="work-head"><div><div class="work-title">${escPractice(p.title)}</div><div class="work-meta">${sessions.length?`${fmtShortDate(sessions[0].createdAt)} 시작 · 최근 ${fmtShortDate(last.createdAt)}`:'아직 기록 없음'}</div></div><div class="work-total"><b>${total}T</b><span>누적 작업</span></div></div>
-      ${thumbs.length>1?`<div class="timeline">${thumbs.join('')}</div>`:''}
-      <div class="work-actions"><button class="btn btn-dark" type="button" onclick="openPracticeSheet('add','${p.id}')">＋ 오늘 기록 추가</button><button class="btn btn-line" type="button" onclick="completePracticeProject('${p.id}')">완성</button><button class="icon-btn" type="button" onclick="deletePracticeProject('${p.id}')" aria-label="작품 삭제">${ICON_TRASH}</button></div>
-    </div></div>`;
+  const thumbs=[];for(const [i,s] of ss.entries()){const u=await imageUrlFor(s);thumbs.push(`<div class="tl" onclick="openProjectProcess('${p.id}',${i})"><div class="tl-img">${u?`<img src="${u}" alt="">`:''}<span>${Number(s.t)||0}T</span></div><div class="tl-l">${i+1}회</div></div>`);}
+  return `<div class="wk-item"><div class="pc-img" ${ss.length?`onclick="openProjectProcess('${p.id}',${ss.length-1})"`:''}>${latestUrl?`<img src="${latestUrl}" alt="">`:''}${ss.length>1?`<span class="pc-badge">과정 ${ss.length}장</span>`:''}<div class="pc-cap"><b>${escPractice(p.title)}</b><em>누적 ${total}T</em><span>${ss.length?fmtDot(ss[0].createdAt)+' 시작 · '+ss.length+'회 기록':'기록 전'}</span></div></div>
+    ${thumbs.length>1?`<div class="timeline">${thumbs.join('')}</div>`:''}
+    <div class="pc-act three"><label class="pc-up"><input type="file" accept="image/*" onchange="quickPick(event,'${p.id}')">사진 올리기</label><button class="pc-done" type="button" onclick="completePracticeProject('${p.id}')" ${ss.length?'':'disabled'}>완료하기</button><button class="pc-del" type="button" onclick="deletePracticeProject('${p.id}')" aria-label="작품 삭제">${ICON_TRASH}</button></div></div>`;
 }
 async function renderCompletedPractice(p){
-  const sessions=p.sessions||[],last=sessions[sessions.length-1],u=last?await imageUrlFor(last):'';
-  return `<div class="card done-item" onclick="openProjectProcess('${p.id}',${Math.max(0,sessions.length-1)})"><div class="done-thumb">${u?`<img src="${u}" alt="">`:''}</div><div class="done-copy"><b>${escPractice(p.title)}</b><span>${sessions.length}회 기록${p.completedAt?' · '+fmtShortDate(p.completedAt)+' 완성':''}</span></div><div class="done-t">${projectTotalT(p)}T</div><button class="icon-btn" type="button" onclick="event.stopPropagation();deletePracticeProject('${p.id}')" aria-label="삭제">${ICON_TRASH}</button></div>`;
+  const ss=p.sessions||[],l=ss[ss.length-1],u=l?await imageUrlFor(l):'';
+  return `<div class="dn" onclick="openProjectProcess('${p.id}',${Math.max(0,ss.length-1)})">${u?`<img src="${u}" alt="">`:''}<button class="dn-del" type="button" onclick="event.stopPropagation();deletePracticeProject('${p.id}')" aria-label="삭제">${ICON_TRASH}</button><div class="dn-c"><b>${escPractice(p.title)}</b><div><span>${fmtDot(p.completedAt||l?.createdAt)}</span><span>누적 ${projectTotalT(p)}T</span></div></div></div>`;
 }
 async function loadPracticeTracker(){
   if(!document.getElementById('activePracticeProjects')||!me)return;clearPracticeObjectUrls();const s=getPracticeStore(),projects=s.projects||[];const allSessions=projects.flatMap(p=>(p.sessions||[]).map(x=>({...x,projectId:p.id})));
   const today=practiceDayKey(new Date()),todaySessions=allSessions.filter(x=>practiceDayKey(x.createdAt)===today);const todayT=todaySessions.reduce((a,b)=>a+(Number(b.t)||0),0);
-  document.getElementById('todayPracticeT').innerHTML=`${todayT}<small>T</small>`;document.getElementById('todayPracticeCount').textContent=`오늘 ${todaySessions.length}회 기록`;
+  document.getElementById('statDone').innerHTML=`${projects.filter(p=>p.status==='done').length}<small>개</small>`;document.getElementById('statTotalT').innerHTML=`${allSessions.reduce((a,b)=>a+(Number(b.t)||0),0)}<small>T</small>`;document.getElementById('todayPracticeCount').textContent=`오늘 ${todaySessions.length}회 기록`;
   const ws=weekStartDate(),days=[];let weekTotal=0,maxT=1;for(let i=0;i<7;i++){const d=new Date(ws);d.setDate(ws.getDate()+i);const k=practiceDayKey(d);const t=allSessions.filter(x=>practiceDayKey(x.createdAt)===k).reduce((a,b)=>a+(Number(b.t)||0),0);days.push({d,t});weekTotal+=t;maxT=Math.max(maxT,t);}
-  document.getElementById('practiceWeekTotal').innerHTML=`${weekTotal}<small>T</small>`;
   const labels=['월','화','수','목','금','토','일'];document.getElementById('practiceWeekBars').innerHTML=days.map((x,i)=>{const isToday=practiceDayKey(x.d)===today;const h=x.t?Math.max(10,Math.round((x.t/maxT)*52)):4;return `<div class="wd${isToday?' today':''}"><div class="wd-t">${x.t?x.t+'T':''}</div><div class="wd-bar-wrap"><div class="wd-bar${x.t?' has':''}" style="height:${h}px"></div></div><div class="wd-l">${labels[i]}</div></div>`;}).join('');
   const active=projects.filter(p=>p.status!=='done').sort((a,b)=>new Date(b.updatedAt||b.createdAt)-new Date(a.updatedAt||a.createdAt));const wrap=document.getElementById('activePracticeProjects');
   document.getElementById('activeCountStat').innerHTML=`${active.length}<small>개</small>`;
   document.getElementById('activeCount').textContent=active.length?active.length:'';
   const wt=document.getElementById('waToday');if(wt){wt.textContent=todaySessions.length?`✓ 오늘 ${todayT}T 기록`:'아직 기록 전';wt.classList.toggle('done',!!todaySessions.length);}
   await renderHomeWorks(active);
-  if(!active.length)wrap.innerHTML=`<div class="empty"><b>진행 중인 작품이 없어요</b>수업이 끝나면 사진 한 장과 사용한 타임을 남겨보세요.<br>작품이 완성되는 과정이 여기 쌓여요.<br><button class="btn btn-dark" type="button" onclick="openPracticeSheet('new')">첫 작품 기록하기</button></div>`;
+  if(!active.length)wrap.innerHTML=`<label class="pc-new"><input type="file" accept="image/*" onchange="quickPick(event,'')"><i>＋</i>첫 작품 시작하기<small>사진 한 장으로 시작해요</small></label>`;
   else{const cards=[];for(const p of active)cards.push(await renderPracticeProjectCard(p));wrap.innerHTML=cards.join('');}
   const done=projects.filter(p=>p.status==='done').sort((a,b)=>new Date(b.completedAt||b.updatedAt)-new Date(a.completedAt||a.updatedAt));const sec=document.getElementById('completedPracticeSection');
   if(done.length){sec.style.display='block';document.getElementById('completedPracticeCount').textContent=done.length;const arr=[];for(const p of done)arr.push(await renderCompletedPractice(p));document.getElementById('completedPracticeProjects').innerHTML=arr.join('');}else sec.style.display='none';
@@ -1657,7 +2333,7 @@ function renderFeedbackHistory(){
 function loadRoutine(){loadGoalPin();renderTimer();renderRoutineStats();renderTimerHistory();renderFeedbackHistory();}
 function switchToolView(view,btn){
   document.querySelectorAll('.tool-view').forEach(v=>v.classList.remove('on'));
-  document.querySelectorAll('#pane-tools .seg button').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#pane-tools .p-seg button').forEach(b=>b.classList.remove('on'));
   document.getElementById('toolView'+view.charAt(0).toUpperCase()+view.slice(1))?.classList.add('on');
   if(btn)btn.classList.add('on');
   loadRoutine();haptic('light');
@@ -1748,6 +2424,148 @@ window.addEventListener('online',()=>{if(me&&fbAuth.currentUser)loadPracticeStor
 window.addEventListener('offline',()=>setCloudStatus('err','오프라인'));
 window.addEventListener('DOMContentLoaded',initSwipe);
 init();
+
+
+// ── 인터랙션 ──
+const FX_REDUCED=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+// 하단 탭 인디케이터
+function fxTabInd(){
+  const tabs=document.querySelector('.tabs.pill');if(!tabs)return;
+  let ind=tabs.querySelector('.tab-ind');if(!ind){ind=document.createElement('span');ind.className='tab-ind';tabs.prepend(ind);}
+  const on=tabs.querySelector('.tab.on');if(!on)return;
+  ind.style.width=on.offsetWidth+'px';ind.style.transform=`translateX(${on.offsetLeft-5}px)`;
+}
+const _fxSwitchTab=switchTab;
+switchTab=function(name,btn){_fxSwitchTab(name,btn);fxTabInd();if(name==='home')requestAnimationFrame(fxReveal);};
+window.addEventListener('resize',fxTabInd);
+
+// 스크롤 등장
+let fxIO=null;
+function fxReveal(){
+  if(FX_REDUCED)return;
+  if(!fxIO)fxIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');fxIO.unobserve(e.target);}}),{root:document.getElementById('mainScr'),threshold:.12});
+  document.querySelectorAll('#pane-home .h-sec-h,#pane-home .dn,#pane-home .more-btn,#pane-home .pc-track').forEach((el,i)=>{
+    if(el.classList.contains('in'))return;el.classList.add('rv');
+    if(el.classList.contains('dn'))el.style.transitionDelay=((i%2)*70)+'ms';
+    fxIO.observe(el);
+  });
+}
+
+// 진행중 카드 깊이감
+function fxCarousel(){
+  const tr=document.getElementById('homeWorks');if(!tr||FX_REDUCED)return;
+  const upd=()=>{const L=tr.getBoundingClientRect().left+16;tr.querySelectorAll('.pc').forEach(c=>{const d=Math.min(1,Math.abs(c.getBoundingClientRect().left-L)/c.offsetWidth);c.style.transform=`scale(${1-d*.07})`;c.style.opacity=String(1-d*.35);});};
+  if(!tr.dataset.fx){tr.dataset.fx=1;tr.addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true});}
+  upd();
+}
+const _fxWorks=renderHomeWorks;
+renderHomeWorks=async function(a){await _fxWorks(a);fxDragScroll(document.getElementById('homeWorks'),'.pc');fxWorkDots();fxCarousel();fxReveal();};
+
+// 카드 슬라이드: 마우스 드래그 + 점 표시
+function fxDragScroll(tr,itemSel){
+  if(!tr||tr.dataset.drag)return;tr.dataset.drag=1;tr.classList.add('drag-x');
+  let down=false,x0=0,s0=0,moved=0;
+  tr.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')return;down=true;moved=0;x0=e.clientX;s0=tr.scrollLeft;});
+  window.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-x0;if(Math.abs(dx)>4&&!tr.classList.contains('dragging'))tr.classList.add('dragging');moved=Math.max(moved,Math.abs(dx));tr.scrollLeft=s0-dx;});
+  window.addEventListener('pointerup',e=>{if(!down)return;down=false;const was=tr.classList.contains('dragging');tr.classList.remove('dragging');
+    if(was){const items=[...tr.querySelectorAll(itemSel)];const dx=e.clientX-x0;const cur=items.findIndex(c=>c.offsetLeft+c.offsetWidth/2>s0+ (items[0]?.offsetLeft||0));let base=items.reduce((b,c,i)=>Math.abs(c.offsetLeft-items[0].offsetLeft-s0)<Math.abs(items[b].offsetLeft-items[0].offsetLeft-s0)?i:b,0);
+      let t=base+(dx<-40?1:dx>40?-1:0);t=Math.max(0,Math.min(items.length-1,t));tr.scrollTo({left:items[t].offsetLeft-items[0].offsetLeft,behavior:'smooth'});}
+  });
+  tr.addEventListener('click',e=>{if(moved>6){e.stopPropagation();e.preventDefault();moved=0;}},true);
+}
+function fxWorkDots(){
+  const tr=document.getElementById('homeWorks'),dots=document.getElementById('workDots');if(!tr||!dots)return;
+  const items=[...tr.querySelectorAll('.pc')];
+  dots.innerHTML=items.length>1?items.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join(''):'';
+  dots.querySelectorAll('i').forEach((d,i)=>d.onclick=()=>tr.scrollTo({left:items[i].offsetLeft-items[0].offsetLeft,behavior:'smooth'}));
+  const upd=()=>{const s=tr.scrollLeft;let b=0;items.forEach((c,i)=>{if(Math.abs(c.offsetLeft-items[0].offsetLeft-s)<Math.abs(items[b].offsetLeft-items[0].offsetLeft-s))b=i;});dots.querySelectorAll('i').forEach((d,i)=>d.classList.toggle('on',i===b));};
+  if(!tr.dataset.dots){tr.dataset.dots=1;tr.addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true});}
+  upd();
+}
+
+// 시범 자동 슬라이드
+let fxDemoTimer=null,fxDemoPause=0;
+function fxDemoActive(){
+  const tr=document.getElementById('teacherDemoStrip');if(!tr)return 0;
+  const i=Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth));
+  tr.querySelectorAll('.dh').forEach((d,x)=>d.classList.toggle('on',x===i));
+  document.querySelectorAll('#demoDots i').forEach((d,x)=>d.classList.toggle('on',x===i));return i;
+}
+function fxDemo(){
+  const tr=document.getElementById('teacherDemoStrip');if(!tr)return;
+  document.querySelectorAll('#demoDots i').forEach((d,x)=>d.onclick=()=>{fxDemoPause=Date.now();tr.scrollTo({left:x*tr.clientWidth,behavior:'smooth'});});
+  if(!tr.dataset.fx){tr.dataset.fx=1;
+    tr.addEventListener('scroll',()=>requestAnimationFrame(fxDemoActive),{passive:true});
+    ['touchstart','pointerdown','wheel'].forEach(ev=>tr.addEventListener(ev,()=>fxDemoPause=Date.now(),{passive:true}));
+  }
+  setTimeout(fxDemoActive,50);
+  clearInterval(fxDemoTimer);
+  if(FX_REDUCED)return;
+  fxDemoTimer=setInterval(()=>{
+    const n=tr.querySelectorAll('.dh').length;if(n<2||document.hidden||Date.now()-fxDemoPause<6000)return;
+    if(!document.getElementById('pane-home').classList.contains('on'))return;
+    const i=(fxDemoActive()+1)%n;tr.scrollTo({left:i*tr.clientWidth,behavior:'smooth'});
+  },4500);
+}
+const _fxDemoStrip=renderDemoStrip;
+renderDemoStrip=function(){_fxDemoStrip();fxDragScroll(document.getElementById('teacherDemoStrip'),'.dh');fxDemo();};
+
+// 주간 날짜 선택 애니메이션
+const _fxPick=pickWeekDay;
+pickWeekDay=function(ts){_fxPick(ts);const w=document.getElementById('todayClass');w.classList.remove('swap');void w.offsetWidth;w.classList.add('swap');};
+
+// 기록 저장 성공 → 해당 작품 카드 강조
+const _fxSave=savePracticeRecord;
+savePracticeRecord=async function(){
+  const pid=practiceProjectId,mode=practiceSheetMode;
+  const before=getPracticeStore().projects.reduce((a,p)=>a+(p.sessions||[]).length,0);
+  await _fxSave();
+  const after=getPracticeStore().projects.reduce((a,p)=>a+(p.sessions||[]).length,0);
+  if(after>before){
+    let card=mode==='add'&&pid?document.querySelector(`#homeWorks .pc input[onchange*="${pid}"]`)?.closest('.pc'):document.querySelector('#homeWorks .pc');
+    if(card){card.scrollIntoView({behavior:'smooth',inline:'start',block:'nearest'});card.classList.remove('pulse');void card.offsetWidth;card.classList.add('pulse');}
+  }
+};
+
+// 완료 → 축하 효과
+function fxConfetti(){
+  if(FX_REDUCED)return;
+  const colors=['#FF3B30','#111','#FFC400','#1E9A5A','#3F6FE5'];const W=innerWidth,H=innerHeight;
+  for(let i=0;i<60;i++){const el=document.createElement('i');el.className='cf';el.style.background=colors[i%colors.length];document.body.appendChild(el);
+    const x0=W/2,y0=H*.45,ang=Math.random()*Math.PI*2,sp=160+Math.random()*260,dx=Math.cos(ang)*sp,dy=Math.sin(ang)*sp-220,rot=Math.random()*720;
+    el.animate([{transform:`translate(${x0}px,${y0}px) rotate(0)`,opacity:1},{transform:`translate(${x0+dx}px,${y0+dy+420}px) rotate(${rot}deg)`,opacity:0}],{duration:1100+Math.random()*500,easing:'cubic-bezier(.2,.7,.4,1)'}).onfinish=()=>el.remove();}
+}
+completePracticeProject=async function(id){
+  const s=getPracticeStore(),p=s.projects.find(x=>x.id===id);if(!p)return;
+  if(!(p.sessions||[]).length){showToast('과정 사진을 먼저 기록해주세요');return;}
+  if(!confirm(`“${p.title}” 작품을 완료할까요?`))return;
+  const card=document.querySelector(`#homeWorks .pc input[onchange*="${id}"]`)?.closest('.pc');
+  if(card&&!FX_REDUCED){card.classList.add('leaving');await new Promise(r=>setTimeout(r,340));}
+  p.status='done';p.completedAt=new Date().toISOString();p.updatedAt=p.completedAt;
+  try{await savePracticeStore(s);await loadPracticeTracker();haptic('medium');fxConfetti();showToast(`총 ${projectTotalT(p)}T 작업으로 완료했어요`,'ok');
+    const first=document.querySelector('#homeDone .dn');if(first){first.classList.remove('pulse-in');void first.offsetWidth;first.classList.add('pulse-in');}}
+  catch(e){card?.classList.remove('leaving');showToast('완료 상태를 저장하지 못했어요');}
+};
+
+// 시트 끌어서 닫기
+const FX_CLOSERS={practiceSheet:()=>closePracticeSheet(),goalSheet:()=>closeGoalSheet(),teacherDemoSheet:()=>closeTeacherDemoSheet()};
+function fxCloseSheet(sheet){const id=sheet.id;(FX_CLOSERS[id]||(()=>closeSheet(id)))();}
+document.querySelectorAll('.sheet').forEach(sheet=>{
+  const card=sheet.querySelector('.sheet-card');if(!card)return;let y0=0,dy=0,drag=false;
+  card.addEventListener('touchstart',e=>{if(card.scrollTop>0)return;const t=e.target;if(t.closest('input,textarea,.tds-gallery'))return;y0=e.touches[0].clientY;dy=0;drag=true;},{passive:true});
+  card.addEventListener('touchmove',e=>{if(!drag)return;dy=e.touches[0].clientY-y0;if(dy>0){card.classList.add('dragging');card.style.transform=`translateY(${dy}px)`;}},{passive:true});
+  card.addEventListener('touchend',()=>{if(!drag)return;drag=false;card.classList.remove('dragging');
+    if(dy>110){sheet.classList.add('closing');setTimeout(()=>{fxCloseSheet(sheet);sheet.classList.remove('closing');card.style.transform='';},220);}
+    else{card.classList.add('snap');card.style.transform='';setTimeout(()=>card.classList.remove('snap'),260);}
+  });
+});
+
+const _fxEnter=enterApp;
+enterApp=async function(){const r=_fxEnter();setTimeout(fxTabInd,30);await r;fxTabInd();fxReveal();};
+
+// 공지 펼침 시 햅틱은 기존 함수 사용 · 탭 인디케이터 초기 위치
+window.addEventListener('load',()=>setTimeout(fxTabInd,50));
+setTimeout(fxTabInd,300);
 
 </script>
 </body>
