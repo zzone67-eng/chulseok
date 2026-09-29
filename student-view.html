@@ -1207,7 +1207,7 @@ setTimeout(hideSplash,9000);
 
 
 // ── 자동 업데이트: 앱을 켜둔 채로 있어도 새 버전을 올리면 자동으로 새로고침 ──
-const APP_VERSION='20260929-230136';
+const APP_VERSION='20260929-230640';
 let updChecking=false,updLast=0;
 function updBusy(){return !!document.querySelector('.sheet.on,.cpage.on,.crop-editor.on,.pv.on')||(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName));}
 async function checkAppUpdate(){
@@ -1243,7 +1243,21 @@ try{if(sessionStorage.getItem('hwa_updated')){sessionStorage.removeItem('hwa_upd
   if(isStandalone())return;
 
   // 카카오톡 인앱 브라우저 → 기본 브라우저로 자동 전환 (인앱에서는 홈 화면 추가 불가)
-  if(inKakao){location.href='kakaotalk://web/openExternal?url='+encodeURIComponent(location.href);}
+  function openExternal(){
+    const url=location.href;
+    if(isAndroid){
+      // 안드로이드: 크롬으로 바로 열기 (가장 확실한 방법)
+      location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme='+location.protocol.replace(':','')+';package=com.android.chrome;S.browser_fallback_url='+encodeURIComponent(url)+';end';
+      setTimeout(()=>{location.href='kakaotalk://web/openExternal?url='+encodeURIComponent(url);},700);
+    }else{
+      location.href='kakaotalk://web/openExternal?url='+encodeURIComponent(url);
+    }
+  }
+  window.hwaOpenExternal=openExternal;
+  if(inKakao){
+    let tried=false;try{tried=sessionStorage.getItem('hwa_ext_tried')==='1';sessionStorage.setItem('hwa_ext_tried','1');}catch(e){}
+    if(!tried)openExternal();
+  }
 
   function hiddenNow(){try{return Date.now()<Number(localStorage.getItem(KEY)||0)}catch(e){return false}}
   function hideFor(days){try{localStorage.setItem(KEY,String(Date.now()+days*86400000))}catch(e){}}
@@ -1259,6 +1273,10 @@ try{if(sessionStorage.getItem('hwa_updated')){sessionStorage.removeItem('hwa_upd
     }else if(mode==='ios'){
       body=`<div class="inst-t">홈 화면에 앱 추가하기</div><div class="inst-d">3초면 끝나요. 다음부터 아이콘으로 바로 열려요.</div>
       <ol class="inst-steps"><li><i>1</i><span>화면 아래(또는 주소창 옆) <b class="ic">${shareIcon}</b> <b>공유</b> 버튼을 누르세요<small>안 보이면 ··· 버튼 → 공유</small></span></li><li><i>2</i><span>목록을 올려 <b class="ic">${plusIcon}</b> <b>홈 화면에 추가</b>를 누르세요</span></li><li><i>3</i><span>오른쪽 위 <b>추가</b>를 누르면 완료!</span></li></ol>`;
+    }else if(mode==='kakao'){
+      body=`<div class="inst-t">${isIOS?'Safari':'Chrome'}에서 열어주세요</div><div class="inst-d">카카오톡 안에서는 홈 화면에 추가할 수 없어요.</div>
+      <ol class="inst-steps">${isIOS?`<li><i>1</i><span>화면 <b>오른쪽 아래 ··· </b>(또는 <b class="ic">${shareIcon}</b>) 버튼을 누르세요</span></li><li><i>2</i><span><b>Safari로 열기</b> (또는 다른 브라우저로 열기)를 누르세요</span></li>`:`<li><i>1</i><span>화면 <b>오른쪽 위 ⋮</b> 버튼을 누르세요</span></li><li><i>2</i><span><b>다른 브라우저로 열기</b>를 누르세요</span></li>`}<li><i>3</i><span>열린 화면의 안내대로 홈 화면에 추가하면 끝!</span></li></ol>
+      <button class="inst-go" id="instExt">${isIOS?'Safari':'Chrome'}로 바로 열기</button><button class="inst-later" id="instCopy2" style="margin-top:4px">안 되면 · 주소 복사하기</button>`;
     }else if(mode==='inapp'){
       body=`<div class="inst-t">Safari·Chrome에서 열어주세요</div><div class="inst-d">지금 화면은 다른 앱 안의 브라우저라 홈 화면에 추가할 수 없어요.<br>오른쪽 위 메뉴 → <b>다른 브라우저로 열기</b>를 눌러주세요.</div><button class="inst-go" id="instCopy">주소 복사하기</button>`;
     }
@@ -1269,6 +1287,8 @@ try{if(sessionStorage.getItem('hwa_updated')){sessionStorage.removeItem('hwa_upd
     el.querySelector('.inst-bg').onclick=close;el.querySelector('.inst-x').onclick=()=>{hideFor(1);close();};
     el.querySelector('.inst-later').onclick=()=>{hideFor(1);close();};
     const go=el.querySelector('#instGo');if(go)go.onclick=async()=>{if(!deferred)return;deferred.prompt();const r=await deferred.userChoice.catch(()=>null);deferred=null;close();if(r?.outcome!=='accepted')hideFor(1);};
+    const ex=el.querySelector('#instExt');if(ex)ex.onclick=()=>openExternal();
+    const cp2=el.querySelector('#instCopy2');if(cp2)cp2.onclick=async()=>{try{await navigator.clipboard.writeText(location.href);cp2.textContent='복사됐어요 · 사파리/크롬 주소창에 붙여넣기';}catch(e){cp2.textContent=location.href;}};
     const cp=el.querySelector('#instCopy');if(cp)cp.onclick=async()=>{try{await navigator.clipboard.writeText(location.href);cp.textContent='복사됐어요 · 브라우저에 붙여넣기';}catch(e){cp.textContent=location.href;}};
   }
   function showWhenReady(mode){
@@ -1278,8 +1298,9 @@ try{if(sessionStorage.getItem('hwa_updated')){sessionStorage.removeItem('hwa_upd
   }
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;showWhenReady('android');});
   window.addEventListener('appinstalled',()=>{document.getElementById('instSheet')?.remove();hideFor(3650);});
-  window.showInstallGuide=()=>{try{localStorage.removeItem(KEY)}catch(e){};build(inOtherInApp?'inapp':isIOS?'ios':deferred?'android':'ios');};
-  if(inOtherInApp&&!inKakao)showWhenReady('inapp');
+  window.showInstallGuide=()=>{try{localStorage.removeItem(KEY)}catch(e){};build(inKakao?'kakao':inOtherInApp?'inapp':isIOS?'ios':deferred?'android':'ios');};
+  if(inKakao){setTimeout(()=>{if(document.visibilityState==='visible'&&!document.getElementById('instSheet'))build('kakao');},1600);}
+  else if(inOtherInApp)showWhenReady('inapp');
   else if(isIOS&&!inKakao)showWhenReady('ios');
 })();
 
