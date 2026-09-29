@@ -925,6 +925,208 @@ body{color:var(--ink)!important}
   .crop-editor{left:50%;width:min(430px,100%);transform:translateX(-50%);box-shadow:0 0 0 100vw rgba(0,0,0,.68)}
 }
 
+
+/* ========================= MOBILE FRAME + WEEK SCHEDULE FIX ========================= */
+html,body{
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  overflow:hidden!important;
+}
+body{
+  margin:0!important;
+  padding:0!important;
+}
+.app{
+  width:100%!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  max-height:100dvh!important;
+  max-width:520px!important;
+  margin:0 auto!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+}
+
+/* 상단바가 노치/상태바에 가리지 않도록 safe-area를 다시 적용 */
+.hdr{
+  flex:none!important;
+  position:relative!important;
+  top:auto!important;
+  min-height:calc(64px + env(safe-area-inset-top))!important;
+  padding:calc(9px + env(safe-area-inset-top)) 14px 9px!important;
+  background:var(--bg)!important;
+  border-bottom:1px solid var(--line)!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.hdr-logo{width:40px!important;height:40px!important}
+.hdr-me{width:38px!important;height:38px!important}
+
+/* 실제 스크롤 영역은 헤더와 하단바 사이만 사용 */
+.scr{
+  flex:1!important;
+  min-height:0!important;
+  padding:12px 0 calc(72px + env(safe-area-inset-bottom))!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
+.pane{padding:0 14px!important}
+
+/* 하단바를 화면 아래쪽으로 내리고 불필요한 위 여백 제거 */
+.tabbar{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  z-index:40!important;
+  padding:0 12px max(4px,env(safe-area-inset-bottom))!important;
+  background:linear-gradient(to top,var(--bg) 72%,rgba(247,245,241,0))!important;
+  border:0!important;
+}
+.tabs{
+  height:62px!important;
+  border-radius:999px!important;
+  padding:5px!important;
+  box-shadow:0 6px 18px rgba(17,17,17,.08)!important;
+}
+.tab{
+  padding:7px 6px!important;
+  gap:3px!important;
+  font-size:10px!important;
+}
+.tab svg{width:19px!important;height:19px!important}
+
+/* 홈 - 오늘 수업: 카드 제거 + 일주일 날짜 */
+.today-card{
+  margin:2px 0 6px!important;
+  padding:4px 1px 2px!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+  color:var(--ink)!important;
+}
+.today-card::before,.today-card::after{display:none!important}
+.week-class-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 2px;
+  margin-bottom:12px;
+}
+.week-class-head>div{
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+}
+.week-class-head b{
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:-.035em;
+}
+.week-class-head>div span{
+  font-size:10px;
+  color:var(--faint);
+  font-weight:700;
+}
+.week-class-head .tc-more{
+  font-size:10px!important;
+  color:var(--faint)!important;
+  font-weight:700!important;
+}
+.week-date-row{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:3px;
+  width:100%;
+}
+.week-date{
+  min-width:0;
+  height:61px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  border-radius:14px;
+  color:var(--sub);
+}
+.week-date>span{
+  font-size:9px;
+  font-weight:700;
+  line-height:1;
+  margin-bottom:7px;
+}
+.week-date>b{
+  font-size:15px;
+  line-height:1;
+  font-weight:800;
+}
+.week-date>i{
+  position:absolute;
+  bottom:6px;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:transparent;
+}
+.week-date.has-class>i{background:#BBB4AA}
+.week-date.special>i{background:var(--accent)}
+.week-date.today{
+  background:#111;
+  color:#fff;
+}
+.week-date.today>span{color:rgba(255,255,255,.62)}
+.week-date.today>i{background:var(--accent)}
+.week-class-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:10px;
+  padding:10px 2px 0;
+  border-top:1px solid var(--line);
+}
+.week-class-summary>div{
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+  flex:none;
+}
+.week-now-label{
+  font-size:10px;
+  color:var(--sub);
+  font-weight:700;
+}
+.week-class-summary b{
+  font-size:15px;
+  font-weight:900;
+  letter-spacing:-.03em;
+}
+.week-now-time{
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  text-align:right;
+  font-size:10px;
+  color:var(--sub);
+  font-weight:650;
+}
+.week-class-summary.empty-day b{font-size:14px}
+
+@media(min-width:560px){
+  body{padding:0!important}
+  .app{
+    height:100dvh!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1758,17 +1960,59 @@ function slotTimes(info){return [...new Set([...(info.r||[]),...(info.s||[])])].
 // ── 홈: 다음 수업 ──
 function renderTodayClass(){
   const box=document.getElementById('todayClass');if(!box)return;
-  const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const info=dayMap(now.getFullYear(),now.getMonth()+1)[now.getDate()];
-  const head=`<div class="tc-top"><span class="tc-label">오늘 수업 · ${now.getMonth()+1}/${now.getDate()} (${DY[now.getDay()]})</span><span class="tc-more">시간표 ›</span></div>`;
-  if(info){
-    const ts=slotTimes(info);
-    box.innerHTML=head+`<div class="tc-main"><b>${ts.length}타임</b><span>${ts.length*3.5}시간</span></div><div class="tc-slots">${ts.map(t=>{const sp=info.s.includes(t)&&!info.r.includes(t);return `<span class="${sp?'sp':''}">${t}타임 ${TM[String(t)]||''}${sp?' · 특강':''}</span>`;}).join('')}</div>`;
-    return;
+  const now=new Date();
+  const todayKey=ds(now.getFullYear(),now.getMonth()+1,now.getDate());
+
+  // 월요일 시작 일주일
+  const monday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const offset=(now.getDay()+6)%7;
+  monday.setDate(monday.getDate()-offset);
+
+  const week=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);
+    d.setDate(monday.getDate()+i);
+    const y=d.getFullYear(),m=d.getMonth()+1,day=d.getDate();
+    const info=dayMap(y,m)[day];
+    const key=ds(y,m,day);
+    const slots=info?slotTimes(info):[];
+    week.push({d,y,m,day,key,info,slots});
   }
-  let next=null;
-  for(let k=0;k<2&&!next;k++){const y=now.getFullYear()+(now.getMonth()+k>11?1:0),m=(now.getMonth()+k)%12+1,bd=dayMap(y,m);for(const d of Object.keys(bd).map(Number).sort((a,b)=>a-b)){const dt=new Date(y,m-1,d);if(dt>today){next={m,d,dt};break;}}}
-  box.innerHTML=head+`<div class="tc-main"><b>수업 없음</b></div><div class="tc-slots">${next?`<span>다음 수업 ${next.m}/${next.d} (${DY[next.dt.getDay()]})</span>`:'<span>예정된 수업이 없어요</span>'}</div>`;
+
+  const today=week.find(x=>x.key===todayKey);
+  let summary='';
+  if(today?.info){
+    const ts=today.slots;
+    summary=`<div class="week-class-summary">
+      <div><span class="week-now-label">오늘 수업</span><b>${ts.length}타임</b></div>
+      <span class="week-now-time">${ts.map(t=>`${t}T ${TM[String(t)]||''}`).join(' · ')}</span>
+    </div>`;
+  }else{
+    const next=week.find(x=>x.d>now&&x.info);
+    summary=`<div class="week-class-summary empty-day">
+      <div><span class="week-now-label">오늘</span><b>수업 없음</b></div>
+      <span class="week-now-time">${next?`이번 주 다음 수업 ${next.m}/${next.day} (${DY[next.d.getDay()]})`:'이번 주 예정된 수업이 없어요'}</span>
+    </div>`;
+  }
+
+  box.innerHTML=`
+    <div class="week-class-head">
+      <div><b>이번 주 수업</b><span>${now.getMonth()+1}월</span></div>
+      <span class="tc-more">시간표 ›</span>
+    </div>
+    <div class="week-date-row">
+      ${week.map(x=>{
+        const isToday=x.key===todayKey;
+        const hasClass=!!x.info;
+        const isSpecial=x.info&&x.info.s?.length&&!x.info.r?.length;
+        return `<div class="week-date${isToday?' today':''}${hasClass?' has-class':''}${isSpecial?' special':''}">
+          <span>${DY[x.d.getDay()]}</span>
+          <b>${x.day}</b>
+          <i></i>
+        </div>`;
+      }).join('')}
+    </div>
+    ${summary}`;
 }
 
 // ── 시간표 탭 ──
