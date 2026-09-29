@@ -764,6 +764,27 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .crop-apply:disabled,.crop-apply-top:disabled{opacity:.4}
 @media(min-width:560px){.crop-editor{left:50%;right:auto;width:min(520px,100%);transform:translateX(-50%)}}
 
+/* ===== complete chooser ===== */
+.cmp-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.cmp-thumb{width:76px;height:50px;border-radius:10px;overflow:hidden;background:#EEE;flex:none}
+.cmp-thumb img{width:100%;height:100%;object-fit:cover}
+.cmp-head h3{font-size:19px;font-weight:800;letter-spacing:-.4px}
+.cmp-head p{font-size:13px;color:var(--sub);margin-top:3px}
+.cmp-opt{position:relative;display:flex;align-items:center;gap:14px;width:100%;padding:16px;margin-bottom:10px;border-radius:16px;border:1.5px solid #E2E2E2;background:#fff;text-align:left;cursor:pointer;transition:transform .15s}
+.cmp-opt:active{transform:scale(.98)}
+.cmp-opt input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.cmp-opt .ic{width:44px;height:44px;border-radius:12px;background:#F2F2F2;display:grid;place-items:center;flex:none}
+.cmp-opt .ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cmp-opt .tx{flex:1;min-width:0}
+.cmp-opt b{display:block;font-size:16px;font-weight:800}
+.cmp-opt small{display:block;font-size:12px;color:var(--faint);margin-top:3px;line-height:1.4}
+.cmp-opt .ar{font-size:20px;color:#BBB}
+.cmp-opt.primary{background:var(--black);border-color:var(--black);color:#fff}
+.cmp-opt.primary .ic{background:rgba(255,255,255,.14)}
+.cmp-opt.primary small{color:rgba(255,255,255,.6)}
+.cmp-opt.primary .ar{color:rgba(255,255,255,.5)}
+.cmp-opt:disabled{opacity:.45;cursor:not-allowed}
+
 .pv-photo-wrap{width:100%;height:100%;display:grid;place-items:center}
 </style>
 </head>
@@ -1000,6 +1021,18 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
     </div>
     <div class="crop-note">기울어진 사진은 반듯하게 펴고, 세로로 찍은 사진은 가로로 저장돼요.</div>
     <button class="crop-apply" id="cropApplyBtn" type="button" onclick="applyPracticeCrop()">이대로 사용</button>
+  </div>
+</div>
+
+<!-- 완료하기 선택 -->
+<div class="sheet" id="completeSheet">
+  <div class="sheet-bg" onclick="closeSheet('completeSheet')"></div>
+  <div class="sheet-card">
+    <div class="sheet-handle"></div>
+    <div class="cmp-head"><div class="cmp-thumb" id="cmpThumb"></div><div><h3 id="cmpTitle">작품 완료하기</h3><p id="cmpSub"></p></div></div>
+    <label class="cmp-opt primary"><input type="file" accept="image/*" onchange="completeWithPhoto(event)"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h4l1.5-2h5L16 7h4v12H4Z"/><circle cx="12" cy="13" r="3.5"/></svg></span><span class="tx"><b>사진 올리고 완료하기</b><small>완성된 모습을 찍어서 마지막 기록으로 남겨요</small></span><span class="ar">›</span></label>
+    <button class="cmp-opt" id="cmpPlain" type="button" onclick="completePlain()"><span class="ic"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span class="tx"><b>그냥 완료하기</b><small id="cmpPlainSub">마지막으로 올린 사진을 완성작으로 사용해요</small></span><span class="ar">›</span></button>
+    <button class="btn btn-ghost" type="button" onclick="closeSheet('completeSheet')">취소</button>
   </div>
 </div>
 
@@ -2519,10 +2552,12 @@ const _fxSave=savePracticeRecord;
 savePracticeRecord=async function(){
   const pid=practiceProjectId,mode=practiceSheetMode;
   const before=getPracticeStore().projects.reduce((a,p)=>a+(p.sessions||[]).length,0);
+  const finish=completeAfterSave;
   await _fxSave();
   const after=getPracticeStore().projects.reduce((a,p)=>a+(p.sessions||[]).length,0);
   if(after>before){
     let card=mode==='add'&&pid?document.querySelector(`#homeWorks .pc input[onchange*="${pid}"]`)?.closest('.pc'):document.querySelector('#homeWorks .pc');
+    if(finish&&finish===pid){completeAfterSave='';await doCompleteProject(pid);return;}
     if(card){card.scrollIntoView({behavior:'smooth',inline:'start',block:'nearest'});card.classList.remove('pulse');void card.offsetWidth;card.classList.add('pulse');}
   }
 };
@@ -2535,17 +2570,39 @@ function fxConfetti(){
     const x0=W/2,y0=H*.45,ang=Math.random()*Math.PI*2,sp=160+Math.random()*260,dx=Math.cos(ang)*sp,dy=Math.sin(ang)*sp-220,rot=Math.random()*720;
     el.animate([{transform:`translate(${x0}px,${y0}px) rotate(0)`,opacity:1},{transform:`translate(${x0+dx}px,${y0+dy+420}px) rotate(${rot}deg)`,opacity:0}],{duration:1100+Math.random()*500,easing:'cubic-bezier(.2,.7,.4,1)'}).onfinish=()=>el.remove();}
 }
-completePracticeProject=async function(id){
-  const s=getPracticeStore(),p=s.projects.find(x=>x.id===id);if(!p)return;
-  if(!(p.sessions||[]).length){showToast('과정 사진을 먼저 기록해주세요');return;}
-  if(!confirm(`“${p.title}” 작품을 완료할까요?`))return;
-  const card=document.querySelector(`#homeWorks .pc input[onchange*="${id}"]`)?.closest('.pc');
+// 완료 처리(실제 저장 + 효과)
+async function doCompleteProject(id){
+  const s=getPracticeStore(),p=s.projects.find(x=>x.id===id);if(!p||p.status==='done')return;
+  const card=document.querySelector(`#homeWorks .pc input[onchange*="${id}"]`)?.closest('.pc')||document.querySelector(`#activePracticeProjects input[onchange*="${id}"]`)?.closest('.wk-item');
   if(card&&!FX_REDUCED){card.classList.add('leaving');await new Promise(r=>setTimeout(r,340));}
   p.status='done';p.completedAt=new Date().toISOString();p.updatedAt=p.completedAt;
   try{await savePracticeStore(s);await loadPracticeTracker();haptic('medium');fxConfetti();showToast(`총 ${projectTotalT(p)}T 작업으로 완료했어요`,'ok');
     const first=document.querySelector('#homeDone .dn');if(first){first.classList.remove('pulse-in');void first.offsetWidth;first.classList.add('pulse-in');}}
   catch(e){card?.classList.remove('leaving');showToast('완료 상태를 저장하지 못했어요');}
+}
+// 완료하기 → 선택지
+let completeTargetId='',completeAfterSave='';
+completePracticeProject=async function(id){
+  const p=getPracticeStore().projects.find(x=>x.id===id);if(!p)return;
+  completeTargetId=id;const ss=p.sessions||[],l=ss[ss.length-1],u=l?await imageUrlFor(l):'';
+  document.getElementById('cmpTitle').textContent=`‘${p.title}’ 완료하기`;
+  document.getElementById('cmpSub').textContent=`지금까지 ${ss.length}회 · 누적 ${projectTotalT(p)}T`;
+  document.getElementById('cmpThumb').innerHTML=u?`<img src="${u}" alt="">`:'';
+  const plain=document.getElementById('cmpPlain');plain.disabled=!ss.length;
+  document.getElementById('cmpPlainSub').textContent=ss.length?'마지막으로 올린 사진을 완성작으로 사용해요':'올린 사진이 없어 사진과 함께 완료해야 해요';
+  document.getElementById('completeSheet').classList.add('on');haptic('light');
 };
+function completeWithPhoto(e){
+  const id=completeTargetId;closeSheet('completeSheet');
+  completeAfterSave=id;
+  quickPick(e,id);
+  document.getElementById('recTitle').textContent='완성 사진 올리기';
+  document.getElementById('recSub').textContent='마지막 모습을 저장하면 작품이 완료돼요.';
+  document.getElementById('practiceSaveBtn').textContent='저장하고 완료하기';
+}
+function completePlain(){const id=completeTargetId;closeSheet('completeSheet');doCompleteProject(id);}
+const _fxClosePS=closePracticeSheet;
+closePracticeSheet=function(){_fxClosePS();if(!document.getElementById('practiceSaveBtn').disabled)completeAfterSave='';const b=document.getElementById('practiceSaveBtn');if(b&&!b.disabled)b.textContent='저장';};
 
 // 시트 끌어서 닫기
 const FX_CLOSERS={practiceSheet:()=>closePracticeSheet(),goalSheet:()=>closeGoalSheet(),teacherDemoSheet:()=>closeTeacherDemoSheet()};
