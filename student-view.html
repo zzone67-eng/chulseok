@@ -1763,6 +1763,33 @@ body.is-standalone .scr{
   }
 }
 
+
+/* ==================== HOME COMPLETE BUTTON ==================== */
+.ac-actions{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:7px;
+  margin-top:8px;
+}
+.ac-actions .ac-add{
+  margin-top:0!important;
+}
+.ac-complete{
+  height:42px;
+  padding:0 12px;
+  border:1px solid var(--line2);
+  border-radius:12px;
+  background:#fff;
+  color:var(--ink);
+  font-size:12px;
+  font-weight:850;
+  white-space:nowrap;
+  cursor:pointer;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.ac-complete:active{transform:scale(.98)}
+
 </style>
 </head>
 <body>
@@ -2130,6 +2157,18 @@ async function ensureFirebaseAuth(uid,pw){
   const email=authEmailFor(uid);
   const cloudPw=firebasePasswordFor(pw);
 
+  // 브라우저/PWA에 Firebase 세션이 이미 살아 있으면 네트워크 로그인을 다시 하지 않음
+  let current=fbAuth.currentUser;
+  if(!current){
+    try{
+      current=await Promise.race([
+        waitForAuthReady(),
+        new Promise(resolve=>setTimeout(()=>resolve(null),220))
+      ]);
+    }catch(_e){}
+  }
+  if(current&&String(current.email||'').toLowerCase()===email.toLowerCase())return current;
+
   // v19 방식 계정으로 먼저 로그인
   try{
     const cred=await fbAuth.signInWithEmailAndPassword(email,cloudPw);
@@ -2179,13 +2218,15 @@ async function doLogin(){
   const msg=document.getElementById('loginMsg');msg.className='auth-msg';
   if(!name||!pw){msg.className='auth-msg err';msg.textContent='이름과 비밀번호를 입력하세요.';return;}
   try{
+    msg.style.display='block';msg.textContent='로그인 확인 중…';
     const r=await fetch(`${DB}/approved_users.json?_=${Date.now()}`);
     const all=r.ok?(await r.json()||{}):null;
     if(!all){msg.className='auth-msg err';msg.textContent='승인되지 않은 계정입니다.';return;}
     const entries=Object.entries(all).filter(([_,u])=>u.name===name);
     if(!entries.length){msg.className='auth-msg err';msg.textContent='승인되지 않은 계정입니다.';return;}
-    let found=null;
-    for(const [id,u] of entries){if(u.pw===await hashPw(pw,name)){found={uid:id,...u};break;}}
+    const hashedPw=await hashPw(pw,name);
+    const hit=entries.find(([_,u])=>u.pw===hashedPw);
+    const found=hit?{uid:hit[0],...hit[1]}:null;
     if(!found){msg.className='auth-msg err';msg.textContent='비밀번호가 틀렸습니다.';return;}
     msg.className='auth-msg';msg.textContent='클라우드 계정 연결 중…';msg.style.display='block';
     const authUser=await ensureFirebaseAuth(found.uid,pw);
@@ -2220,6 +2261,7 @@ async function checkApproval(){
 async function doLogout(){stopPracticeRealtime();try{await fbAuth.signOut();}catch(e){}localStorage.removeItem('hwa_user');me=null;location.reload();}
 // ── 실기 과정 기록 ──
 let practiceSheetMode='add', practiceProjectId='', practiceSelectedT=1, practicePendingFile=null, practicePreviewUrl='', practiceOriginalFile=null;
+let practicePreparedBlobPromise=null,practicePreparedSource=null,practicePrepareToken=0;
 let practiceObjectUrls=[];
 let practiceCache={projects:[]};
 let practiceCloudReady=false;
@@ -2407,16 +2449,41 @@ function initPracticeRealtime(){
   ref.on('value',practiceRealtimeHandler,err=>{console.error('practice realtime',err);setCloudStatus('err','실시간 동기화 오류');});
 }
 async function compressPracticeImage(file){
-  const maxSide=1200,target=420*1024;let img,src='';
+  if(!file)return file;
+  // 이미 충분히 작은 JPEG이면 재압축하지 않는다.
+  if(file.type==='image/jpeg'&&file.size>0&&file.size<=300*1024)return file;
+
+  const maxSide=1100,target=330*1024;
+  let src='',img=null;
   try{
-    src=URL.createObjectURL(file);img=new Image();img.decoding='async';img.src=src;await img.decode();
+    src=URL.createObjectURL(file);
+    img=new Image();
+    img.decoding='async';
+    img.src=src;
+    await img.decode();
+
     const scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
-    const w=Math.max(1,Math.round(img.naturalWidth*scale)),h=Math.max(1,Math.round(img.naturalHeight*scale));
-    const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.drawImage(img,0,0,w,h);
-    let q=.78,blob=null;
-    for(let i=0;i<5;i++){blob=await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(new Error('압축 실패')),'image/jpeg',q));if(blob.size<=target||q<=.5)break;q-=.08;}
+    const w=Math.max(1,Math.round(img.naturalWidth*scale));
+    const h=Math.max(1,Math.round(img.naturalHeight*scale));
+    const c=document.createElement('canvas');
+    c.width=w;c.height=h;
+    const ctx=c.getContext('2d',{alpha:false});
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+    ctx.drawImage(img,0,0,w,h);
+
+    let blob=await new Promise((resolve,reject)=>
+      c.toBlob(b=>b?resolve(b):reject(new Error('압축 실패')),'image/jpeg',.72)
+    );
+    // 아주 복잡한 사진만 한 번 더 압축. 기존처럼 5번 반복하지 않음.
+    if(blob.size>target*1.55){
+      blob=await new Promise((resolve,reject)=>
+        c.toBlob(b=>b?resolve(b):reject(new Error('압축 실패')),'image/jpeg',.62)
+      );
+    }
     return blob;
-  }finally{if(src)URL.revokeObjectURL(src);}
+  }finally{
+    if(src)URL.revokeObjectURL(src);
+  }
 }
 async function savePracticeRecord(){
   if(!practicePendingFile){showToast('현재 과정 사진을 한 장 남겨주세요','info');return;}
@@ -2429,7 +2496,10 @@ async function savePracticeRecord(){
       p={id:practiceId('work'),title,status:'active',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),sessions:[]};s.projects.unshift(p);
     }else p=s.projects.find(x=>x.id===practiceProjectId);
     if(!p)throw new Error('작품 없음');
-    const sessionId=practiceId('shot'),blob=await compressPracticeImage(practicePendingFile);
+    const sessionId=practiceId('shot');
+    const blob=(practicePreparedSource===practicePendingFile&&practicePreparedBlobPromise)
+      ? await practicePreparedBlobPromise
+      : await compressPracticeImage(practicePendingFile);
     setCloudStatus('syncing','사진 업로드 중');
     const imagePath=await uploadPracticeBlob(blob,p.id,sessionId);
     const imageUrl=await storageUrl(imagePath);
@@ -2563,7 +2633,7 @@ async function enterApp(){
   document.getElementById('vApp').classList.add('on');
   forceAppTop();
   requestAnimationFrame(()=>requestAnimationFrame(forceAppTop));
-  const hd=new Date();
+
   document.getElementById('hdrDate').textContent=me.cls;
   document.getElementById('hdrTitle').textContent=me.name;
   const ini=(me.name||'?').trim().slice(-2);
@@ -2571,14 +2641,49 @@ async function enterApp(){
   document.getElementById('pfAv').textContent=ini;
   document.getElementById('pfName').textContent=me.name;
   document.getElementById('pfCls').textContent=me.cls;
-  try{const r=await fetch(`${DB}/schedule_backup.json?_=${Date.now()}`);sch=r.ok?(await r.json()||{}):{};}catch(e){sch={};}
+
+  // 1. 이전에 받아둔 데이터를 먼저 그려 앱을 즉시 보여준다.
+  try{
+    const cachedSchedule=JSON.parse(localStorage.getItem('hwa_schedule_cache')||'null');
+    if(cachedSchedule&&typeof cachedSchedule==='object')sch=cachedSchedule;
+  }catch(_e){}
+
+  practiceCache=normalizePracticeStore(readLocalPracticeStore());
   renderTodayClass();
   renderSchTab();
-  initTeacherFeedRealtime();
-  await loadPracticeStoreFromCloud();
-  initPracticeRealtime();
-  await loadPracticeTracker();
   loadRoutine();
+  loadPracticeTracker().catch(()=>{});
+
+  // 2. 공지/시범은 첫 화면이 그려진 뒤 연결한다.
+  requestAnimationFrame(()=>setTimeout(initTeacherFeedRealtime,40));
+
+  // 3. 시간표와 작품 클라우드 동기화는 서로 기다리지 않고 백그라운드에서 진행한다.
+  const scheduleJob=(async()=>{
+    try{
+      const r=await fetch(`${DB}/schedule_backup.json?_=${Date.now()}`);
+      if(r.ok){
+        sch=await r.json()||{};
+        try{localStorage.setItem('hwa_schedule_cache',JSON.stringify(sch));}catch(_e){}
+        renderTodayClass();
+        renderSchTab();
+      }
+    }catch(e){console.warn('schedule sync',e);}
+  })();
+
+  const practiceJob=(async()=>{
+    if(!fbAuth.currentUser){
+      setCloudStatus('syncing','클라우드 연결 중');
+      return;
+    }
+    try{
+      await loadPracticeStoreFromCloud();
+      initPracticeRealtime();
+      await loadPracticeTracker();
+    }catch(e){console.warn('practice sync',e);}
+  })();
+
+  // 앱 진입 자체는 위 작업들을 기다리지 않는다.
+  Promise.allSettled([scheduleJob,practiceJob]).catch(()=>{});
 }
 
 // ── 탭 ──
@@ -2758,7 +2863,7 @@ async function fileToCropCanvas(file){
     img.src=url;
     await img.decode();
 
-    const maxSide=1800;
+    const maxSide=1400;
     const scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
     const c=document.createElement('canvas');
     c.width=Math.max(1,Math.round(img.naturalWidth*scale));
@@ -3146,7 +3251,7 @@ async function cropWithoutOpenCv(){
     finalCanvas.toBlob(
       blob=>blob?resolve(blob):reject(new Error('crop-blob-failed')),
       'image/jpeg',
-      .9
+      .82
     );
   });
 }
@@ -3193,12 +3298,23 @@ function quickPick(e,pid){
   openPracticeSheet(pid?'add':'new',pid||'');openPracticeCropper(f);
 }
 function setPracticeFile(f){
-  practicePendingFile=f;if(practicePreviewUrl)URL.revokeObjectURL(practicePreviewUrl);practicePreviewUrl=URL.createObjectURL(f);
-  document.getElementById('practicePhotoPreview').src=practicePreviewUrl;document.getElementById('practicePhotoPicker').classList.add('has');
+  practicePendingFile=f;
+  if(practicePreviewUrl)URL.revokeObjectURL(practicePreviewUrl);
+  practicePreviewUrl=URL.createObjectURL(f);
+  document.getElementById('practicePhotoPreview').src=practicePreviewUrl;
+  document.getElementById('practicePhotoPicker').classList.add('has');
+
+  // 사용자가 타임/메모를 입력하는 동안 업로드용 압축을 미리 끝낸다.
+  const token=++practicePrepareToken;
+  practicePreparedSource=f;
+  practicePreparedBlobPromise=compressPracticeImage(f)
+    .then(blob=>token===practicePrepareToken?blob:f)
+    .catch(e=>{console.warn('photo prepare',e);return f;});
 }
 function setPracticeT(v,btn){practiceSelectedT=v;document.querySelectorAll('#practiceTChoice button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');haptic('light');}
 function resetPracticeSheet(){
   practicePendingFile=null;practiceOriginalFile=null;practiceSelectedT=1;practiceProjectId='';
+  practicePreparedBlobPromise=null;practicePreparedSource=null;practicePrepareToken++;
   if(practicePreviewUrl){URL.revokeObjectURL(practicePreviewUrl);practicePreviewUrl='';}
   const input=document.getElementById('practicePhotoInput');if(input)input.value='';
   document.getElementById('practicePhotoPicker')?.classList.remove('has');
@@ -3291,7 +3407,7 @@ async function renderHomeWorks(active){
   const today=practiceDayKey(new Date());
   const cards=[];
   for(const p of active){const ss=p.sessions||[],l=ss[ss.length-1],u=l?await imageUrlFor(l):'';const doneToday=ss.some(s=>practiceDayKey(s.createdAt)===today);
-    cards.push(`<div class="ac${active.length===1?' only':''}"><div class="ac-img" onclick="openProjectProcess('${p.id}',${Math.max(0,ss.length-1)})">${u?`<img src="${u}" alt="">`:''}<span class="n">${ss.length}회</span>${doneToday?'<span class="today">✓ 오늘</span>':''}</div><b>${escPractice(p.title)}</b><small>누적 ${projectTotalT(p)}T${l?' · '+fmtShortDate(l.createdAt):''}</small><label class="ac-add"><input type="file" accept="image/*" onchange="quickPick(event,'${p.id}')">${CAM}사진 추가</label></div>`);}
+    cards.push(`<div class="ac${active.length===1?' only':''}"><div class="ac-img" onclick="openProjectProcess('${p.id}',${Math.max(0,ss.length-1)})">${u?`<img src="${u}" alt="">`:''}<span class="n">${ss.length}회</span>${doneToday?'<span class="today">✓ 오늘</span>':''}</div><b>${escPractice(p.title)}</b><small>누적 ${projectTotalT(p)}T${l?' · '+fmtShortDate(l.createdAt):''}</small><div class="ac-actions"><label class="ac-add"><input type="file" accept="image/*" onchange="quickPick(event,'${p.id}')">${CAM}사진 추가</label><button class="ac-complete" type="button" onclick="completePracticeProject('${p.id}')">완료하기</button></div></div>`);}
   cards.push(`<div class="ac${active.length?'':' only'}"><label class="ac-new"><input type="file" accept="image/*" onchange="quickPick(event,'')"><i>＋</i>${active.length?'새 작품 시작':'첫 작품 시작'}<small style="font-weight:500;color:var(--faint)">사진 한 장으로 시작</small></label></div>`);
   el.innerHTML=cards.join('');
   await renderHomeDone();
