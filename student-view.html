@@ -1249,6 +1249,36 @@ body.is-standalone .tabbar{
   .scr{padding-bottom:66px!important}
 }
 
+
+/* ==================== START POSITION FIX ==================== */
+/* iOS 홈화면 실행 시 상단 safe-area를 중복으로 더하던 부분 제거 */
+body.is-standalone .hdr{
+  min-height:60px!important;
+  padding:9px 14px!important;
+}
+
+/* 앱 시작 위치를 항상 화면 최상단 기준으로 고정 */
+.app,
+.app.on{
+  top:0!important;
+  right:0!important;
+  bottom:0!important;
+  left:0!important;
+  inset:0!important;
+  transform:none!important;
+  margin-top:0!important;
+  padding-top:0!important;
+}
+
+/* 첫 화면 콘텐츠가 헤더 아래에서 바로 시작 */
+.scr{
+  margin-top:0!important;
+  scroll-padding-top:0!important;
+}
+.pane{
+  padding-top:0!important;
+}
+
 </style>
 </head>
 <body>
@@ -2037,6 +2067,8 @@ const TAB_TITLES={home:'홈',works:'내 작품',schedule:'시간표',tools:'도�
 async function enterApp(){
   document.querySelectorAll('.auth').forEach(v=>v.classList.remove('on'));
   document.getElementById('vApp').classList.add('on');
+  forceAppTop();
+  requestAnimationFrame(()=>requestAnimationFrame(forceAppTop));
   const hd=new Date();
   document.getElementById('hdrDate').textContent=me.cls;
   document.getElementById('hdrTitle').textContent=me.name;
@@ -2602,6 +2634,22 @@ function initSwipe(){
 }
 
 
+
+// ===== viewport start-position patch =====
+if ('scrollRestoration' in history) history.scrollRestoration='manual';
+
+function forceAppTop(){
+  try{window.scrollTo(0,0);}catch(e){}
+  try{document.documentElement.scrollTop=0;}catch(e){}
+  try{document.body.scrollTop=0;}catch(e){}
+  const scr=document.getElementById('mainScr');
+  if(scr) scr.scrollTop=0;
+}
+
+window.addEventListener('pageshow',()=>{
+  requestAnimationFrame(()=>requestAnimationFrame(forceAppTop));
+});
+
 // ===== preview mode patch =====
 function previewSvg(label, bg1, bg2){
   const safe=(label||'').replace(/[&<>]/g,'');
@@ -2673,6 +2721,8 @@ async function enterPreviewApp(){
   localStorage.setItem(practiceStoreKey(),JSON.stringify(practiceCache));
   document.querySelectorAll('.auth').forEach(v=>v.classList.remove('on'));
   document.getElementById('vApp').classList.add('on');
+  forceAppTop();
+  requestAnimationFrame(()=>requestAnimationFrame(forceAppTop));
   document.getElementById('vApp').classList.add('preview-mode');
   const ini=(me.name||'?').trim().slice(-2);
   document.getElementById('hdrTitle').textContent=me.name;
