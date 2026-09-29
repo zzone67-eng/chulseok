@@ -1502,6 +1502,162 @@ body.is-standalone .tabs,
   display:flex!important;
 }
 
+
+/* ==================== CROP TOUCH HANDLE FIX ==================== */
+.crop-stage{
+  position:relative!important;
+  touch-action:none!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+}
+#cropCanvas{
+  pointer-events:none!important;
+  touch-action:none!important;
+}
+.crop-handle-layer{
+  position:absolute!important;
+  inset:0!important;
+  z-index:8!important;
+  pointer-events:none!important;
+}
+.crop-handle{
+  position:absolute!important;
+  left:0;
+  top:0;
+  width:48px!important;
+  height:48px!important;
+  min-width:48px!important;
+  min-height:48px!important;
+  margin:0!important;
+  padding:0!important;
+  transform:translate(-50%,-50%)!important;
+  border-radius:999px!important;
+  border:3px solid #fff!important;
+  background:#FF4538!important;
+  color:#fff!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  box-shadow:0 3px 14px rgba(0,0,0,.35)!important;
+  pointer-events:auto!important;
+  touch-action:none!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  -webkit-touch-callout:none!important;
+  -webkit-tap-highlight-color:transparent!important;
+  cursor:grab!important;
+}
+.crop-handle:active{
+  width:54px!important;
+  height:54px!important;
+  min-width:54px!important;
+  min-height:54px!important;
+  cursor:grabbing!important;
+}
+.crop-editor.crop-dragging .crop-help{
+  opacity:.35!important;
+}
+
+
+/* ==================== BOTTOM BAR CORNER SAFE FIX ==================== */
+/* 휴대폰 하단 라운드 모서리에 잘려 보이지 않도록 바 자체를 조금 안쪽으로 */
+.tabbar,
+body.is-standalone .tabbar{
+  position:absolute!important;
+  left:16px!important;
+  right:16px!important;
+  bottom:8px!important;
+  width:auto!important;
+  height:58px!important;
+  margin:0!important;
+  padding:0!important;
+  background:transparent!important;
+  overflow:visible!important;
+}
+
+.tabs,
+body.is-standalone .tabs{
+  width:100%!important;
+  height:58px!important;
+  margin:0!important;
+  padding:5px!important;
+  border-radius:22px!important;
+  overflow:hidden!important;
+  background:#fff!important;
+  border:1px solid var(--line)!important;
+  box-shadow:0 5px 16px rgba(17,17,17,.08)!important;
+}
+
+/* 콘텐츠가 새 하단바 뒤로 숨지 않도록 여백만 최소 조정 */
+.scr,
+body.is-standalone .scr{
+  padding-bottom:74px!important;
+}
+
+/* 화면이 특히 좁은 기기는 좌우를 조금 더 안쪽으로 */
+@media(max-width:390px){
+  .tabbar,
+  body.is-standalone .tabbar{
+    left:14px!important;
+    right:14px!important;
+    bottom:7px!important;
+  }
+}
+
+/* 홈화면(PWA)에서 safe-area가 큰 기기도 과하게 위로 올라가지 않게 제한 */
+@supports (bottom: max(0px)){
+  body.is-standalone .tabbar{
+    bottom:max(7px, min(11px, env(safe-area-inset-bottom)))!important;
+  }
+}
+
+
+/* ==================== CROP PAGE FULL TOUCH FIX ==================== */
+/* 트리밍 화면 전체에 걸려 있던 touch-action:none 제거 */
+.crop-editor{
+  touch-action:auto!important;
+  pointer-events:auto!important;
+  overflow:hidden!important;
+}
+.crop-topbar,
+.crop-bottom{
+  position:relative!important;
+  z-index:30!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+.crop-topbar button,
+.crop-bottom button{
+  position:relative!important;
+  z-index:31!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+.crop-stage{
+  position:relative!important;
+  z-index:1!important;
+  pointer-events:auto!important;
+  touch-action:pan-x pan-y!important;
+}
+#cropCanvas{
+  pointer-events:none!important;
+  touch-action:auto!important;
+}
+.crop-handle-layer{
+  pointer-events:none!important;
+  z-index:20!important;
+}
+.crop-handle{
+  pointer-events:auto!important;
+  touch-action:none!important;
+  z-index:21!important;
+}
+.crop-help{z-index:10!important;pointer-events:none!important}
+
 </style>
 </head>
 <body>
@@ -1722,7 +1878,13 @@ body.is-standalone .tabs,
   </div>
   <div class="crop-stage" id="cropStage">
     <canvas id="cropCanvas"></canvas>
-    <div class="crop-help">점 4개를 작품 모서리에 맞춰주세요</div>
+    <div class="crop-handle-layer" id="cropHandleLayer" aria-hidden="true">
+      <button class="crop-handle" type="button" data-crop-index="0" aria-label="왼쪽 위 모서리">1</button>
+      <button class="crop-handle" type="button" data-crop-index="1" aria-label="오른쪽 위 모서리">2</button>
+      <button class="crop-handle" type="button" data-crop-index="2" aria-label="오른쪽 아래 모서리">3</button>
+      <button class="crop-handle" type="button" data-crop-index="3" aria-label="왼쪽 아래 모서리">4</button>
+    </div>
+    <div class="crop-help">빨간 점을 손가락으로 끌어 작품 모서리에 맞춰주세요</div>
   </div>
   <div class="crop-bottom">
     <div class="crop-tools">
@@ -2502,7 +2664,7 @@ function fitCropCanvas(){
   c.width=cropSourceCanvas.width;c.height=cropSourceCanvas.height;
   const availW=Math.max(1,stage.clientWidth-28),availH=Math.max(1,stage.clientHeight-28);
   const sc=Math.min(availW/c.width,availH/c.height,1);c.style.width=Math.max(1,Math.round(c.width*sc))+'px';c.style.height=Math.max(1,Math.round(c.height*sc))+'px';
-  drawCropEditor();
+  drawCropEditor();requestAnimationFrame(syncCropHandles);
 }
 function drawCropEditor(){
   const c=document.getElementById('cropCanvas');if(!c||!cropSourceCanvas)return;const ctx=c.getContext('2d');
@@ -2510,64 +2672,114 @@ function drawCropEditor(){
   if(cropPoints.length!==4)return;
   ctx.save();ctx.fillStyle='rgba(0,0,0,.48)';ctx.beginPath();ctx.rect(0,0,c.width,c.height);ctx.moveTo(cropPoints[0].x,cropPoints[0].y);for(let i=1;i<4;i++)ctx.lineTo(cropPoints[i].x,cropPoints[i].y);ctx.closePath();ctx.fill('evenodd');
   ctx.strokeStyle='#FFFFFF';ctx.lineWidth=Math.max(3,c.width/350);ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(cropPoints[0].x,cropPoints[0].y);for(let i=1;i<4;i++)ctx.lineTo(cropPoints[i].x,cropPoints[i].y);ctx.closePath();ctx.stroke();
-  cropPoints.forEach((p,i)=>{const r=Math.max(11,c.width/75);ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle='#FF4538';ctx.fill();ctx.lineWidth=Math.max(3,c.width/400);ctx.strokeStyle='#fff';ctx.stroke();ctx.fillStyle='#fff';ctx.font=`900 ${Math.max(11,c.width/85)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(i+1),p.x,p.y)});ctx.restore();
+  ctx.restore();
+  syncCropHandles();
 }
 function cropClientPos(clientX,clientY){
   const c=document.getElementById('cropCanvas'),r=c.getBoundingClientRect();
   if(!r.width||!r.height)return{x:0,y:0};
   return{x:(clientX-r.left)*c.width/r.width,y:(clientY-r.top)*c.height/r.height};
 }
-function cropPointerPos(e){return cropClientPos(e.clientX,e.clientY);}
-function beginCropDrag(clientX,clientY){
-  if(cropPoints.length!==4)return false;
-  const p=cropClientPos(clientX,clientY),c=document.getElementById('cropCanvas'),rect=c.getBoundingClientRect();
-  const radius=64*c.width/Math.max(rect.width,1);
-  let best=-1,dist=Infinity;
-  cropPoints.forEach((q,i)=>{const d=cropDist(p,q);if(d<dist){dist=d;best=i}});
-  if(best>=0&&dist<=radius){cropDragIndex=best;return true}
-  return false;
+function syncCropHandles(){
+  const c=document.getElementById('cropCanvas');
+  const stage=document.getElementById('cropStage');
+  const layer=document.getElementById('cropHandleLayer');
+  if(!c||!stage||!layer||cropPoints.length!==4)return;
+  const cr=c.getBoundingClientRect(),sr=stage.getBoundingClientRect();
+  if(!cr.width||!cr.height)return;
+  layer.querySelectorAll('.crop-handle').forEach((h,i)=>{
+    const p=cropPoints[i];if(!p)return;
+    const x=(cr.left-sr.left)+(p.x/c.width)*cr.width;
+    const y=(cr.top-sr.top)+(p.y/c.height)*cr.height;
+    h.style.left=x+'px';
+    h.style.top=y+'px';
+  });
 }
-function moveCropDrag(clientX,clientY){
-  if(cropDragIndex<0)return false;
+function setCropDragPoint(clientX,clientY){
+  if(cropDragIndex<0||cropPoints.length!==4)return;
   const c=document.getElementById('cropCanvas'),p=cropClientPos(clientX,clientY),pad=2;
-  cropPoints[cropDragIndex]={x:Math.max(pad,Math.min(c.width-pad,p.x)),y:Math.max(pad,Math.min(c.height-pad,p.y))};
-  drawCropEditor();return true;
+  cropPoints[cropDragIndex]={
+    x:Math.max(pad,Math.min(c.width-pad,p.x)),
+    y:Math.max(pad,Math.min(c.height-pad,p.y))
+  };
+  drawCropEditor();
 }
-function onCropPointerDown(e){
-  if(beginCropDrag(e.clientX,e.clientY)){try{e.currentTarget.setPointerCapture?.(e.pointerId)}catch(_){}e.preventDefault();e.stopPropagation();}
+function startCropHandleDrag(index,clientX,clientY,e){
+  cropDragIndex=Number(index);
+  const ed=document.getElementById('practiceCropEditor');
+  ed?.classList.add('crop-dragging');
+  setCropDragPoint(clientX,clientY);
+  if(e?.cancelable)e.preventDefault();
+  e?.stopPropagation?.();
 }
-function onCropPointerMove(e){
-  if(moveCropDrag(e.clientX,e.clientY)){e.preventDefault();e.stopPropagation();}
-}
-function onCropPointerUp(e){
+function stopCropHandleDrag(e){
+  if(cropDragIndex<0)return;
   cropDragIndex=-1;
-  try{e.currentTarget.releasePointerCapture?.(e.pointerId)}catch(_){}
+  document.getElementById('practiceCropEditor')?.classList.remove('crop-dragging');
+  if(e?.cancelable)e.preventDefault();
 }
-function onCropTouchStart(e){
-  const t=e.touches?.[0]||e.changedTouches?.[0];if(!t)return;
-  if(beginCropDrag(t.clientX,t.clientY)){e.preventDefault();e.stopPropagation();}
-}
-function onCropTouchMove(e){
-  const t=e.touches?.[0]||e.changedTouches?.[0];if(!t)return;
-  if(moveCropDrag(t.clientX,t.clientY)){e.preventDefault();e.stopPropagation();}
-}
-function onCropTouchEnd(e){cropDragIndex=-1;if(e.cancelable)e.preventDefault();}
 function bindCropTouch(){
-  const c=document.getElementById('cropCanvas');if(!c||c.dataset.cropTouchReady)return;
-  c.dataset.cropTouchReady='1';
-  c.addEventListener('pointerdown',onCropPointerDown,{passive:false});
-  c.addEventListener('pointermove',onCropPointerMove,{passive:false});
-  c.addEventListener('pointerup',onCropPointerUp,{passive:false});
-  c.addEventListener('pointercancel',onCropPointerUp,{passive:false});
-  c.addEventListener('touchstart',onCropTouchStart,{passive:false});
-  c.addEventListener('touchmove',onCropTouchMove,{passive:false});
-  c.addEventListener('touchend',onCropTouchEnd,{passive:false});
-  c.addEventListener('touchcancel',onCropTouchEnd,{passive:false});
+  const layer=document.getElementById('cropHandleLayer');
+  if(!layer||layer.dataset.cropTouchReady)return;
+  layer.dataset.cropTouchReady='1';
+
+  const handles=[...layer.querySelectorAll('.crop-handle')];
+
+  // 최신 iPhone/Android: Pointer Events만 사용해서 버튼 탭과 충돌하지 않게 함
+  if(window.PointerEvent){
+    handles.forEach(handle=>{
+      handle.addEventListener('pointerdown',e=>{
+        cropDragIndex=Number(handle.dataset.cropIndex);
+        document.getElementById('practiceCropEditor')?.classList.add('crop-dragging');
+        try{handle.setPointerCapture(e.pointerId)}catch(_){}
+        setCropDragPoint(e.clientX,e.clientY);
+        e.preventDefault();
+        e.stopPropagation();
+      },{passive:false});
+      handle.addEventListener('pointermove',e=>{
+        if(cropDragIndex!==Number(handle.dataset.cropIndex))return;
+        setCropDragPoint(e.clientX,e.clientY);
+        e.preventDefault();
+        e.stopPropagation();
+      },{passive:false});
+      const finish=e=>{
+        if(cropDragIndex===Number(handle.dataset.cropIndex))cropDragIndex=-1;
+        document.getElementById('practiceCropEditor')?.classList.remove('crop-dragging');
+        try{handle.releasePointerCapture(e.pointerId)}catch(_){}
+      };
+      handle.addEventListener('pointerup',finish,{passive:true});
+      handle.addEventListener('pointercancel',finish,{passive:true});
+    });
+    return;
+  }
+
+  // 구형 iOS fallback: 핸들 자체에서만 touch 이벤트 차단
+  handles.forEach(handle=>{
+    handle.addEventListener('touchstart',e=>{
+      const t=e.touches&&e.touches[0];if(!t)return;
+      cropDragIndex=Number(handle.dataset.cropIndex);
+      document.getElementById('practiceCropEditor')?.classList.add('crop-dragging');
+      setCropDragPoint(t.clientX,t.clientY);
+      e.preventDefault();e.stopPropagation();
+    },{passive:false});
+    handle.addEventListener('touchmove',e=>{
+      if(cropDragIndex!==Number(handle.dataset.cropIndex))return;
+      const t=e.touches&&e.touches[0];if(!t)return;
+      setCropDragPoint(t.clientX,t.clientY);
+      e.preventDefault();e.stopPropagation();
+    },{passive:false});
+    const finish=()=>{
+      cropDragIndex=-1;
+      document.getElementById('practiceCropEditor')?.classList.remove('crop-dragging');
+    };
+    handle.addEventListener('touchend',finish,{passive:true});
+    handle.addEventListener('touchcancel',finish,{passive:true});
+  });
 }
 async function detectCropQuad(){
   const cv=await ensureOpenCv();let src=null,small=null,gray=null,blur=null,edges=null,dil=null,contours=null,hier=null,kernel=null;
   try{
-    src=cv.imread(cropSourceCanvas);const max=1000,scale=Math.min(1,max/Math.max(src.cols,src.rows));
+    src=cv.imread(cropSourceCanvas);const max=560,scale=Math.min(1,max/Math.max(src.cols,src.rows));
     small=new cv.Mat();if(scale<1)cv.resize(src,small,new cv.Size(Math.round(src.cols*scale),Math.round(src.rows*scale)),0,0,cv.INTER_AREA);else src.copyTo(small);
     gray=new cv.Mat();cv.cvtColor(small,gray,cv.COLOR_RGBA2GRAY);blur=new cv.Mat();cv.GaussianBlur(gray,blur,new cv.Size(5,5),0);
     edges=new cv.Mat();cv.Canny(blur,edges,45,135);kernel=cv.Mat.ones(3,3,cv.CV_8U);dil=new cv.Mat();cv.dilate(edges,dil,kernel);
@@ -2592,12 +2804,35 @@ async function autoDetectPracticeCrop(){
 }
 function resetPracticeCropPoints(){cropPoints=defaultCropPoints();document.getElementById('cropStatus').textContent='전체 영역에서 시작합니다. 모서리를 작품에 맞춰주세요.';drawCropEditor();haptic('light')}
 async function openPracticeCropper(file,{keepOriginal=true}={}){
-  if(!file)return;const token=++cropOpenToken;if(keepOriginal)practiceOriginalFile=file;const ed=document.getElementById('practiceCropEditor');ed.classList.add('on');ed.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bindCropTouch();
-  document.getElementById('cropStatus').textContent='사진을 준비하고 있어요.';const btn=document.getElementById('cropApplyBtn'),top=document.querySelector('.crop-apply-top');btn.disabled=true;if(top)top.disabled=true;
-  try{cropSourceCanvas=await fileToCropCanvas(file);if(token!==cropOpenToken)return;cropPoints=defaultCropPoints();requestAnimationFrame(()=>fitCropCanvas());await autoDetectPracticeCrop();btn.disabled=false;if(top)top.disabled=false;}
-  catch(e){console.error(e);document.getElementById('cropStatus').textContent='사진을 불러오지 못했어요.';showToast('사진을 불러오지 못했어요','info')}
+  if(!file)return;
+  const token=++cropOpenToken;
+  if(keepOriginal)practiceOriginalFile=file;
+  const ed=document.getElementById('practiceCropEditor');
+  ed.classList.add('on');ed.setAttribute('aria-hidden','false');
+  bindCropTouch();
+  const status=document.getElementById('cropStatus');
+  const btn=document.getElementById('cropApplyBtn'),top=document.querySelector('.crop-apply-top');
+  if(status)status.textContent='사진을 준비하고 있어요.';
+  btn.disabled=true;if(top)top.disabled=true;
+  try{
+    cropSourceCanvas=await fileToCropCanvas(file);
+    if(token!==cropOpenToken)return;
+    cropPoints=defaultCropPoints();
+    fitCropCanvas();
+    btn.disabled=false;if(top)top.disabled=false;
+    if(status)status.textContent='모서리를 직접 조정하거나 자동 맞춤을 사용할 수 있어요.';
+    // 화면과 버튼을 먼저 터치 가능하게 만든 뒤 자동 감지를 실행
+    setTimeout(async()=>{
+      if(token!==cropOpenToken||!ed.classList.contains('on'))return;
+      try{await autoDetectPracticeCrop()}catch(e){console.warn(e)}
+    },180);
+  }catch(e){
+    console.error(e);
+    if(status)status.textContent='사진을 불러오지 못했어요.';
+    showToast('사진을 불러오지 못했어요','info');
+  }
 }
-function cancelPracticeCrop(){++cropOpenToken;document.getElementById('practiceCropEditor').classList.remove('on');document.getElementById('practiceCropEditor').setAttribute('aria-hidden','true');document.body.style.overflow='';cropDragIndex=-1;}
+function cancelPracticeCrop(){++cropOpenToken;document.getElementById('practiceCropEditor').classList.remove('on');document.getElementById('practiceCropEditor').setAttribute('aria-hidden','true');document.body.style.overflow='';cropDragIndex=-1;document.getElementById('practiceCropEditor')?.classList.remove('crop-dragging');}
 function reopenPracticeCropper(){if(practiceOriginalFile)openPracticeCropper(practiceOriginalFile,{keepOriginal:false});else showToast('원본 사진을 다시 선택해주세요','info')}
 
 async function cropWithOpenCv(){
