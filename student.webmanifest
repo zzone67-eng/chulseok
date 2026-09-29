@@ -1,0 +1,24 @@
+{
+  "name": "화강암+ 학생",
+  "short_name": "화강암+",
+  "start_url": "./student-view.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0B0B0B",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon-student-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-student-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

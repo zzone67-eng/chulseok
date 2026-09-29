@@ -1,0 +1,24 @@
+{
+  "name": "화강암+ 선생님",
+  "short_name": "화강암+ 쌤",
+  "start_url": "./teacher-view.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0B0B0B",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon-teacher-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-teacher-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
