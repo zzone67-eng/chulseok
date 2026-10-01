@@ -1207,7 +1207,7 @@ setTimeout(hideSplash,9000);
 
 
 // ── 자동 업데이트: 앱을 켜둔 채로 있어도 새 버전을 올리면 자동으로 새로고침 ──
-const APP_VERSION='20260929-230640';
+const APP_VERSION='20260930-220441';
 let updChecking=false,updLast=0;
 function updBusy(){return !!document.querySelector('.sheet.on,.cpage.on,.crop-editor.on,.pv.on')||(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName));}
 async function checkAppUpdate(){
@@ -1382,7 +1382,7 @@ async function init(){
     const u=JSON.parse(s);
     const [r,authUser]=await Promise.all([fetch(`${DB}/approved_users/${u.uid}.json`),waitForAuthReady()]);
     const d=await r.json();
-    if(d&&d.name===u.name&&authUser){me={...u,authUid:authUser.uid};localStorage.setItem('hwa_user',JSON.stringify(me));await enterApp();}
+    if(d&&d.name===u.name&&authUser){me={...u,cls:d.cls||u.cls,authUid:authUser.uid};if(d.cls&&d.cls!==u.cls)window.__clsChanged=d.cls;localStorage.setItem('hwa_user',JSON.stringify(me));await enterApp();}
     else if(d&&d.name===u.name&&!authUser){localStorage.removeItem('hwa_user');const msg=document.getElementById('loginMsg');msg.className='auth-msg err';msg.textContent='클라우드 기록 연결을 위해 한 번 다시 로그인해주세요.';showAuth('vLogin');}
     else{
       const r2=await fetch(`${DB}/pending_users/${u.uid}.json`);const p=await r2.json();
@@ -2281,7 +2281,12 @@ function closeSheet(id){document.getElementById(id).classList.remove('on');}
 function openProfileSheet(){document.getElementById('profileSheet').classList.add('on');haptic('light');}
 
 // ── 헬퍼 ──
-function myD(y,m){return sch[`${me.cls}_${me.name}_${m}`]||{};}
+function myD(y,m){
+  const exact=sch[`${me.cls}_${me.name}_${m}`];if(exact)return exact;
+  // 반이 바뀐 직후 등: 같은 이름의 시간표가 다른 반에 딱 하나만 있으면 그걸 사용
+  const hits=Object.keys(sch||{}).filter(k=>k.endsWith(`_${me.name}_${m}`));
+  return hits.length===1?(sch[hits[0]]||{}):{};
+}
 function ds(y,m,d){return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 function dayMap(y,m){
   const sd=myD(y,m),reg=sd.lessons||[],sp=sd.special||[],bd={};
@@ -2807,6 +2812,24 @@ enterApp=async function(){const r=_fxEnter();setTimeout(fxTabInd,30);await r;fxT
 // 공지 펼침 시 햅틱은 기존 함수 사용 · 탭 인디케이터 초기 위치
 window.addEventListener('load',()=>setTimeout(fxTabInd,50));
 setTimeout(fxTabInd,300);
+
+// ── 반 변경 동기화 (선생님이 반을 바꾸면 바로 반영) ──
+function applyClassChange(c,fromServer){
+  if(!me||!c||c===me.cls)return;
+  me.cls=c;try{localStorage.setItem('hwa_user',JSON.stringify(me));}catch(e){}
+  const hd=document.getElementById('hdrDate');if(hd)hd.textContent=me.cls;
+  const pc=document.getElementById('pfCls');if(pc)pc.textContent=me.cls;
+  try{renderWeekStrip();renderSchTab();renderNotices();renderDemoStrip();}catch(e){}
+  try{savePracticeStore(getPracticeStore()).catch(()=>{});}catch(e){}
+  showToast(`반이 ${c}(으)로 변경됐어요`,'ok');
+}
+let clsWatchOn=false;
+function watchClass(){
+  if(clsWatchOn||!me?.uid)return;clsWatchOn=true;
+  try{fbRtdb.ref('approved_users/'+me.uid+'/cls').on('value',s=>{const c=s.val();if(c&&c!==me.cls)applyClassChange(c);},()=>{});}catch(e){}
+}
+const _fxEnter2=enterApp;
+enterApp=async function(){await _fxEnter2();watchClass();if(window.__clsChanged){const c=window.__clsChanged;window.__clsChanged=null;setTimeout(()=>showToast(`반이 ${c}(으)로 변경됐어요`,'ok'),2400);}};
 
 </script>
 </body>
