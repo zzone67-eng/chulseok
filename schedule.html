@@ -1163,7 +1163,7 @@ function setMonthYear(m,y,btn){
   mon=m;
   document.querySelectorAll('.mth-btn').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
-  if(curStu)selectStu(curCls,curStu);
+  if(curStu)pick(curCls,curStu);
   else{renderCal();updateStats();}
 }
 function setMonth(m,el,ctx){
@@ -1519,17 +1519,24 @@ async function syncFB(){
   btn.textContent='동기화 중...';btn.className='sync-btn ing';
   try{
     const now2=new Date();
+    // 전달 / 이번달 / 다음달 모두 동기화
     const syncMonths=[];
-    for(let i=0;i<2;i++){const d=new Date(now2.getFullYear(),now2.getMonth()+i,1);syncMonths.push(d.getMonth()+1);}
+    const syncYears=[];
+    for(let i=-1;i<=1;i++){
+      const d=new Date(now2.getFullYear(),now2.getMonth()+i,1);
+      syncMonths.push(d.getMonth()+1);
+      syncYears.push(d.getFullYear());
+    }
 
-    for(const month of syncMonths){
+    for(let mi=0;mi<syncMonths.length;mi++){
+      const month=syncMonths[mi],syncY=syncYears[mi];
       Object.entries(STUDENTS).forEach(([cls,stus])=>{ stus.forEach(s=>getData(cls,s.name,month)); });
 
       // timetable 저장 (출석부 연동)
       const sch={};
-      const tot=getDays(month),fst=getFirst(month);
+      const tot=new Date(syncY,month,0).getDate(),fst=new Date(syncY,month-1,1).getDay();
       for(let day=1;day<=tot;day++){
-        const ds=YEAR+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+        const ds=syncY+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0');
         sch[ds]={'1타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]},'2타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]},'3타임':{'입시반':[],'예비반':[],'중등반':[],'취미반':[]}};
         Object.entries(STUDENTS).forEach(([cls,stus])=>{
           stus.forEach(s=>{
@@ -1541,7 +1548,7 @@ async function syncFB(){
           });
         });
       }
-      const monthKey='timetable/'+YEAR+'-'+String(month).padStart(2,'0');
+      const monthKey='timetable/'+syncY+'-'+String(month).padStart(2,'0');
       await fetch(DB+'/'+monthKey+'.json',{method:'PUT',body:JSON.stringify(sch),headers:{'Content-Type':'application/json'}});
     }
 
