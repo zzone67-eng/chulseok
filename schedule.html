@@ -400,7 +400,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 
 <script>
 const DB='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
-const YEAR=new Date().getFullYear();
+let YEAR=new Date().getFullYear();
 const BANK='부산은행 101-2092-8547-06 (예금주: 화강암플러스미술학원)';
 const CONT='학원: 051-553-3698\n원장: 010-7701-6594 (문자 문의 가능)';
 const FOOT='\n\n■ 납부 방법\n'+BANK+'\n카드결제 시 아이편으로 보내주시면 결제 도와드리겠습니다.\n\n■ 문의\n'+CONT+'\n감사합니다.';
@@ -411,16 +411,17 @@ function buildMonthButtons(){
   row.innerHTML='';
   const now=new Date();
   const months=[];
-  // 현재 달 + 다음 달
-  for(let i=0;i<2;i++){
+  // 전달 / 이번달 / 다음달
+  for(let i=-1;i<=1;i++){
     const d=new Date(now.getFullYear(),now.getMonth()+i,1);
     months.push({y:d.getFullYear(),m:d.getMonth()+1});
   }
-  months.forEach(({y,m},i)=>{
+  months.forEach(({y,m})=>{
     const btn=document.createElement('button');
     btn.className='mth-btn'+(mon===m&&YEAR===y?' on':'');
-    btn.textContent=m+'월';
-    btn.onclick=()=>setMonth(m,btn);
+    const label=m+'월'+(y!==now.getFullYear()?' ('+y+')':'');
+    btn.textContent=label;
+    btn.onclick=()=>setMonthYear(m,y,btn);
     row.appendChild(btn);
   });
 }
@@ -1157,6 +1158,14 @@ function pick(cls,name){
   renderCal();updateStats();loadNote();loadFixedFee();loadExtraFee();loadSpecials();renderDiscountBtns();updateFee();renderSB();}
 
 // ── 월 변경 ──
+function setMonthYear(m,y,btn){
+  YEAR=y;
+  mon=m;
+  document.querySelectorAll('.mth-btn').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  if(curStu)selectStu(curCls,curStu);
+  else{renderCal();updateStats();}
+}
 function setMonth(m,el,ctx){
   saveNote();mon=m;
   if(ctx==='mob') document.querySelectorAll('.mob-mth').forEach(b=>b.classList.remove('on'));
