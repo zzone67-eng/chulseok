@@ -299,6 +299,55 @@ const CONTACT = '학원: 051-553-3698\n원장: 010-7701-6594 (문자 문의 가�
 const FOOTER = `\n■ 납부 방법\n${BANK}\n카드결제 시 아이편으로 보내주시면 결제 도와드리겠습니다.\n\n■ 문의\n${CONTACT}\n감사합니다.`;
 
 // initData 제거 - Firebase students_list에서 동적 로드
+// 학생 기본 정보 (학교, 학년, 전화번호)
+const STUDENTS_INFO = {
+  "입시반": [
+    {name:"박민지",school:"검정고시",grade:"재수",phone:"010-7205-8450"},
+    {name:"김나현",school:"사대부고졸",grade:"재수",phone:"010-3771-7981"},
+    {name:"박선영",school:"검정고시",grade:"3수",phone:"010-2209-8850"},
+    {name:"김나연",school:"계성여고",grade:"고3",phone:"010-5848-1531"},
+    {name:"김동현",school:"내성고",grade:"고1",phone:"010-7205-8450"}
+  ],
+  "예비반": [
+    {name:"박하영",school:"사직고",grade:"고1",phone:"010-3771-7981"},
+    {name:"송채이",school:"",grade:"",phone:""}
+  ],
+  "중등반": [
+    {name:"안시연",school:"혜화여중",grade:"중3",phone:"010-2209-8850"},
+    {name:"한지유",school:"초연중",grade:"중3",phone:"010-5848-1531"},
+    {name:"조제우",school:"초읍중",grade:"중3",phone:"010-6626-8931"},
+    {name:"전서빈",school:"연일중",grade:"중3",phone:"010-4517-8515"},
+    {name:"권해원",school:"부산예중",grade:"중3",phone:"010-7887-7547"},
+    {name:"김현준",school:"부곡중",grade:"중3",phone:"010-6238-6980"},
+    {name:"최주연",school:"온천중",grade:"중3",phone:"010-4519-2704"}
+  ],
+  "취미반": [
+    {name:"나은솔",school:"사직여중",grade:"중2",phone:"010-7644-2874"},
+    {name:"김건휘",school:"여명중",grade:"중2",phone:"010-4241-6027"},
+    {name:"김예진",school:"사직여중",grade:"중1",phone:"010-3214-6306"},
+    {name:"최다윤",school:"만덕중",grade:"중2",phone:"010-3469-1228"},
+    {name:"최현우",school:"동인고",grade:"고1",phone:"010-8295-7408"},
+    {name:"김윤재",school:"여명중",grade:"중1",phone:"010-3201-3014"},
+    {name:"김가람",school:"사직여중",grade:"중1",phone:"010-5604-6864"},
+    {name:"이지아",school:"거제여중",grade:"중1",phone:"010-8753-1302"},
+    {name:"명지민",school:"사직여중",grade:"중1",phone:"010-3405-3398"},
+    {name:"조서연",school:"사직여중",grade:"중1",phone:"010-2784-3055"},
+    {name:"김소윤",school:"거제여중",grade:"중2",phone:"010-4492-0312"},
+    {name:"강민주",school:"사직중",grade:"중2",phone:"010-4694-4243"},
+    {name:"김예슬",school:"부산진여중",grade:"중1",phone:"010-8351-4107"}
+  ]
+};
+function getStuInfo(cls,name){
+  const list=STUDENTS_INFO[cls]||[];
+  return list.find(s=>s.name===name)||null;
+}
+async function saveStudentsInfoToFB(){
+  try{
+    await fetch(FB_URL+'/students_info.json',{method:'PUT',body:JSON.stringify(STUDENTS_INFO),headers:{'Content-Type':'application/json'}});
+    alert('학생 정보가 Firebase에 저장되었습니다.');
+  }catch(e){alert('저장 실패: '+e.message);}
+}
+
 const initData = {}; // 더 이상 사용 안함
 
 
@@ -434,17 +483,13 @@ async function syncFromFirebase(){
               const weeklyCount=sdata.use4wk&&sdata.reg4!=null
                 ?Math.round(sdata.reg4/4)
                 :(regT>0?Math.round(regT/4):1);
-              const isW2=weeklyCount>=2;
               const wRate=25000;
-              const baseAmt=isW2?200000:100000;
-              if(absT===0&&spT===0){
-                s.amount=baseAmt;s.days='주'+(isW2?2:1)+'회';
-              }else{
-                const netT=Math.max(0,effRegT2-absT);
-                s.amount=netT*wRate+spT*wRate;
-                s.days=absT>0?`실수업 ${effRegT2}T - 결석 ${absT}회 = ${netT}T`:`${effRegT2}T`;
-              }
-              s.totalT=Math.max(0,effRegT2-absT)+spT;
+              const base4wk=weeklyCount*4*wRate;
+              const fee=Math.max(0,base4wk - absT*wRate + spT*wRate);
+              s.amount=fee;
+              const netT=Math.max(0,weeklyCount*4-absT)+spT;
+              s.days=absT>0?`주${weeklyCount}회×4주 - 결석${absT}T + 특강${spT}T`:`주${weeklyCount}회×4주`;
+              s.totalT=netT;
             }else{
               // 일반: (정규+특강-결석) × 단가
               // use4wk 켜진 경우 reg4(4주환산 타임수) 우선 사용
@@ -674,7 +719,8 @@ function mobMakeCard(s,month){
     </div>
     ${tagsStr?`<div class="tags">${tagsStr}</div>`:''}
     <div class="detail" id="detail-${s.id}">
-      <div class="d-row"><span class="d-lbl">수업 요일</span><span class="d-val">${s.schedule.replace(/\n/g,'<br>')}</span></div>
+      \${(()=>{const si=getStuInfo(s.cls,s.name);return si&&(si.school||si.grade)?`<div class="d-row"><span class="d-lbl">학교/학년</span><span class="d-val">\${si.school||''} \${si.grade||''}</span></div><div class="d-row"><span class="d-lbl">전화번호</span><span class="d-val">\${si.phone||''}</span></div>`:'';})()} 
+      <div class="d-row"><span class="d-lbl">수업 요일</span><span class="d-val">\${s.schedule.replace(/\n/g,'<br>')}</span></div>
       ${s.days?`<div class="d-row"><span class="d-lbl">수업 일자/시수</span><span class="d-val">${s.days.replace(/\n/g,'<br>')}</span></div>`:''}
       ${s.absence>0?`<div class="d-row"><span class="d-lbl">결석 차감</span><span class="d-val" style="color:var(--red)">-${s.absence}T</span></div>`:''}
       <div class="d-row"><span class="d-lbl">수강료</span><span class="d-val" style="color:var(--blue);font-weight:700">${s.remain!==null?'해당없음 (잔여'+s.remain+'T)':fmt(s.amount)}</span></div>
@@ -837,7 +883,7 @@ function pcRenderDetail(){
       <div class="dcard">
         <div class="dcard-title">${s.name} · ${s.cls}</div>
         <div style="margin-bottom:10px">${(s.tags||[]).map(tagHtml).join('')}</div>
-        <div class="drow"><span class="dlbl">수업 요일</span><span class="dval">${s.schedule.replace(/\n/g,'<br>')}</span></div>
+        ${(()=>{const si=getStuInfo(s.cls,s.name);return si&&(si.school||si.grade||si.phone)?`<div class="drow"><span class="dlbl">학교/학년</span><span class="dval">${si.school||''} ${si.grade||''}</span></div><div class="drow"><span class="dlbl">전화번호</span><span class="dval">${si.phone||''}</span></div>`:'';})()} <div class="drow"><span class="dlbl">수업 요일</span><span class="dval">${s.schedule.replace(/\n/g,'<br>')}</span></div>
         ${s.days?`<div class="drow"><span class="dlbl">수업일자/시수</span><span class="dval">${s.days.replace(/\n/g,'<br>')}</span></div>`:''}
         ${s.absence>0?`<div class="drow"><span class="dlbl">결석 차감</span><span class="dval red">-${s.absence}T</span></div>`:''}
         ${s.totalT>0?`<div class="drow"><span class="dlbl">총 시수</span><span class="dval">${s.totalT}T</span></div>`:''}

@@ -400,6 +400,46 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Apple SD Go
 
 <script>
 const DB='https://hwa1-c1ad9-default-rtdb.firebaseio.com';
+
+// 학생 기본 정보
+const STUDENTS_INFO = {
+  "입시반": [
+    {name:"박민지",school:"검정고시",grade:"재수",phone:"010-7205-8450"},
+    {name:"김나현",school:"사대부고졸",grade:"재수",phone:"010-3771-7981"},
+    {name:"박선영",school:"검정고시",grade:"3수",phone:"010-2209-8850"},
+    {name:"김나연",school:"계성여고",grade:"고3",phone:"010-5848-1531"},
+    {name:"김동현",school:"내성고",grade:"고1",phone:"010-7205-8450"}
+  ],
+  "예비반": [
+    {name:"박하영",school:"사직고",grade:"고1",phone:"010-3771-7981"},
+    {name:"송채이",school:"",grade:"",phone:""}
+  ],
+  "중등반": [
+    {name:"안시연",school:"혜화여중",grade:"중3",phone:"010-2209-8850"},
+    {name:"한지유",school:"초연중",grade:"중3",phone:"010-5848-1531"},
+    {name:"조제우",school:"초읍중",grade:"중3",phone:"010-6626-8931"},
+    {name:"전서빈",school:"연일중",grade:"중3",phone:"010-4517-8515"},
+    {name:"권해원",school:"부산예중",grade:"중3",phone:"010-7887-7547"},
+    {name:"김현준",school:"부곡중",grade:"중3",phone:"010-6238-6980"},
+    {name:"최주연",school:"온천중",grade:"중3",phone:"010-4519-2704"}
+  ],
+  "취미반": [
+    {name:"나은솔",school:"사직여중",grade:"중2",phone:"010-7644-2874"},
+    {name:"김건휘",school:"여명중",grade:"중2",phone:"010-4241-6027"},
+    {name:"김예진",school:"사직여중",grade:"중1",phone:"010-3214-6306"},
+    {name:"최다윤",school:"만덕중",grade:"중2",phone:"010-3469-1228"},
+    {name:"최현우",school:"동인고",grade:"고1",phone:"010-8295-7408"},
+    {name:"김윤재",school:"여명중",grade:"중1",phone:"010-3201-3014"},
+    {name:"김가람",school:"사직여중",grade:"중1",phone:"010-5604-6864"},
+    {name:"이지아",school:"거제여중",grade:"중1",phone:"010-8753-1302"},
+    {name:"명지민",school:"사직여중",grade:"중1",phone:"010-3405-3398"},
+    {name:"조서연",school:"사직여중",grade:"중1",phone:"010-2784-3055"},
+    {name:"김소윤",school:"거제여중",grade:"중2",phone:"010-4492-0312"},
+    {name:"강민주",school:"사직중",grade:"중2",phone:"010-4694-4243"},
+    {name:"김예슬",school:"부산진여중",grade:"중1",phone:"010-8351-4107"}
+  ]
+};
+function getStuInfo(cls,name){const list=STUDENTS_INFO[cls]||[];return list.find(s=>s.name===name)||null;}
 let YEAR=new Date().getFullYear();
 const BANK='부산은행 101-2092-8547-06 (예금주: 화강암플러스미술학원)';
 const CONT='학원: 051-553-3698\n원장: 010-7701-6594 (문자 문의 가능)';
@@ -996,11 +1036,12 @@ function calcFeeRaw(){
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
-    // 실제 타임수 기반 주당 횟수 판단 (4주 기준)
     const weeklyT=getHobbyWeekly(use4wk,curCls,curStu,mon);
-    const isWeekly2=weeklyT>=2;
-    const wRate=25000;
-    fee=abs===0?(isWeekly2?200000:100000)+sp*wRate:Math.max(0,actualReg-abs)*wRate+sp*wRate;
+    const wRate=25000; // 취미반 단가
+    const base4wk=weeklyT*4*wRate; // 4주 기준 금액
+    fee=base4wk - abs*wRate + sp*wRate;
+    if(fee<0)fee=0;
+    reg=weeklyT*4; finalT=reg-abs+sp;
   }
   return {fee,rate,reg,sp,abs,finalT,actualReg};
 }
@@ -1152,6 +1193,9 @@ function pick(cls,name){
   // 헤더
   document.getElementById('hName').textContent=name;
   document.getElementById('hCls').textContent=cls;
+  const _si=getStuInfo(cls,name);
+  const _hSub=document.getElementById('hSub');
+  if(_hSub)_hSub.textContent=_si&&(_si.school||_si.grade)?_si.school+' '+_si.grade:'';
   document.getElementById('stuStats').style.display='flex';
   document.getElementById('actRow').style.display='flex';
   // 모바일: 달력 탭으로
@@ -1212,19 +1256,12 @@ function calcFee(){
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
-    // 실제 타임수로 주당 횟수 판단 (5주 달 기준)
     const wkT=getHobbyWeekly(use4wk,curCls,curStu,mon);
-    const isW2=wkT>=2;
-    const weekRate=25000;
-    const base=isW2?200000:100000;
-    if(abs===0){
-      fee=base+sp*weekRate;
-      reg=isW2?8:4; finalT=reg+sp;
-    } else {
-      const netT=Math.max(0,actualReg-abs);
-      fee=netT*weekRate+sp*weekRate;
-      reg=actualReg; finalT=netT+sp;
-    }
+    const wRate=25000; // 취미반 단가
+    const base4wk=wkT*4*wRate;
+    fee=base4wk - abs*wRate + sp*wRate;
+    if(fee<0)fee=0;
+    reg=wkT*4; finalT=reg-abs+sp;
   }
   // 1. 정규/특강 별도 할인율 적용
   const drReg=parseInt(localStorage.getItem('discount_reg_'+curCls+'_'+curStu+'_'+mon)||'0');
@@ -1235,8 +1272,8 @@ function calcFee(){
     fee=regFee+spFee;
     if(curCls==='취미반'&&s){
       const wkT2=getHobbyWeekly(use4wk,curCls,curStu,mon);
-      const wRate=25000; // 타임당 단가 고정
-      const baseFee=abs===0?(wkT2>=2?200000:100000):Math.max(0,actualReg-abs)*wRate;
+      const wRate=25000;
+      const baseFee=Math.max(0,wkT2*4*wRate - abs*wRate);
       fee=Math.round(baseFee*(1-drReg/100))+Math.round(sp*wRate*(1-drSp/100));
     }
   }
@@ -1323,21 +1360,15 @@ function genMsg(c){
   } else if(curCls==='취미반'){
     const _use4wk=document.getElementById('use4wk')?.checked;
     const _weeklyT=getHobbyWeekly(_use4wk,curCls,curStu,mon);
-    const _isW2=_weeklyT>=2;
-    const wRate=25000; // 타임당 단가 고정
-    const baseWRate=_isW2?200000:100000;
+    const wRate=25000;
+    const base4wk=_weeklyT*4*wRate;
+    const weekLabel=_weeklyT>=2?'주 '+_weeklyT+'회':'주 1회';
     let feeDetail='';
     if(!hasA&&!hasSp&&!hasDiscount){
-      // 결석/특강/할인 없음: 4주 고정
-      feeDetail=fmt(baseWRate);
+      feeDetail=weekLabel+' × 4주 = '+fmt(base4wk);
     } else {
-      // 상세 내역
-      const regNet=c.fixedFeeSet?c.fixedFee:c.fee;
-      if(hasA){
-        feeDetail='실제 수업: '+c.actualReg+'T\n전월 결석 차감: -'+c.abs+'회\n정규 합계: '+Math.max(0,c.actualReg-c.abs)+'T';
-      } else {
-        feeDetail='정규: 4주 기준 '+fmt(baseWRate);
-      }
+      feeDetail=weekLabel+' × 4주 기준: '+fmt(base4wk);
+      if(hasA) feeDetail+='\n전월 결석 차감: -'+c.abs+'T (-'+fmt(c.abs*wRate)+')';
       if(drReg>0) feeDetail+='\n정규 '+drReg+'% 할인 적용';
       if(hasSp) feeDetail+='\n특강: '+c.sp+'T × '+fmt(wRate);
       if(drSp>0) feeDetail+='\n특강 '+drSp+'% 할인 적용';
