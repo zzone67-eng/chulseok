@@ -1036,12 +1036,18 @@ function calcFeeRaw(){
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
-    const weeklyT=getHobbyWeekly(use4wk,curCls,curStu,mon);
     const wRate=25000; // 취미반 단가
-    const base4wk=weeklyT*4*wRate; // 4주 기준 금액
-    fee=base4wk - abs*wRate + sp*wRate;
-    if(fee<0)fee=0;
-    reg=weeklyT*4; finalT=reg-abs+sp;
+    if(use4wk){
+      const weeklyT=getHobbyWeekly(true,curCls,curStu,mon);
+      const base4wk=weeklyT*4*wRate;
+      fee=base4wk - abs*wRate + sp*wRate;
+      if(fee<0)fee=0;
+      reg=weeklyT*4; finalT=reg-abs+sp;
+    } else {
+      // 4주기준 OFF: 실타임 그대로
+      fee=Math.max(0,actualReg*wRate - abs*wRate + sp*wRate);
+      reg=actualReg; finalT=Math.max(0,actualReg-abs)+sp;
+    }
   }
   return {fee,rate,reg,sp,abs,finalT,actualReg};
 }
@@ -1256,12 +1262,17 @@ function calcFee(){
   let finalT=Math.max(0,reg+sp-abs);
   let fee=finalT*rate;
   if(curCls==='취미반'){
-    const wkT=getHobbyWeekly(use4wk,curCls,curStu,mon);
     const wRate=25000; // 취미반 단가
-    const base4wk=wkT*4*wRate;
-    fee=base4wk - abs*wRate + sp*wRate;
-    if(fee<0)fee=0;
-    reg=wkT*4; finalT=reg-abs+sp;
+    if(use4wk){
+      const wkT=getHobbyWeekly(true,curCls,curStu,mon);
+      const base4wk=wkT*4*wRate;
+      fee=base4wk - abs*wRate + sp*wRate;
+      if(fee<0)fee=0;
+      reg=wkT*4; finalT=reg-abs+sp;
+    } else {
+      fee=Math.max(0,actualReg*wRate - abs*wRate + sp*wRate);
+      reg=actualReg; finalT=Math.max(0,actualReg-abs)+sp;
+    }
   }
   // 1. 정규/특강 별도 할인율 적용
   const drReg=parseInt(localStorage.getItem('discount_reg_'+curCls+'_'+curStu+'_'+mon)||'0');
@@ -1271,10 +1282,15 @@ function calcFee(){
     const spFee=Math.round(sp*rate*(1-drSp/100));
     fee=regFee+spFee;
     if(curCls==='취미반'&&s){
-      const wkT2=getHobbyWeekly(use4wk,curCls,curStu,mon);
       const wRate=25000;
-      const baseFee=Math.max(0,wkT2*4*wRate - abs*wRate);
-      fee=Math.round(baseFee*(1-drReg/100))+Math.round(sp*wRate*(1-drSp/100));
+      if(use4wk){
+        const wkT2=getHobbyWeekly(true,curCls,curStu,mon);
+        const baseFee=Math.max(0,wkT2*4*wRate - abs*wRate);
+        fee=Math.round(baseFee*(1-drReg/100))+Math.round(sp*wRate*(1-drSp/100));
+      } else {
+        const baseFee=Math.max(0,actualReg*wRate - abs*wRate);
+        fee=Math.round(baseFee*(1-drReg/100))+Math.round(sp*wRate*(1-drSp/100));
+      }
     }
   }
   const discountRate=drReg||drSp;
@@ -1359,20 +1375,35 @@ function genMsg(c){
   // ── 취미반 ──
   } else if(curCls==='취미반'){
     const _use4wk=document.getElementById('use4wk')?.checked;
-    const _weeklyT=getHobbyWeekly(_use4wk,curCls,curStu,mon);
     const wRate=25000;
-    const base4wk=_weeklyT*4*wRate;
-    const weekLabel=_weeklyT>=2?'주 '+_weeklyT+'회':'주 1회';
     let feeDetail='';
-    if(!hasA&&!hasSp&&!hasDiscount){
-      feeDetail=weekLabel+' × 4주 = '+fmt(base4wk);
+    if(_use4wk){
+      const _weeklyT=getHobbyWeekly(true,curCls,curStu,mon);
+      const base4wk=_weeklyT*4*wRate;
+      const weekLabel=_weeklyT>=2?'주 '+_weeklyT+'회':'주 1회';
+      if(!hasA&&!hasSp&&!hasDiscount){
+        feeDetail=weekLabel+' × 4주 = '+fmt(base4wk);
+      } else {
+        feeDetail=weekLabel+' × 4주 기준: '+fmt(base4wk);
+        if(hasA) feeDetail+='\n전월 결석 차감: -'+c.abs+'T (-'+fmt(c.abs*wRate)+')';
+        if(drReg>0) feeDetail+='\n정규 '+drReg+'% 할인 적용';
+        if(hasSp) feeDetail+='\n특강: '+c.sp+'T × '+fmt(wRate);
+        if(drSp>0) feeDetail+='\n특강 '+drSp+'% 할인 적용';
+        feeDetail+='\n합계: '+fmt(c.fee);
+      }
     } else {
-      feeDetail=weekLabel+' × 4주 기준: '+fmt(base4wk);
-      if(hasA) feeDetail+='\n전월 결석 차감: -'+c.abs+'T (-'+fmt(c.abs*wRate)+')';
-      if(drReg>0) feeDetail+='\n정규 '+drReg+'% 할인 적용';
-      if(hasSp) feeDetail+='\n특강: '+c.sp+'T × '+fmt(wRate);
-      if(drSp>0) feeDetail+='\n특강 '+drSp+'% 할인 적용';
-      feeDetail+='\n합계: '+fmt(c.fee);
+      // 4주기준 OFF: 실타임 기반
+      const regT=c.actualReg;
+      if(!hasA&&!hasSp&&!hasDiscount){
+        feeDetail=regT+'T × '+fmt(wRate)+' = '+fmt(c.fee);
+      } else {
+        feeDetail='실수업: '+regT+'T';
+        if(hasA) feeDetail+='\n전월 결석 차감: -'+c.abs+'T (-'+fmt(c.abs*wRate)+')';
+        if(drReg>0) feeDetail+='\n정규 '+drReg+'% 할인 적용';
+        if(hasSp) feeDetail+='\n특강: '+c.sp+'T × '+fmt(wRate);
+        if(drSp>0) feeDetail+='\n특강 '+drSp+'% 할인 적용';
+        feeDetail+='\n합계: '+fmt(c.fee);
+      }
     }
     body='■ 수업 일정\n'+dd+'\n\n■ '+m+' 수강료\n'+feeDetail;
 
