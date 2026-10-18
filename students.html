@@ -719,7 +719,7 @@ function mobMakeCard(s,month){
     </div>
     ${tagsStr?`<div class="tags">${tagsStr}</div>`:''}
     <div class="detail" id="detail-${s.id}">
-      \${(()=>{const si=getStuInfo(s.cls,s.name);return si&&(si.school||si.grade)?`<div class="d-row"><span class="d-lbl">학교/학년</span><span class="d-val">\${si.school||''} \${si.grade||''}</span></div><div class="d-row"><span class="d-lbl">전화번호</span><span class="d-val">\${si.phone||''}</span></div>`:'';})()} 
+      \${(()=>{const si=getStuInfo(s.cls,s.name);if(!si||(!(si.school)&&!(si.grade)))return '';return '<div class="d-row"><span class="d-lbl">학교/학년</span><span class="d-val">'+(si.school||'')+' '+(si.grade||'')+'</span></div><div class="d-row"><span class="d-lbl">전화번호</span><span class="d-val">'+(si.phone||'')+'</span></div>';})()}
       <div class="d-row"><span class="d-lbl">수업 요일</span><span class="d-val">\${s.schedule.replace(/\n/g,'<br>')}</span></div>
       ${s.days?`<div class="d-row"><span class="d-lbl">수업 일자/시수</span><span class="d-val">${s.days.replace(/\n/g,'<br>')}</span></div>`:''}
       ${s.absence>0?`<div class="d-row"><span class="d-lbl">결석 차감</span><span class="d-val" style="color:var(--red)">-${s.absence}T</span></div>`:''}
