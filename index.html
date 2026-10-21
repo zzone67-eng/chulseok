@@ -303,32 +303,27 @@ async function loadTimetable() {
     const d=new Date(baseDate.getFullYear(),baseDate.getMonth()+i,1);
     months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
   }
-  let retries=3;
-  while(retries-->0){
-    try{
-      let data={};
-      for(const ym of months){
-        const mdata=await fbGet(`timetable/${ym}`);
-        if(mdata) Object.assign(data,mdata);
-      }
-      if(data && typeof data==='object'){
-        const fixed={};
-        Object.entries(data).forEach(([date,dayData])=>{
-          fixed[date]={};
-          ['1타임','2타임','3타임'].forEach(tim=>{
-            fixed[date][tim]={};
-            ['입시반','예비반','중등반','취미반'].forEach(cls=>{
-              fixed[date][tim][cls]=(dayData[tim]&&dayData[tim][cls])?dayData[tim][cls]:[];
-            });
+  try{
+    let data={};
+    for(const ym of months){
+      const mdata=await fbGet(`timetable/${ym}`);
+      if(mdata) Object.assign(data,mdata);
+    }
+    if(data && typeof data==='object'){
+      const fixed={};
+      Object.entries(data).forEach(([date,dayData])=>{
+        fixed[date]={};
+        ['1타임','2타임','3타임'].forEach(tim=>{
+          fixed[date][tim]={};
+          ['입시반','예비반','중등반','취미반'].forEach(cls=>{
+            fixed[date][tim][cls]=(dayData[tim]&&dayData[tim][cls])?dayData[tim][cls]:[];
           });
         });
-        S=fixed;
-      }
-      return; // 성공 시 종료
-    }catch(e){
-      console.warn(`[loadTimetable] 실패 (남은 재시도: ${retries}):`, e.message);
-      if(retries>0) await new Promise(r=>setTimeout(r,2000)); // 2초 후 재시도
+      });
+      S=fixed;
     }
+  }catch(e){
+    console.warn('[loadTimetable] 실패:', e.message);
   }
 }
 
@@ -378,7 +373,7 @@ function launch(){
   ['nextMonBtn','nextMonBtnMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>moveMonth(1);});
   const sd=document.getElementById('sch-date');if(sd)sd.textContent=SCHEDULE_UPDATED;
   if(pollTimer)clearInterval(pollTimer);
-  pollTimer=setInterval(()=>loadTimetable().then(()=>{buildNav();load(cur,false);}),30000);
+  pollTimer=setInterval(()=>loadTimetable().then(()=>{buildNav();load(cur,false);}),300000);
 }
 async function load(dk,show=true){
   if(show){const ct=isMob()?'mob-ct':'pc-ct';const el=document.getElementById(ct);if(el)el.innerHTML='<div class="closed-box">불러오는 중…</div>';}
